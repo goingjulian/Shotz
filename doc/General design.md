@@ -1,12 +1,12 @@
-#Shotz, a beautiful pubquiz game
+# Shotz, a beautiful pubquiz game
 
-##The design of Shotz is based on 5 principles:
+## The design of Shotz is based on 5 principles:
 1. Resusability. We want to reuse as much components as possible.
 2. Simplicity. Even intoxicated people should be able to use the app.
 3. Scalability. The backend should be scalable so the app remains usable with a growing amount of user.
 4. No registration. We don't care who our users are. This is why we don't require registration when using the app.
 
-##Shotz consists of 3 SPA's with each their own responsibilities:
+## Shotz consists of 3 SPA's with each their own responsibilities:
 
 | Team                          | Master                                                           | Scoreboard  |
 | :----------------------------:|:------------------------------------------------------------------:| :-----:|
