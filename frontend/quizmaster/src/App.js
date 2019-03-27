@@ -1,20 +1,19 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
+import React from 'react';
 import './App.scss';
+import * as ReactRedux from 'react-redux';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            This is quizmaster!
-          </p>
-        </header>
-      </div>
-    );
+function App(props) {
+  return (
+    <div className="App">
+      <props.activeView />
+    </div>
+  );
+}
+
+function mapStateToProps(state) {
+  return {
+    activeView: state.activeView
   }
 }
 
-export default App;
+export default ReactRedux.connect(mapStateToProps)(App);
