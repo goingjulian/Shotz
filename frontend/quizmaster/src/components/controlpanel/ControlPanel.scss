@@ -1,0 +1,44 @@
+@import "../../scss/variables";
+
+.ControlPanel {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+}
+
+.Scoreboard {
+  border-right: 1px solid $border-grey;
+}
+
+.QuestionQueue {
+  border-left: 1px solid $border-grey;
+}
+
+.Scoreboard,
+.QuestionQueue {
+  width: 275px;
+  height: 100%;
+  header {
+    padding: 10px 20px;
+    border-bottom: 1px solid $border-grey;
+    h1 {
+      font-size: 1.2em;
+      font-weight: 700;
+    }
+  }
+  .questionItem, .scoreboardItem {
+      padding: 20px;
+      border-bottom: 1px solid $border-grey;
+      .itemIndex {
+        margin-right: 10px;
+      }
+      span {
+          color: $text-color-dark;
+      }
+  }
+}
+
+.QuestionInfo {
+    flex: 1;
+}

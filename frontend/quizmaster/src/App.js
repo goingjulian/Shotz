@@ -1,11 +1,14 @@
 import React from 'react';
 import './App.scss';
 import * as ReactRedux from 'react-redux';
+import ControlPanel from './components/controlpanel/ControlPanel';
+
 
 function App(props) {
   return (
     <div className="App">
-      <props.activeView />
+      {/* <props.activeView /> */}
+      <ControlPanel></ControlPanel>
     </div>
   );
 }
