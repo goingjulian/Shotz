@@ -1,10 +1,10 @@
 
 export const viewActionTypes = {
-    createRoomAction: "createRoomAction"
+    LobbyView: "LobbyView"
 }
 
 export function createRoomAction() {
     return {
-        type: viewActionTypes.createRoomAction
+        type: viewActionTypes.LobbyView
     }
 }
