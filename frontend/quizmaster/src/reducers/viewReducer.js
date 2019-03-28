@@ -1,5 +1,5 @@
-import Login from '../components/Login'
-import Lobby from '../components/Lobby'
+import Login from '../components/Login.jsx'
+import Lobby from '../components/Lobby.jsx'
 
 import { viewActionTypes } from '../actions/viewActions'
 
