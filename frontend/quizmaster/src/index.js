@@ -5,9 +5,9 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import * as Redux from 'redux';
 import * as ReactRedux from 'react-redux';
-import  viewReducer  from './reducers/viewReducer';
+import  {mainReducer}  from './reducers/mainReducer';
 
-const store = Redux.createStore(viewReducer)
+const store = Redux.createStore(mainReducer)
 
 const RootComponent = (
     <ReactRedux.Provider store={store}>
