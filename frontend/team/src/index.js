@@ -1,12 +1,18 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.scss';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import React from "react";
+import ReactDOM from "react-dom";
+import * as Redux from "redux";
+import * as ReactRedux from "react-redux";
 
-ReactDOM.render(<App />, document.getElementById('root'));
+import "./assets/scss/style.scss";
+import mainReducer from "./reducers/mainReducer";
+import ShotzTeam from "./components/ShotzTeam";
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+const store = Redux.createStore(mainReducer);
+
+const RootComponent = (
+  <ReactRedux.Provider store={store}>
+    <ShotzTeam />
+  </ReactRedux.Provider>
+);
+
+ReactDOM.render(RootComponent, document.getElementById("root"));
