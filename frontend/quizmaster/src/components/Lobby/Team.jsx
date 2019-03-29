@@ -5,8 +5,8 @@ export default function Team(props) {
         <div className={props.team.accept ? "team accept" : "team"}>
             {props.team.name}
             <span className="buttons">
-                <button disabled={props.accept} onclick={() => props.accetTeamAction(props.team.id)}>V</button>
-                <button onClick={() => props.rejectTeamAction(props.team.id)}>X</button>
+                {!props.team.accept ? <button onClick={() => props.onAccept(props.team.id)}>V</button> : null}
+                <button onClick={() => props.onReject(props.team.id)}>X</button>
             </span>
         </div>
     )

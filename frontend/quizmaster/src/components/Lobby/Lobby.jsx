@@ -1,8 +1,8 @@
 import React from 'react';
 import * as ReactRedux from 'react-redux'
 
-import { loginViewAction } from '../../actions/viewActions'
-import { acceptTeamAction, rejectTeamAction } from '../../actions/teamActions'
+import { loginViewAction, categorySelectViewAction } from '../../actions/viewActions'
+import { acceptTeamAction, rejectTeamAction, clearRejectedTeamsAction } from '../../actions/lobbyActions'
 
 import './Lobby.scss'
 import Team from './Team.jsx'
@@ -12,10 +12,10 @@ function Lobby(props) {
         <div className="lobby">
             <h1>Waiting for teams</h1>
             <h2>Room key: <span className="highlight">1234</span></h2>
-            <h2><span className="highlight">0</span> teams joined</h2>
+            <h2><span className="highlight">{props.teamList.filter(team => team.accept).length}</span> teams joined</h2>
             <div className="teamsContainer">
                 {
-                    props.teams.map(team =>
+                    props.teamList.map(team =>
                         <Team
                             team={team}
                             key={team.name}
@@ -24,7 +24,12 @@ function Lobby(props) {
                     )
                 }
             </div>
-            <button>Start quiz</button>
+            <button
+                disabled={props.teamList.filter(team => team.accept === true).length < 2}
+                onClick={() => {
+                    props.clearRejectedTeamsAction();
+                    props.categorySelectViewAction();
+                }}>Start quiz</button>
             <button onClick={props.loginViewAction}>Back</button>
         </div>
     )
@@ -32,15 +37,17 @@ function Lobby(props) {
 
 function mapStateToProps(state) {
     return {
-        teams: state.teams
+        teamList: state.lobby.teamList
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         loginViewAction: () => dispatch(loginViewAction()),
-        acceptTeamAction: () => dispatch(acceptTeamAction()),
-        rejectTeamAction: () => dispatch(rejectTeamAction())
+        categorySelectViewAction: () => dispatch(categorySelectViewAction()),
+        acceptTeamAction: (id) => dispatch(acceptTeamAction(id)),
+        rejectTeamAction: (id) => dispatch(rejectTeamAction(id)),
+        clearRejectedTeamsAction: () => dispatch(clearRejectedTeamsAction())
     }
 }
 

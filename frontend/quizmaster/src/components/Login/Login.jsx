@@ -8,7 +8,7 @@ function Login(props) {
     return (
         <div className="login">
             <h1>Quizmaster</h1>
-            <h1>Start a new quiz</h1>
+            <h2>Start a new quiz</h2>
             <button onClick={props.lobbyViewAction}>Create room</button>
             <button>Participate in a game</button>
         </div>

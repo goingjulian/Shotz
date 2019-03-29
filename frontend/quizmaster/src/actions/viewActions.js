@@ -1,7 +1,8 @@
 
 export const viewActionTypes = {
     LobbyView: "LobbyView",
-    LoginView: "LoginView"
+    LoginView: "LoginView",
+    CategorySelectView: "CategorySelectView"
 }
 
 export function lobbyViewAction() {
@@ -13,5 +14,11 @@ export function lobbyViewAction() {
 export function loginViewAction() {
     return {
         type: viewActionTypes.LoginView
+    }
+}
+
+export function categorySelectViewAction() {
+    return {
+        type: viewActionTypes.CategorySelectView
     }
 }
