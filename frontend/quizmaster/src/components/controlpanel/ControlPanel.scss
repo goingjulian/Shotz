@@ -27,18 +27,43 @@
       font-weight: 700;
     }
   }
-  .questionItem, .scoreboardItem {
-      padding: 20px;
-      border-bottom: 1px solid $border-grey;
-      .itemIndex {
-        margin-right: 10px;
-      }
-      span {
-          color: $text-color-dark;
-      }
-  }
 }
 
 .QuestionInfo {
-    flex: 1;
+
+  padding: 40px;
+  flex: 1;
+  .infoActions {
+    padding: 20px;
+    h2 {
+      font-size: 1.2em;
+      font-weight: 700;
+    }
+  }
+  .infoQuestion {
+    padding: 20px;
+    h2 {
+      font-size: 1.4em;
+      font-weight: 700;
+      margin: 20px 0;
+      span {
+        font-weight: 400;
+      }
+    }
+  }
+  .infoAnswers {
+    padding: 20px;
+    h2 {
+      font-size: 1.4em;
+      font-weight: 700;
+    }
+    .infoAnswersList {
+      padding: 20px 0;
+      .AnswerItem {
+        max-width: 300px;
+        margin: 0 20px 20px 0;
+        border: 1px solid $border-grey;
+      }
+    }
+  }
 }

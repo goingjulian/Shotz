@@ -1,0 +1,62 @@
+@import "../../scss/variables";
+
+.Item {
+  padding: 20px;
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  overflow: hidden;
+
+  border-bottom: 1px solid $border-grey;
+  .itemIndex {
+    padding-right: 10px;
+  }
+  .itemTextHolder {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    .itemTeam {
+      margin: 5px 0;
+      display: block;
+      font-size: 0.8em;
+      font-weight: 700;
+    }
+  }
+  .itemButtonsHolder {
+    margin-left: auto;
+  }
+  .itemButtonHolder {
+    padding-left: 10px;
+  }
+  span {
+    line-height: 1em;
+    color: $text-color-dark;
+  }
+  button[class^="itemButton"] {
+    width: 2em;
+    height: 2em;
+    margin-left: auto;
+    border-radius: 100%;
+    background-color: transparent;
+    border: 1px solid $border-grey;
+    cursor: pointer;
+    svg {
+      width: 33%;
+      height: 33%;
+      fill: $text-color-dark;
+    }
+    &[class$="__close"]:hover {
+      background-color: $red;
+      border: none;
+      svg {
+        fill: $white;
+      }
+    }
+    &[class$="__accept"]:hover {
+      background-color: $green;
+      border: none;
+      svg {
+        fill: $white;
+      }    }
+  }
+}
