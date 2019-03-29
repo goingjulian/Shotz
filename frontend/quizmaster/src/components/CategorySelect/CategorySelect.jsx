@@ -1,5 +1,8 @@
 import React from 'react'
 import * as ReactRedux from 'react-redux'
+
+import { startRound } from '../../actions/roundsActions'
+import { controlPanelViewAction } from '../../actions/viewActions'
 import './CategorySelect.scss'
 
 class CategorySelect extends React.Component {
@@ -26,8 +29,11 @@ class CategorySelect extends React.Component {
                 or the <span className="key">cmd</span> key on mac to select multiple items</p>
 
                 {this.state.error ? this.state.error : null}
-                
-                <button disabled={!this.state.selectedCategories.length > 0 || this.state.error}>Start round</button>
+
+                <button
+                    disabled={!this.state.selectedCategories.length > 0 || this.state.error}
+                    onClick={() => this.props.startRound(this.state.selectedCategories)}>
+                    Start round</button>
             </div>
         )
     }
@@ -56,6 +62,7 @@ class CategorySelect extends React.Component {
 }
 
 function mapStateToProps(state) {
+    console.log(state)
     return {
         categories: state.questions.categories
     }
@@ -63,7 +70,10 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        setCategories: () => dispatch()
+        startRound: (selectedCategories) => {
+            dispatch(startRound(selectedCategories));
+            dispatch(controlPanelViewAction());
+        }
     }
 }
 
