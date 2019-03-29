@@ -27,3 +27,9 @@ html,
 ul, ol {
   list-style: none;
 }
+button {
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
