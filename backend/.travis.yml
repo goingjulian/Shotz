@@ -1,0 +1,19 @@
+language: node_js
+node_js: 
+  - "stable"
+
+cache:
+  directories:
+    - "node_modules"
+
+before_script:
+  - npm install
+
+script:
+  - npm build
+
+deploy:
+  provider: azure_web_apps
+  username: AZURE_WA_USERNAME
+  password: AZURE_WA_PASSWORD
+  site: AZURE_WA_SITENAME
