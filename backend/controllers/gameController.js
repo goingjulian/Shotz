@@ -2,10 +2,8 @@ import Game from '../models/game';
 
 //Todo:: introduce error handling for DB ops
 export async function handleRoomCreation(req) {
-    if (!sreq.ession.roomKey) {
-        console.log("Fetching keys")
+    if (!req.session.roomKey) {
         const roomKey = await _generateUniqueRoomKey()
-        console.log("Done fetching keys")
 
         await _addNewGameToDB(roomKey, req.session.id)
 
@@ -60,7 +58,12 @@ async function _generateUniqueRoomKey() {
     while (!isUnique) {
         roomKey = Math.floor(1000 + Math.random() * 9000)
 
-        let keyExists = await Game.findOne({ roomKey: roomKey })
+        let keyExists
+        try {
+            keyExists = await Game.findOne({ roomKey: roomKey })
+        } catch(err) {
+            console.log("ERROR", err)
+        }
 
         if (!keyExists) {
             isUnique = true;

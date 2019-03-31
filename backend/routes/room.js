@@ -13,7 +13,7 @@ router.post("/", async (req, res, next) => {
             roomKey: roomKey
         })
     } catch (err) {
-        console.error(err.message)
+        console.error(err)
         next(err.message)
     }
 
@@ -27,7 +27,7 @@ router.post("/:roomKey", async (req, res, next) => {
             roomKey: roomKey
         })
     } catch (err) {
-        console.error(err.message)
+        console.error(err)
         next(err.message)
     }
 })
