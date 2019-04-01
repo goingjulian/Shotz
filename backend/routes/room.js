@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router()
 
-import { handleRoomCreation, handleRoomJoin } from '../controllers/gameController'
+import { handleRoomCreation, handleRoomJoin } from '../service/gameService'
 
 router.post("/", async (req, res, next) => {
     try {
