@@ -29,6 +29,9 @@ const app = express()
 const APIPort = 3000
 const httpServer = http.createServer(app);
 
+let websocketServer
+let sessionParser
+
 const dbName = process.env.DB_NAME || "shotz"
 const dbAuth = process.env.DB_AUTH || "admin"
 const dbPort = process.env.DB_PORT || "27017"
@@ -43,6 +46,7 @@ mongoose.connection.on("connecting", () => {
 mongoose.connection.on("connected", () => {
     console.log(`SUCCESS: Database connected succesfully on ${dbUrl} with port ${dbPort}`)
     runAPIServer()
+    runWsServer()
 })
 
 mongoose.connection.on("error", (error) => {
@@ -62,13 +66,13 @@ connectToMongo();
 
 async function connectToMongo() {
     let connectionString
-    if(dbUser && dbPassword) {
+    if (dbUser && dbPassword) {
         connectionString = `mongodb://${dbUser}:${dbPassword}@${dbUrl}:${dbPort}/${dbName}?authSource=${dbAuth}`
     } else {
         connectionString = `mongodb://${dbUrl}:${dbPort}/${dbName}?authSource=${dbAuth}`
     }
 
-    await mongoose.connect(connectionString, { 
+    await mongoose.connect(connectionString, {
         useNewUrlParser: true,
         bufferMaxEntries: 0 //if no db connection, immediately give out an error
     })
@@ -77,16 +81,18 @@ async function connectToMongo() {
 function runAPIServer() {
     const MongoStore = connectMongo(session)
 
-    app.use(cors())
+    app.use(cors({ origin: true, credentials: true }));
 
     app.use(bodyParser.json())
 
-    app.use(session({
+    sessionParser = session({
         resave: true,
         saveUninitialized: false,
         secret: "secretkey",
         store: new MongoStore({ mongooseConnection: mongoose.connection })
-    }))
+    })
+
+    app.use(sessionParser)
 
     app.use("/room", room)
 
@@ -97,5 +103,37 @@ function runAPIServer() {
 
 function shutdownAPIServer() {
     console.log(`WARNING: API Server shutting down`)
-    httpServer.close( () => console.log(`WARNING: API server is offline`) )
+    httpServer.close(() => console.log(`WARNING: API server is offline`))
+}
+
+function runWsServer() {
+    websocketServer = new ws.Server({
+        server: httpServer,
+        path: "/ws",
+        verifyClient: checkConnectionAttempt
+    })
+
+    websocketServer.on("connection", (websocket, req) => {
+        console.log(`INFO: New websocket connection with IP: ${req.connection.remoteAddress} `)
+        
+        req.session.websocket = websocket
+        console.log("set session ws : ", req.session.websocket)
+
+        req.session.websocket.send("Hello world")
+
+        websocket.on("message", message => {
+            console.log("WS message received: ", message)
+        })
+
+        websocket.on("close", () => {
+            console.log("Websocket connection closed")
+        })
+    })
+}
+
+function checkConnectionAttempt(info, done) {
+    sessionParser(info.req, {}, () => {
+        console.log("Session is parsed")
+        done(info.req.session.roomKey !== undefined)
+    })
 }
