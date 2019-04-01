@@ -9,7 +9,7 @@ export async function handleRoomCreation(req) {
 
         return roomKey
     }
-
+ 
     return session.roomKey
 }
 
