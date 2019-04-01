@@ -21,6 +21,7 @@ import connectMongo from 'connect-mongo'
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 dotenv.config()
+import cors from 'cors'
 
 import room from './routes/room'
 
@@ -75,6 +76,8 @@ async function connectToMongo() {
 
 function runAPIServer() {
     const MongoStore = connectMongo(session)
+
+    app.use(cors())
 
     app.use(bodyParser.json())
 
