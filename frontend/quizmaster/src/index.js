@@ -5,9 +5,13 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import * as Redux from 'redux';
 import * as ReactRedux from 'react-redux';
+import thunkMiddleware from 'redux-thunk'
 import  {mainReducer}  from './reducers/mainReducer';
 
-const store = Redux.createStore(mainReducer)
+const store = Redux.createStore(
+    mainReducer,
+    composeEnhancers(Redux.applyMiddleware(thunkMiddleware))
+)
 
 const RootComponent = (
     <ReactRedux.Provider store={store}>

@@ -29,6 +29,7 @@ const APIPort = 3000
 const httpServer = http.createServer(app);
 
 const dbName = process.env.DB_NAME || "shotz"
+const dbAuth = process.env.DB_AUTH || "admin"
 const dbPort = process.env.DB_PORT || "27017"
 const dbUrl = process.env.DB_URL || "localhost"
 const dbUser = process.env.DB_USER || ''
@@ -61,9 +62,9 @@ connectToMongo();
 async function connectToMongo() {
     let connectionString
     if(dbUser && dbPassword) {
-        connectionString = `mongodb://${dbUser}:${dbPassword}@${dbUrl}:${dbPort}/${dbName}`
+        connectionString = `mongodb://${dbUser}:${dbPassword}@${dbUrl}:${dbPort}/${dbName}?authSource=${dbAuth}`
     } else {
-        connectionString = `mongodb://${dbUrl}:${dbPort}/${dbName}`
+        connectionString = `mongodb://${dbUrl}:${dbPort}/${dbName}?authSource=${dbAuth}`
     }
 
     await mongoose.connect(connectionString, { 
