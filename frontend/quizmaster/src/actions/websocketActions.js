@@ -7,6 +7,7 @@ export async function initSocket() {
         console.log("Opening socket")
         const socket = await new WebSocket(`ws://${environment.baseUrl}/ws`)
         socket.onmessage = messageReceived
+        socket.onopen = socketConnected
     }
 }
 
@@ -20,4 +21,9 @@ export function getSocket() {
 
 function messageReceived(message) {
     console.log("websocket message received ", message)
+}
+
+function socketConnected() {
+    console.log("socket connected")
+    this.send( "Hello server")
 }

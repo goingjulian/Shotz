@@ -28,7 +28,8 @@ export async function handleRoomJoin(req) {
 
     game.teams.push({
         name: req.body.name,
-        sessionId: req.session.id
+        sessionId: req.session.id,
+        accept: false
     })
 
     await game.save()

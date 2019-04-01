@@ -115,14 +115,15 @@ function runWsServer() {
 
     websocketServer.on("connection", (websocket, req) => {
         console.log(`INFO: New websocket connection with IP: ${req.connection.remoteAddress} `)
+
+        websocket.sessionId = req.session.id
         
         req.session.websocket = websocket
-        console.log("set session ws : ", req.session.websocket)
 
         req.session.websocket.send("Hello world")
 
         websocket.on("message", message => {
-            console.log("WS message received: ", message)
+            console.log("WS message received: ", message, " from ", websocket.sessionId)
         })
 
         websocket.on("close", () => {
