@@ -11,7 +11,7 @@ function Lobby(props) {
     return (
         <div className="lobby">
             <h1>Waiting for teams</h1>
-            <h2>Room key: <span className="highlight">1234</span></h2>
+            <h2>Room key: <span className="highlight">{props.roomKey}</span></h2>
             <h2><span className="highlight">{props.teamList.filter(team => team.accept).length}</span> teams joined</h2>
             <div className="teamsContainer">
                 {
@@ -37,7 +37,8 @@ function Lobby(props) {
 
 function mapStateToProps(state) {
     return {
-        teamList: state.lobby.teamList
+        teamList: state.lobby.teamList,
+        roomKey: state.room.roomKey
     }
 }
 

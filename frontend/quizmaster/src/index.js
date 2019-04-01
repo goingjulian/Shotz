@@ -10,7 +10,7 @@ import  {mainReducer}  from './reducers/mainReducer';
 
 const store = Redux.createStore(
     mainReducer,
-    composeEnhancers(Redux.applyMiddleware(thunkMiddleware))
+    Redux.applyMiddleware(thunkMiddleware)
 )
 
 const RootComponent = (
