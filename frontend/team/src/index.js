@@ -1,18 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import * as Redux from "redux";
-import * as ReactRedux from "react-redux";
+import { createStore, applyMiddleware } from "redux";
+import { Provider } from "react-redux";
+import thunk from "redux-thunk";
 
 import "./assets/scss/style.scss";
 import mainReducer from "./reducers/mainReducer";
 import ShotzTeam from "./components/ShotzTeam";
 
-const store = Redux.createStore(mainReducer);
+const store = createStore(mainReducer, applyMiddleware(thunk));
 
 const RootComponent = (
-  <ReactRedux.Provider store={store}>
+  <Provider store={store}>
     <ShotzTeam />
-  </ReactRedux.Provider>
+  </Provider>
 );
 
 ReactDOM.render(RootComponent, document.getElementById("root"));
