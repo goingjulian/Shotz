@@ -1,12 +1,15 @@
 import Game from '../models/Game';
-import GameDAO from './../DAO/GameDao';
-import ShotzException from './../errors/ShotzException';
+import GameDAO from '../DAO/GameDao';
+import ShotzException from '../exceptions/ShotzException';
 
 const gameDAO = new GameDAO();
 
+// Todo make gameserver class
+// Compact functions
+
 export async function createNewRoom(quizmasterId) {
     try {
-        const roomCode = await _generateUniqueRoomKey();
+        const roomCode = await _generateUniqueRoomCode();
         await gameDAO._addNewGame(roomCode, quizmasterId);
         return roomCode;
     }
@@ -19,9 +22,9 @@ export async function createNewRoom(quizmasterId) {
 export async function handleRoomJoin(req) {
     if (!req.body.name) throw new Error('Please provide a name');
 
-    const game = await Game.findOne({ roomKey: req.params.roomKey });
+    const game = await Game.findOne({ roomCode: req.params.roomCode });
 
-    if (!game) throw new Error('RoomKey is invalid');
+    if (!game) throw new Error('Room code is invalid');
 
     if (
         game.quizmaster === req.session.id ||
@@ -40,12 +43,12 @@ export async function handleRoomJoin(req) {
 
     await game.save();
 
-    return req.params.roomKey;
+    return req.params.roomCode;
 }
 
-async function _addNewGameToDB(roomKey, quizmasterSessionId) {
+async function _addNewGameToDB(roomCode, quizmasterSessionId) {
     const game = new Game({
-        roomKey: roomKey,
+        roomCode: roomCode,
         quizmaster: quizmasterSessionId,
         teams: []
     });
@@ -55,16 +58,16 @@ async function _addNewGameToDB(roomKey, quizmasterSessionId) {
     console.log('saved game');
 }
 
-async function _generateUniqueRoomKey() {
-    let roomKey = null;
+async function _generateUniqueRoomCode() {
+    let roomCode = null;
     let isUnique = false;
 
     while (!isUnique) {
-        roomKey = Math.floor(1000 + Math.random() * 9000);
+        roomCode = Math.floor(1000 + Math.random() * 9000);
 
         let keyExists;
         try {
-            keyExists = await Game.findOne({ roomKey: roomKey });
+            keyExists = await Game.findOne({ roomCode: roomCode });
         } catch (err) {
             console.log('ERROR', err);
         }
@@ -73,5 +76,5 @@ async function _generateUniqueRoomKey() {
             isUnique = true;
         }
     }
-    return roomKey;
+    return roomCode;
 }

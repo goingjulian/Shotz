@@ -23,7 +23,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 import cors from 'cors'
 
-import room from './routes/room'
+import room from './routes/roomRouter'
 
 const app = express()
 const APIPort = 3000

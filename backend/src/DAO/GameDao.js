@@ -4,7 +4,7 @@ export default class GameDAO {
 
     async  _addNewGame(roomCode, quizmasterId) {
         return Game.create({
-            roomKey: roomCode,
+            roomCode: roomCode,
             quizmaster: quizmasterId
         })
     }

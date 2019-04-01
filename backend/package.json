@@ -20,7 +20,7 @@
     "@babel/preset-env": "^7.4.2"
   },
   "scripts": {
-    "start": "nodemon --exec babel-node app.js",
+    "start": "nodemon --exec babel-node src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Julian Korf de Gidts & Wout Jansen",
