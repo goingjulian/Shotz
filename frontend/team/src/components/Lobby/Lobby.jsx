@@ -1,8 +1,35 @@
 import React from "react";
 import * as ReactRedux from "react-redux";
-import './Lobby.scss';
+import "./Lobby.scss";
+import { joinRoomAction } from "../../actions/viewActions";
 
 class Lobby extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      roomCode: "",
+      teamName: ""
+    };
+  }
+
+  handleInput(e) {
+    const target = e.target;
+    const value = target.value;
+    const name = target.name;
+    this.setState({
+      [name]: value
+    });
+  }
+
+  submitForm(e) {
+    e.preventDefault();
+    if (this.state.roomCode === "" || this.state.teamName === "") {
+      console.log("Vul alle velden in!");
+    } else {
+      this.props.joinRoom(this.state.roomCode, this.state.teamName);
+    }
+  }
+
   render() {
     return (
       <div className="Lobby">
@@ -12,14 +39,26 @@ class Lobby extends React.Component {
         <main>
           <div className="inputField">
             <label htmlFor="roomCode">Room code:</label>
-            <input name="roomCode" placeholder='Room code' />
+            <input
+              value={this.state.roomCode}
+              onChange={e => this.handleInput(e)}
+              id="roomCode"
+              name="roomCode"
+              placeholder="Room code"
+            />
           </div>
           <div className="inputField">
-            <label htmlFor="teanName">Team name:</label>
-            <input name="teanName" placeholder='Team name' />
+            <label htmlFor="teamName">Team name:</label>
+            <input
+              value={this.state.teamName}
+              onChange={e => this.handleInput(e)}
+              id="teamName"
+              name="teamName"
+              placeholder="Team name"
+            />
           </div>
-          <div className='inputField'>
-            <button>Join quizz</button>
+          <div className="inputField">
+            <button onClick={(e) => this.submitForm(e)}>Join quizz</button>
           </div>
         </main>
       </div>
@@ -32,7 +71,9 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {};
+  return {
+    joinRoom: (roomKey, teamName) => dispatch(joinRoomAction(roomKey, teamName))
+  };
 }
 
 export default ReactRedux.connect(mapStateToProps, mapDispatchToProps)(Lobby);
