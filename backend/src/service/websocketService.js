@@ -1,14 +1,14 @@
-import GameService from './gameService'
+import GameService from "./gameService";
 
 export default class WebsocketService {
     constructor(wsServer, sessionParser) {
-        this.wsServer = wsServer
-        this.sessionParser = sessionParser
-        this.wsServer.on("connection", (websocket, req) => this.onConnection(websocket, req))
+        this.wsServer = wsServer;
+        this.sessionParser = sessionParser;
+        this.wsServer.on("connection", (websocket, req) => this.onConnection(websocket, req));
     }
 
     onConnection(websocket, req) {
-        this.sessionParser(req, {}, async () => {
+      this.sessionParser(req, {}, async () => {
             console.log(`INFO: New websocket connection with IP: ${req.connection.remoteAddress} `)
             console.log("Session is parsed")
             websocket.sessionId = req.session.id
@@ -21,6 +21,23 @@ export default class WebsocketService {
                 req.session.websocket.send(JSON.stringify(stateResponse))
             }
         });
+    }
+
+    async sendMessageTeams(roomKey, message) {
+        const teams = await GameService.getTeams(roomKey);
+        this.wsServer.clients.array.forEach(client => {
+            if (teams.includes(client.sessionId)) this.sendMessage(client, message);
+        });
+    }
+
+    async sendMessageQuizmaster(roomKey, message) {
+        const quizmasterId = GameService.getQuizmaster(roomKey);
+        const quizmaster = this.wsServer.clients.findOne(client => client.sessionId === quizmasterId);
+        if (quizmaster) this.sendMessage(client, message);
+    }
+
+    async sendMessage(client, message) {
+        if (message) client.send(JSON.stringify(message));
     }
 }
 
