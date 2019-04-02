@@ -1,4 +1,4 @@
-export const teamActionTypes = {
+export const lobbyActionTypes = {
     addTeam: "addTeam",
     acceptTeam: "acceptTeam",
     rejectTeam: "rejectTeam",
@@ -7,7 +7,7 @@ export const teamActionTypes = {
 
 export function addTeam(teamId, name) {
     return {
-        type: teamActionTypes.addTeam,
+        type: lobbyActionTypes.addTeam,
         teamId: teamId,
         teamName: name
     }
@@ -15,20 +15,20 @@ export function addTeam(teamId, name) {
 
 export function acceptTeamAction(id) {
     return {
-        type: teamActionTypes.acceptTeam,
+        type: lobbyActionTypes.acceptTeam,
         id: id
     }
 }
 
 export function rejectTeamAction(id) {
     return {
-        type: teamActionTypes.rejectTeam,
+        type: lobbyActionTypes.rejectTeam,
         id: id
     }
 }
 
 export function clearRejectedTeamsAction() {
     return {
-        type: teamActionTypes.clearRejectedTeams
+        type: lobbyActionTypes.clearRejectedTeams
     }
 }
