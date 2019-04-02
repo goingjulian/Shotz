@@ -24,6 +24,7 @@ dotenv.config();
 import cors from 'cors';
 
 import room from './routes/roomRouter';
+import WebsocketService from './service/websocketService'
 
 const app = express();
 const APIPort = 3000;
@@ -107,34 +108,26 @@ function shutdownAPIServer() {
 }
 
 function runWsServer() {
-  websocketServer = new ws.Server({
-    server: httpServer,
-    path: '/ws',
-    verifyClient: checkConnectionAttempt
-  });
+    websocketServer = new ws.Server({
+        server: httpServer,
+        path: "/ws"
+    })
 
-  websocketServer.on('connection', (websocket, req) => {
-    console.log(`INFO: New websocket connection with IP: ${req.connection.remoteAddress} `);
+    new WebsocketService(websocketServer, sessionParser)
 
-    websocket.sessionId = req.session.id;
+    // websocketServer.on("connection", (websocket, req) => {
+        
 
-    req.session.websocket = websocket;
+    //     websocket.on("message", message => {
+    //         console.log("WS message received: ", message, " from ", websocket.sessionId)
+    //     })
 
-    req.session.websocket.send('Hello world');
+    // websocket.on('message', message => {
+    //   console.log('WS message received: ', message, ' from ', websocket.sessionId);
+    // });
 
-    websocket.on('message', message => {
-      console.log('WS message received: ', message, ' from ', websocket.sessionId);
-    });
-
-    websocket.on('close', () => {
-      console.log('Websocket connection closed');
-    });
-  });
-}
-
-function checkConnectionAttempt(info, done) {
-  sessionParser(info.req, {}, () => {
-    console.log('Session is parsed');
-    done(info.req.session.roomKey !== undefined);
-  });
+    // websocket.on('close', () => {
+    //   console.log('Websocket connection closed');
+    // });
+//   });
 }
