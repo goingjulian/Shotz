@@ -5,7 +5,7 @@ export const roomActionTypes = {
     createRoom: " createRoom"
 }
 
-function createRoomAction(roomKey) {
+export function createRoomAction(roomKey) {
     return {
         type: roomActionTypes.createRoom,
         roomKey: roomKey

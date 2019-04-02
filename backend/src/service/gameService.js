@@ -3,14 +3,11 @@ import GameDAO from '../DAO/GameDao';
 import ShotzException from '../exceptions/ShotzException';
 
 export default class GameService {
-    constructor() {
-        this.gameDAO = new GameDAO();
-    }
 
-    async createRoom(quizmasterId) {
+    static async createRoom(quizmasterId) {
         try {
             const roomKey = await this._generateUniqueRoomKey();
-            await this.gameDAO.addNewGame(roomKey, quizmasterId);
+            await GameDAO.addNewGame(roomKey, quizmasterId);
             return roomKey;
         } catch (err) {
             console.log(err);
@@ -18,8 +15,8 @@ export default class GameService {
         }
     }
 
-    async joinRoom(roomKey, sessionId) {
-        const game = await this.gameDAO.getGame(roomKey);
+    static async joinRoom(roomKey, sessionId) {
+        const game = await GameDAO.getGame(roomKey);
         if (!game) {
             throw new ShotzException(`There was no room found with room key ${roomKey}`, 404);
         } else if (game.gameState !== 'Registration') {
@@ -27,30 +24,35 @@ export default class GameService {
         } else if (game.quizmaster === sessionId || game.teams.find(team => team.sessionId === sessionId)) {
             throw new ShotzException('You have already joined this quiz!', 403);
         } else {
-            await this.gameDAO.joinGameAsTeam(roomKey, sessionId);
+            await GameDAO.joinGameAsTeam(roomKey, sessionId);
             return `You joined room ${roomKey}`;
         }
     }
 
-    async restoreSession(roomKey, sessionId) {
-        const game = await this.gameDAO.getGame(roomKey);
-        if (game.quizmaster === sessionId) {
-            return {
-                role: 'Quizmaster',
-                roomKey: roomKey,
-                gameState: game.gameState,
-                teams: game.teams
-            };
-        } else if (game.teams.find(team => team.sessionId === sessionId)) {
-            return {
-                role: 'Player',
-                roomKey: roomKey,
-                gameState: game.gameState
-            };
+    static async restoreSession(roomKey, sessionId) {
+        const game = await GameDAO.getGame(roomKey).lean(); //Makes it a JS obj
+
+        if (game) {
+            if (game.quizmaster === sessionId) {
+                return {
+                    type: 'gameState',
+                    role: 'Quizmaster',
+                    roomKey: roomKey,
+                    gameState: game.gameState,
+                    teams: game.teams
+                };
+            } else if (game.teams.find(team => team.sessionId === sessionId)) {
+                return {
+                    type: 'gameState',
+                    role: 'Player',
+                    roomKey: roomKey,
+                    gameState: game.gameState
+                };
+            }
         }
     }
 
-    async _generateUniqueRoomKey() {
+    static async _generateUniqueRoomKey() {
         let roomKey = null;
         let isUnique = false;
 

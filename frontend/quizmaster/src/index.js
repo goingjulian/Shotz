@@ -7,13 +7,15 @@ import * as Redux from 'redux';
 import * as ReactRedux from 'react-redux';
 import thunkMiddleware from 'redux-thunk'
 import { mainReducer } from './reducers/mainReducer';
-import environment from './environments/environment'
-import { addTeam } from './actions/lobbyActions'
+import { initSocket } from './helpers/websocketHelper'
+
 
 const store = Redux.createStore(
     mainReducer,
     Redux.applyMiddleware(thunkMiddleware)
 )
+
+store.dispatch(initSocket());
 
 const RootComponent = (
     <ReactRedux.Provider store={store}>
@@ -27,30 +29,3 @@ ReactDOM.render(RootComponent, document.getElementById('root'));
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();
-
-store.dispatch(initSocket());
-
-function initSocket() {
-    return async dispatch => {
-        const socket = await new WebSocket(`ws://${environment.baseUrl}/ws`)
-
-        socket.onopen = () => console.log("socket connected")
-
-        socket.onmessage = (eventInfo) => {
-            const parsedMessage = JSON.parse(eventInfo.data)
-
-            console.log("websocket message received ", parsedMessage)
-
-            if (parsedMessage.type) {
-                switch (parsedMessage.type) {
-                    case "addTeam":
-                        console.log("Adding a team")
-                        dispatch(addTeam(parsedMessage.id, parsedMessage.name))
-                        break
-                    default:
-                        console.log("Unknown message");
-                }
-            }  
-        }
-    }
-}

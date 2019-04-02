@@ -1,5 +1,6 @@
 export const lobbyActionTypes = {
     addTeam: "addTeam",
+    addMultipleTeams: "addMultipleTeams",
     acceptTeam: "acceptTeam",
     rejectTeam: "rejectTeam",
     clearRejectedTeams: "clearRejectedTeams"
@@ -10,6 +11,13 @@ export function addTeam(teamId, name) {
         type: lobbyActionTypes.addTeam,
         teamId: teamId,
         teamName: name
+    }
+}
+
+export function addMultipleTeams(teamList) {
+    return {
+        type: lobbyActionTypes.addMultipleTeams,
+        teamList: teamList
     }
 }
 
