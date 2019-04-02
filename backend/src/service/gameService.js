@@ -70,4 +70,12 @@ export default class GameService {
         }
         return roomKey;
     }
+
+    static getTeams(roomKey) {
+        return GmeDAO.getGame(roomKey).teams;
+    }
+
+    static getQuizmaster(roomKey) {
+        return GameDAO.getGame(roomKey).quizmaster;
+    }
 }

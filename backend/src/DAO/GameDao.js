@@ -9,7 +9,7 @@ export default class GameDAO {
         });
     }
 
-    getGame(roomKey) {
+    static getGame(roomKey) {
         return Game.findOne({ roomKey: roomKey });
     }
 
