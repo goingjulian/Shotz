@@ -24,6 +24,7 @@ dotenv.config();
 import cors from 'cors';
 
 import room from './routes/roomRouter';
+import WebsocketService from './service/websocketService'
 
 const app = express();
 const APIPort = 3000;
@@ -112,37 +113,21 @@ function runWsServer() {
         path: "/ws"
     })
 
-    websocketServer.on("connection", async (websocket, req) => {
-        sessionParser(req, {}, () => {
-            console.log("Session is parsed")
-            websocket.sessionId = req.session.id
+    new WebsocketService(websocketServer, sessionParser)
 
-            req.session.websocket = websocket
-
-            req.session.websocket.send(JSON.stringify({
-                type: "addTeam",
-                id: "0",
-                name: "Team Cool"
-            }))
-        })
+    // websocketServer.on("connection", (websocket, req) => {
         
-        //anroep
-        console.log(`INFO: New websocket connection with IP: ${req.connection.remoteAddress} `)
 
+    //     websocket.on("message", message => {
+    //         console.log("WS message received: ", message, " from ", websocket.sessionId)
+    //     })
 
+    // websocket.on('message', message => {
+    //   console.log('WS message received: ', message, ' from ', websocket.sessionId);
+    // });
 
-
-
-        websocket.on("message", message => {
-            console.log("WS message received: ", message, " from ", websocket.sessionId)
-        })
-
-    websocket.on('message', message => {
-      console.log('WS message received: ', message, ' from ', websocket.sessionId);
-    });
-
-    websocket.on('close', () => {
-      console.log('Websocket connection closed');
-    });
-  });
+    // websocket.on('close', () => {
+    //   console.log('Websocket connection closed');
+    // });
+//   });
 }
