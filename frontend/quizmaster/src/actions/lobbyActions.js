@@ -1,7 +1,16 @@
 export const teamActionTypes = {
+    addTeam: "addTeam",
     acceptTeam: "acceptTeam",
     rejectTeam: "rejectTeam",
     clearRejectedTeams: "clearRejectedTeams"
+}
+
+export function addTeam(teamId, name) {
+    return {
+        type: teamActionTypes.addTeam,
+        teamId: teamId,
+        teamName: name
+    }
 }
 
 export function acceptTeamAction(id) {

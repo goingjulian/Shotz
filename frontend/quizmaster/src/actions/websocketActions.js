@@ -1,4 +1,5 @@
 import environment from '../environments/environment'
+import { addTeam } from '../actions/lobbyActions'
 
 let socket
 
@@ -21,9 +22,19 @@ export function getSocket() {
 
 function messageReceived(message) {
     console.log("websocket message received ", message)
+    console.log(typeof message)
+    if (message.type) {
+        switch (message.type) {
+            case "test":
+                addTeam(message.id, message.name)
+                break
+        }
+    }
+
+    
 }
 
 function socketConnected() {
     console.log("socket connected")
-    this.send( "Hello server")
+    this.send("Hello server")
 }
