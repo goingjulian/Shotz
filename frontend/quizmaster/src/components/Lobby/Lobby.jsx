@@ -30,7 +30,7 @@ function Lobby(props) {
                     props.clearRejectedTeamsAction();
                     props.categorySelectViewAction();
                 }}>Start quiz</button>
-            <button onClick={props.loginViewAction}>Back</button>
+            <button onClick={props.loginViewAction}>This should be close</button>
         </div>
     )
 }

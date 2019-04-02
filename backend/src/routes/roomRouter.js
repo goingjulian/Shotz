@@ -1,6 +1,6 @@
 import express from 'express';
 import GameService from '../service/gameService';
-import WebsocketService from '../service/websocketService'
+import { sendMessageQuizmaster } from '../service/websocketService'
 const router = express.Router();
 
 router.route('/').post((req, res, next) => {
@@ -18,8 +18,23 @@ router.route('/').post((req, res, next) => {
 router.route('/:roomKey').post((req, res, next) => {
     const roomKey = req.params.roomKey;
     const sessionId = req.session.id;
-    GameService.joinRoom(roomKey, sessionId)
+    const teamName = req.body.name
+
+    GameService.joinRoom(roomKey, teamName, sessionId)
         .then(message => {
+            console.log("keys: ", roomKey, teamName)
+
+
+
+
+            sendMessageQuizmaster(roomKey, {
+                type: 'addTeam',
+                roomKey: roomKey,
+                name: teamName
+            })
+
+
+
             req.session.roomKey = roomKey;
             res.status(200).json({ message: message });
         })

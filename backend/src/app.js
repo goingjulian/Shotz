@@ -24,13 +24,12 @@ dotenv.config();
 import cors from 'cors';
 
 import room from './routes/roomRouter';
-import WebsocketService from './service/websocketService'
+import { initWSServer } from './service/websocketService'
 
 const app = express();
 const APIPort = 3000;
 const httpServer = http.createServer(app);
 
-let websocketServer;
 let sessionParser;
 
 const dbName = process.env.DB_NAME || 'shotz';
@@ -47,7 +46,7 @@ mongoose.connection.on('connecting', () => {
 mongoose.connection.on('connected', () => {
   console.log(`SUCCESS: Database connected succesfully on ${dbUrl} with port ${dbPort}`);
   runAPIServer();
-  runWsServer();
+  initWSServer(sessionParser, httpServer);
 });
 
 mongoose.connection.on('error', error => {
@@ -107,27 +106,27 @@ function shutdownAPIServer() {
   httpServer.close(() => console.log(`WARNING: API server is offline`));
 }
 
-function runWsServer() {
-    websocketServer = new ws.Server({
-        server: httpServer,
-        path: "/ws"
-    })
+// function runWsServer() {
+//     websocketServer = new ws.Server({
+//         server: httpServer,
+//         path: "/ws"
+//     })
 
-    new WebsocketService(websocketServer, sessionParser)
+//     new WebsocketService(websocketServer, sessionParser)
 
-    // websocketServer.on("connection", (websocket, req) => {
+//     // websocketServer.on("connection", (websocket, req) => {
         
 
-    //     websocket.on("message", message => {
-    //         console.log("WS message received: ", message, " from ", websocket.sessionId)
-    //     })
+//     //     websocket.on("message", message => {
+//     //         console.log("WS message received: ", message, " from ", websocket.sessionId)
+//     //     })
 
-    // websocket.on('message', message => {
-    //   console.log('WS message received: ', message, ' from ', websocket.sessionId);
-    // });
+//     // websocket.on('message', message => {
+//     //   console.log('WS message received: ', message, ' from ', websocket.sessionId);
+//     // });
 
-    // websocket.on('close', () => {
-    //   console.log('Websocket connection closed');
-    // });
-//   });
-}
+//     // websocket.on('close', () => {
+//     //   console.log('Websocket connection closed');
+//     // });
+// //   });
+// }

@@ -13,7 +13,7 @@ export default class GameDAO {
         return Game.findOne({ roomKey: roomKey });
     }
 
-    static joinGameAsTeam(roomKey, sessionId, teamName) {
+    static joinGameAsTeam(roomKey, teamName, sessionId) {
         return Game.updateOne(
             { roomKey: roomKey },
             {
