@@ -15,7 +15,7 @@ export default class GameService {
         }
     }
 
-    static async joinRoom(roomKey, sessionId) {
+    static async joinRoom(roomKey, teamName, sessionId) {
         const game = await GameDAO.getGame(roomKey);
         if (!game) {
             throw new ShotzException(`There was no room found with room key ${roomKey}`, 404);
@@ -24,7 +24,7 @@ export default class GameService {
         } else if (game.quizmaster === sessionId || game.teams.find(team => team.sessionId === sessionId)) {
             throw new ShotzException('You have already joined this quiz!', 403);
         } else {
-            await GameDAO.joinGameAsTeam(roomKey, sessionId);
+            await GameDAO.joinGameAsTeam(roomKey, teamName, sessionId);
             return `You joined room ${roomKey}`;
         }
     }
@@ -77,7 +77,8 @@ export default class GameService {
         return GmeDAO.getGame(roomKey).teams;
     }
 
-    static getQuizmaster(roomKey) {
-        return GameDAO.getGame(roomKey).quizmaster;
+    static async getQuizmaster(roomKey) {
+        const game =  await GameDAO.getGame(roomKey);
+        return game.quizmaster;
     }
 }
