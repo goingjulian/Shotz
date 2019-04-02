@@ -1,3 +1,5 @@
+import GameService from './gameService'
+
 export default class WebsocketService {
     constructor(wsServer, sessionParser) {
         this.wsServer = wsServer
@@ -6,19 +8,19 @@ export default class WebsocketService {
     }
 
     onConnection(websocket, req) {
-        this.sessionParser(req, {}, () => {
+        this.sessionParser(req, {}, async () => {
             console.log(`INFO: New websocket connection with IP: ${req.connection.remoteAddress} `)
             console.log("Session is parsed")
             websocket.sessionId = req.session.id
 
             req.session.websocket = websocket
 
-            req.session.websocket.send(JSON.stringify({
-                type: "addTeam",
-                id: "0",
-                name: "Team Cool"
-            }))
-        })        
+            const stateResponse = await GameService.restoreSession(req.session.roomKey, req.session.id)
+
+            if(stateResponse) {
+                req.session.websocket.send(JSON.stringify(stateResponse))
+            }
+        });
     }
 }
 

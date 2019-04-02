@@ -33,6 +33,9 @@ export default function lobbyReducer(state = initialLobbyState, action) {
                 accept: false
             })
             return { ...state, teamList: teamListCopy }
+        case lobbyActionTypes.addMultipleTeams:
+            console.log("adding multiple teams")
+            return { ...state, teamList: action.teamList }
         case lobbyActionTypes.acceptTeam:
             const teamIndexAccept = state.teamList.findIndex(team => team.id === action.id);
             teamsCopy[teamIndexAccept].accept = true;

@@ -2,18 +2,18 @@ import Game from '../models/Game';
 import { session } from 'express-session';
 
 export default class GameDAO {
-    addNewGame(roomKey, quizmasterId) {
+    static addNewGame(roomKey, quizmasterId) {
         return Game.create({
             roomKey: roomKey,
             quizmaster: quizmasterId
         });
     }
 
-    getGame(roomKey) {
+    static getGame(roomKey) {
         return Game.findOne({ roomKey: roomKey });
     }
 
-    joinGameAsTeam(roomKey, sessionId, teamName) {
+    static joinGameAsTeam(roomKey, sessionId, teamName) {
         return Game.updateOne(
             { roomKey: roomKey },
             {
