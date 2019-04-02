@@ -1,11 +1,30 @@
-import Game from "../models/Game";
+import Game from '../models/Game';
+import { session } from 'express-session';
 
 export default class GameDAO {
-
-    async  _addNewGame(roomCode, quizmasterId) {
+    addNewGame(roomKey, quizmasterId) {
         return Game.create({
-            roomCode: roomCode,
+            roomKey: roomKey,
             quizmaster: quizmasterId
-        })
+        });
+    }
+
+    getGame(roomKey) {
+        return Game.findOne({ roomKey: roomKey });
+    }
+
+    joinGameAsTeam(roomKey, sessionId, teamName) {
+        return Game.updateOne(
+            { roomKey: roomKey },
+            {
+                $push: {
+                    teams: {
+                        name: teamName,
+                        sessionId: sessionId,
+                        accepted: false
+                    }
+                }
+            }
+        );
     }
 }

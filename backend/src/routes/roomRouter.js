@@ -1,27 +1,32 @@
 import express from 'express';
+import GameService from '../service/gameService';
 const router = express.Router();
 
-import { createNewRoom, handleRoomJoin } from '../service/gameService';
+const gameService = new GameService();
 
 router.route('/').post((req, res, next) => {
     const quizmasterId = req.session.id;
-    createNewRoom(quizmasterId)
-        .then(roomCode => {
-            req.session.roomCode = roomCode;
-            res.send(201).json({ roomCode: roomCode });
+    gameService.createRoom(quizmasterId)
+        .then(roomKey => {
+            req.session.roomKey = roomKey;
+            res.status(201).json({ roomKey: roomKey });
         })
         .catch(err => {
             next(err.message);
         });
 });
 
-router.post('/:roomCode', async (req, res, next) => {
-    try {
-        const roomCode = await handleRoomJoin(req);
-        res.json({ roomCode: roomCode });
-    } catch (err) {
-        next(err.message);
-    }
+router.route('/:roomKey').post((req, res, next) => {
+    const roomKey = req.params.roomKey;
+    const sessionId = req.session.id;
+    gameService.joinRoom(roomKey, sessionId)
+        .then(message => {
+            req.session.roomKey = roomKey;
+            res.status(200).json({ message: message });
+        })
+        .catch(err => {
+            next(err.message);
+        });
 });
 
 router.use((err, req, res, next) => {
