@@ -1,5 +1,4 @@
 import environment from '../environments/environment'
-import { initSocket } from './websocketActions'
 import { lobbyViewAction } from './viewActions'
 
 export const roomActionTypes = {
@@ -30,7 +29,6 @@ export function createRoom() {
 
             dispatch(createRoomAction(roomKey))
             dispatch(lobbyViewAction())
-            initSocket()
         } catch (error) {
             console.log(error)
         }

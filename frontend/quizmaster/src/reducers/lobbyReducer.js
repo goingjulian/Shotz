@@ -1,6 +1,6 @@
-import { teamActionTypes } from '../actions/lobbyActions'
+import { lobbyActionTypes } from '../actions/lobbyActions'
 
-const initialTeamState = {
+const initialLobbyState = {
     teamList: [
         // {
         //     id: 0,
@@ -20,27 +20,28 @@ const initialTeamState = {
     ]
 }
 
-export default function teamReducer(state = initialTeamState, action) {
+export default function lobbyReducer(state = initialLobbyState, action) {
     const teamsCopy = [...state.teamList];
 
     switch (action.type) {
-        case teamActionTypes.addTeam:
+        case lobbyActionTypes.addTeam:
+            console.log("team +", action)
             const teamListCopy = [...state.teamList]
             teamListCopy.push({
                 id: action.teamId,
-                name: action.name,
+                name: action.teamName,
                 accept: false
             })
-            return { ...state, teamList: teamList }
-        case teamActionTypes.acceptTeam:
+            return { ...state, teamList: teamListCopy }
+        case lobbyActionTypes.acceptTeam:
             const teamIndexAccept = state.teamList.findIndex(team => team.id === action.id);
             teamsCopy[teamIndexAccept].accept = true;
             return { ...state, teamList: teamsCopy }
-        case teamActionTypes.rejectTeam:
+        case lobbyActionTypes.rejectTeam:
             const teamIndexReject = state.teamList.findIndex(team => team.id === action.id);
             teamsCopy.splice(teamIndexReject, 1);
             return { ...state, teamList: teamsCopy }
-        case teamActionTypes.clearRejectedTeams:
+        case lobbyActionTypes.clearRejectedTeams:
             const acceptedTeams = teamsCopy.filter(team => team.accept)
             return { ...state, teamList: acceptedTeams }
         default:

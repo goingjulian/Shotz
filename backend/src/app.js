@@ -107,20 +107,35 @@ function shutdownAPIServer() {
 }
 
 function runWsServer() {
-  websocketServer = new ws.Server({
-    server: httpServer,
-    path: '/ws',
-    verifyClient: checkConnectionAttempt
-  });
+    websocketServer = new ws.Server({
+        server: httpServer,
+        path: "/ws"
+    })
 
-  websocketServer.on('connection', (websocket, req) => {
-    console.log(`INFO: New websocket connection with IP: ${req.connection.remoteAddress} `);
+    websocketServer.on("connection", async (websocket, req) => {
+        sessionParser(req, {}, () => {
+            console.log("Session is parsed")
+            websocket.sessionId = req.session.id
 
-    websocket.sessionId = req.session.id;
+            req.session.websocket = websocket
 
-    req.session.websocket = websocket;
+            req.session.websocket.send(JSON.stringify({
+                type: "addTeam",
+                id: "0",
+                name: "Team Cool"
+            }))
+        })
+        
+        //anroep
+        console.log(`INFO: New websocket connection with IP: ${req.connection.remoteAddress} `)
 
-    req.session.websocket.send('Hello world');
+
+
+
+
+        websocket.on("message", message => {
+            console.log("WS message received: ", message, " from ", websocket.sessionId)
+        })
 
     websocket.on('message', message => {
       console.log('WS message received: ', message, ' from ', websocket.sessionId);
@@ -129,12 +144,5 @@ function runWsServer() {
     websocket.on('close', () => {
       console.log('Websocket connection closed');
     });
-  });
-}
-
-function checkConnectionAttempt(info, done) {
-  sessionParser(info.req, {}, () => {
-    console.log('Session is parsed');
-    done(info.req.session.roomKey !== undefined);
   });
 }
