@@ -31,6 +31,21 @@ router.route('/restore').post((req, res, next) => {
         });
 });
 
+router.route('/:roomKey/team/:teamSessionId').put((req, res, next) => {
+    const roomKey = req.params.roomKey
+    const teamSessionId = req.params.teamSessionId
+    const accepted = req.body.accepted
+
+    if(accepted === undefined) next(new Error('accepted not provided'))
+
+    GameService.alterTeamAcceptedStatus(roomKey, teamSessionId, accepted)
+        .then( () => {
+            
+        } )
+        .catch(err => next(err))
+    res.send("Test")
+})
+
 router.route('/:roomKey').post((req, res, next) => {
     const roomKey = req.params.roomKey;
     const sessionId = req.session.id;

@@ -95,4 +95,26 @@ export default class GameService {
         const game = await GameDAO.getGame(roomKey);
         return game.quizmaster;
     }
+
+    static async alterTeamAcceptedStatus(roomKey, teamSessionId, accepted) {
+        console.log("Setting team state")
+        console.log("ts", teamSessionId)
+
+        console.log("accept == ", accepted)
+
+        try {
+            if(accepted) {
+                await GameDAO.setTeamAccepted(roomKey, teamSessionId)
+            } else if(accepted === false) {
+                await GameDAO.removeTeam(roomKey, teamSessionId)
+            }
+        } catch(err) {
+            console.log(err)
+            throw new Error("Team not found")
+        }
+
+        
+        
+
+    }
 }
