@@ -83,4 +83,9 @@ export default class GameService {
         const game =  await GameDAO.getGame(roomKey);
         return game.quizmaster;
     }
+
+    static async alterTeamAcceptedStatus(roomKey, teamId, accepted) {
+        const team = await GameDAO.getTeam(roomKey, teamId)
+        console.log(team)
+    }
 }

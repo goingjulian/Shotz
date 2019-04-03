@@ -21,7 +21,7 @@ import connectMongo from 'connect-mongo';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config();
-import cors from 'cors';
+import cors from 'cors';9
 
 import room from './routes/roomRouter';
 import { initWSServer } from './service/websocketService'
@@ -87,7 +87,7 @@ function runAPIServer() {
 
   sessionParser = session({
     resave: true,
-    saveUninitialized: false,
+    saveUninitialized: true,
     secret: 'secretkey',
     store: new MongoStore({ mongooseConnection: mongoose.connection })
   });

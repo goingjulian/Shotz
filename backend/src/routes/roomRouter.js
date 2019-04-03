@@ -16,11 +16,8 @@ router.route('/').post((req, res, next) => {
 });
 
 router.route('/restore').post((req, res, next) => {
-    console.log("sess id: ")
-    console.log(req.session.id)
     const roomKey = req.session.roomKey;
     const sessionId = req.session.id;
-    
 
     GameService.restoreSession(roomKey, sessionId)
         .then(gameState => {
@@ -31,6 +28,19 @@ router.route('/restore').post((req, res, next) => {
             next(err.message);
         });
 });
+
+router.route('/:roomKey/team/:teamId').post( (req, res, next) => {
+    const roomKey = req.params.roomKey
+    const teamId = req.params.teamId
+    const accepted = req.body.accepted
+
+    console.log("Data : ", roomKey, teamId, accepted)
+
+    GameService.alterTeamAcceptedStatus(roomKey, teamId, accepted)
+        .then()
+        .catch(err => console.log(err))
+    res.send("Test")
+} )
 
 router.route('/:roomKey').post((req, res, next) => {
     const roomKey = req.params.roomKey;
