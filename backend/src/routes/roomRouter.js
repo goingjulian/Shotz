@@ -45,9 +45,8 @@ router.route("/:roomKey/team/:teamSessionId").put((req, res, next) => {
             });
         })
         .catch(err => {
-            next(err.message);
+            next(err)
         });
-    res.status(200).send();
 });
 
 router.route("/:roomKey").post((req, res, next) => {
@@ -75,8 +74,8 @@ router.route("/:roomKey/teams").get((req, res, next) => {
             console.log(teams);
             res.status(200).json(teams);
         })
-        .catch(err => console.log(err));
-});
+        .catch(err => next(err))
+})
 
 router.use((err, req, res, next) => {
     const errMsg = err.message || "Couldn't find url";
