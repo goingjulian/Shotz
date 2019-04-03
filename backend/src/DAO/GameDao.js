@@ -1,5 +1,5 @@
+import mongoose from 'mongoose'
 import Game from '../models/Game';
-import { session } from 'express-session';
 
 export default class GameDAO {
     static addNewGame(roomKey, quizmasterId) {
@@ -13,9 +13,26 @@ export default class GameDAO {
         return Game.findOne({ roomKey: roomKey });
     }
 
-    static getTeam(roomKey, teamId) {
-        return Game.teams.id(teamId)
-        // .findOne({_id: teamId})
+    static setTeamAccepted(roomKey, teamSessionId) {
+        return Game.updateOne(
+            { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: 'REGISTER' },
+            {
+                $set: {
+                    'teams.$.accepted': true
+                }
+            }
+        )
+    }
+
+    static removeTeam(roomKey, teamSessionId) {
+        return Game.updateOne(
+            { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: 'REGISTER' },
+            {
+                $pull: {
+                    'teams': {'sessionId': teamSessionId}
+                }
+            }
+        )
     }
 
     static joinGameAsTeam(roomKey, teamName, sessionId) {

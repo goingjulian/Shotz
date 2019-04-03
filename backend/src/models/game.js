@@ -8,9 +8,9 @@ const gameSchema = new mongoose.Schema(
         teams: { type: [teamSchema], required: true, default: [] },
         gameState: {
             type: String,
-            enum: ['Registration'],
+            enum: ['REGISTER'],
             require: true,
-            default: 'Registration'
+            default: 'REGISTER'
         }
     },
     { versionKey: false }

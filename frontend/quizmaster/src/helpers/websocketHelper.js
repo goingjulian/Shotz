@@ -34,11 +34,6 @@ export function initSocket() {
                 throw new Error("Socket connection could not be restored")
             }
         }
-
-
-
-
-
     }
 }
 

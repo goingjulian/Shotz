@@ -75,8 +75,9 @@ export default class GameService {
         return roomKey;
     }
 
-    static getTeams(roomKey) {
-        return GmeDAO.getGame(roomKey).teams;
+    static async getTeams(roomKey) {
+        const game = await GameDAO.getGame(roomKey).lean();
+        return game.teams;
     }
 
     static async getQuizmaster(roomKey) {
@@ -84,8 +85,24 @@ export default class GameService {
         return game.quizmaster;
     }
 
-    static async alterTeamAcceptedStatus(roomKey, teamId, accepted) {
-        const team = await GameDAO.getTeam(roomKey, teamId)
-        console.log(team)
+    static async alterTeamAcceptedStatus(roomKey, teamSessionId, accepted) {
+        console.log("Setting team state")
+        console.log("ts", teamSessionId)
+
+        console.log("accept == ", accepted)
+
+        try {
+            if(accepted) {
+                await GameDAO.setTeamAccepted(roomKey, teamSessionId)
+            } else if(accepted === false) {
+                await GameDAO.removeTeam(roomKey, teamSessionId)
+            }
+        } catch(err) {
+            throw new Error("Team not found")
+        }
+
+        
+        
+
     }
 }

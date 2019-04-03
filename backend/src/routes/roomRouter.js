@@ -29,18 +29,24 @@ router.route('/restore').post((req, res, next) => {
         });
 });
 
-router.route('/:roomKey/team/:teamId').post( (req, res, next) => {
+router.route('/:roomKey/team/:teamSessionId').put((req, res, next) => {
     const roomKey = req.params.roomKey
-    const teamId = req.params.teamId
+    const teamSessionId = req.params.teamSessionId
     const accepted = req.body.accepted
 
-    console.log("Data : ", roomKey, teamId, accepted)
+    if (accepted === undefined) next(new Error('accepted not provided'))
 
-    GameService.alterTeamAcceptedStatus(roomKey, teamId, accepted)
-        .then()
-        .catch(err => console.log(err))
-    res.send("Test")
-} )
+    GameService.alterTeamAcceptedStatus(roomKey, teamSessionId, accepted)
+        .then(() => {
+            sendMessageQuizmaster(roomKey, {
+                type: "teamAccepted"
+            })
+        })
+        .catch(err => {
+            next(err.message)
+        })
+    res.status(200).send()
+})
 
 router.route('/:roomKey').post((req, res, next) => {
     const roomKey = req.params.roomKey;
@@ -51,16 +57,11 @@ router.route('/:roomKey').post((req, res, next) => {
         .then(message => {
             console.log("keys: ", roomKey, teamName)
 
-
-
-
             sendMessageQuizmaster(roomKey, {
                 type: 'addTeam',
                 roomKey: roomKey,
                 name: teamName
             })
-
-
 
             req.session.roomKey = roomKey;
             res.status(200).json({ message: message });
@@ -70,7 +71,14 @@ router.route('/:roomKey').post((req, res, next) => {
         });
 });
 
-
+router.route('/:roomKey/teams').get((req, res, next) => {
+    const roomKey = req.params.roomKey
+    GameService.getTeams(roomKey)
+        .then(teams => {
+            res.json(teams)
+        })
+        .catch(err => console.log(err))
+})
 
 router.use((err, req, res, next) => {
     console.error(err);
