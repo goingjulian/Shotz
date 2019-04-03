@@ -29,18 +29,20 @@ router.route('/restore').post((req, res, next) => {
         });
 });
 
-router.route('/:roomKey/team/:teamId').post( (req, res, next) => {
+router.route('/:roomKey/team/:teamSessionId').put((req, res, next) => {
     const roomKey = req.params.roomKey
-    const teamId = req.params.teamId
+    const teamSessionId = req.params.teamSessionId
     const accepted = req.body.accepted
 
-    console.log("Data : ", roomKey, teamId, accepted)
+    if(accepted === undefined) next(new Error('accepted not provided'))
 
-    GameService.alterTeamAcceptedStatus(roomKey, teamId, accepted)
-        .then()
-        .catch(err => console.log(err))
+    GameService.alterTeamAcceptedStatus(roomKey, teamSessionId, accepted)
+        .then( () => {
+            
+        } )
+        .catch(err => next(err))
     res.send("Test")
-} )
+})
 
 router.route('/:roomKey').post((req, res, next) => {
     const roomKey = req.params.roomKey;
