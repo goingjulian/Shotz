@@ -15,7 +15,7 @@ export default class GameDAO {
 
     static setTeamAccepted(roomKey, teamSessionId) {
         return Game.updateOne(
-            { roomKey: roomKey, 'teams.sessionId': teamSessionId },
+            { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: 'REGISTER' },
             {
                 $set: {
                     'teams.$.accepted': true
@@ -26,12 +26,12 @@ export default class GameDAO {
 
     static removeTeam(roomKey, teamSessionId) {
         return Game.updateOne(
-            { roomKey: roomKey, 'teams.sessionId': teamSessionId },
+            { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: 'REGISTER' },
             {
-                $$pull: {
-                    'teams': {'_id': teamId}
+                $pull: {
+                    'teams': {'sessionId': teamSessionId}
                 }
-            }, {new: true}, (err, doc) => console.log(err, doc)
+            }
         )
     }
 

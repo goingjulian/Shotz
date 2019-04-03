@@ -87,8 +87,9 @@ export default class GameService {
         return roomKey;
     }
 
-    static getTeams(roomKey) {
-        return GmeDAO.getGame(roomKey).teams;
+    static async getTeams(roomKey) {
+        const game = await GameDAO.getGame(roomKey).lean();
+        return game.teams;
     }
 
     static async getQuizmaster(roomKey) {
@@ -109,7 +110,6 @@ export default class GameService {
                 await GameDAO.removeTeam(roomKey, teamSessionId)
             }
         } catch(err) {
-            console.log(err)
             throw new Error("Team not found")
         }
 

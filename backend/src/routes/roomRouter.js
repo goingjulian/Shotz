@@ -36,14 +36,18 @@ router.route('/:roomKey/team/:teamSessionId').put((req, res, next) => {
     const teamSessionId = req.params.teamSessionId
     const accepted = req.body.accepted
 
-    if(accepted === undefined) next(new Error('accepted not provided'))
+    if (accepted === undefined) next(new Error('accepted not provided'))
 
     GameService.alterTeamAcceptedStatus(roomKey, teamSessionId, accepted)
-        .then( () => {
-            
-        } )
-        .catch(err => next(err))
-    res.send("Test")
+        .then(() => {
+            sendMessageQuizmaster(roomKey, {
+                type: "teamAccepted"
+            })
+        })
+        .catch(err => {
+            next(err.message)
+        })
+    res.status(200).send()
 })
 
 router.route('/:roomKey').post((req, res, next) => {
@@ -53,6 +57,14 @@ router.route('/:roomKey').post((req, res, next) => {
 
     GameService.joinRoom(roomKey, teamName, sessionId)
         .then(message => {
+            console.log("keys: ", roomKey, teamName)
+
+            sendMessageQuizmaster(roomKey, {
+                type: 'addTeam',
+                roomKey: roomKey,
+                name: teamName
+            })
+      
             req.session.roomKey = roomKey;
             res.status(200).json(message);
         })
@@ -61,7 +73,14 @@ router.route('/:roomKey').post((req, res, next) => {
         });
 });
 
-
+router.route('/:roomKey/teams').get((req, res, next) => {
+    const roomKey = req.params.roomKey
+    GameService.getTeams(roomKey)
+        .then(teams => {
+            res.json(teams)
+        })
+        .catch(err => console.log(err))
+})
 
 router.use((err, req, res, next) => {
     const errMsg = err.message || "Couldn't find url";
