@@ -8,28 +8,24 @@ let sessionParser
 export function initWSServer(sessionParserParam, httpServer) {
     websocketServer = new ws.Server({
         server: httpServer,
-        path: "/ws"
+        path: "/ws",
+        verifyClient: (info, req) => parseSession(info, req)
     })
     sessionParser = sessionParserParam
     websocketServer.on('connection', _onConnection)
 }
 
+function parseSession(info, done) {
+    console.log("parsing session from request")
+    sessionParser(info.req, {}, () => {
+        console.log("session parsed")
+        done(info.req.session)
+    })
+}
+
 function _onConnection(websocket, req) {
-    sessionParser(req, {}, async () => {
-        console.log(`INFO: New websocket connection with IP: ${req.connection.remoteAddress}, session: ${req.session.id} `)
-        // req.session.save(err => {
-        //     console.log("Session saved")
-        // })
-        websocket.sessionId = req.session.id
-
-        // // req.session.websocket = websocket
-
-        // const stateResponse = await GameService.restoreSession(req.session.roomKey, req.session.id)
-
-        // if (stateResponse) {
-        //     req.session.websocket.send(JSON.stringify(stateResponse))
-        // }
-    });
+    console.log(`INFO: New websocket connection with IP: ${req.connection.remoteAddress}, session: ${req.session.id} `)
+    websocket.sessionId = req.session.id
 }
 
 export async function sendMessageTeams(roomKey, message) {
@@ -42,14 +38,12 @@ export async function sendMessageTeams(roomKey, message) {
 export async function sendMessageQuizmaster(roomKey, message) {
     const quizmasterId = await GameService.getQuizmaster(roomKey);
 
-    for(let client of websocketServer.clients) {
+    for (let client of websocketServer.clients) {
         console.log("CLIENT: ", client.sessionId)
         console.log(quizmasterId)
         console.log(client.sessionId === quizmasterId)
-        if(client.sessionId === quizmasterId) _sendMessage(client, message)
+        if (client.sessionId === quizmasterId) _sendMessage(client, message)
     }
-    // const quizmaster = websocketServer.clients.findOne(client => client.sessionId === quizmasterId);
-    // if (quizmaster) _sendMessage(client, message);
 }
 
 async function _sendMessage(client, message) {
