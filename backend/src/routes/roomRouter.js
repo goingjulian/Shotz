@@ -15,6 +15,23 @@ router.route('/').post((req, res, next) => {
         });
 });
 
+router.route('/restore').post((req, res, next) => {
+    console.log("sess id: ")
+    console.log(req.session.id)
+    const roomKey = req.session.roomKey;
+    const sessionId = req.session.id;
+    
+
+    GameService.restoreSession(roomKey, sessionId)
+        .then(gameState => {
+            req.session.roomKey = roomKey;
+            res.status(200).json(gameState);
+        })
+        .catch(err => {
+            next(err.message);
+        });
+});
+
 router.route('/:roomKey').post((req, res, next) => {
     const roomKey = req.params.roomKey;
     const sessionId = req.session.id;
@@ -43,19 +60,7 @@ router.route('/:roomKey').post((req, res, next) => {
         });
 });
 
-router.route('/restore').post((req, res, next) => {
-    const roomKey = req.session.roomKey;
-    const sessionId = req.session.id;
 
-    GameService.restoreSession(roomKey, sessionId)
-        .then(gameState => {
-            req.session.roomKey = roomKey;
-            res.status(200).json(gameState);
-        })
-        .catch(err => {
-            next(err.message);
-        });
-});
 
 router.use((err, req, res, next) => {
     console.error(err);

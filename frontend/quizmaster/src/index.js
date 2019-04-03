@@ -7,7 +7,7 @@ import * as Redux from 'redux';
 import * as ReactRedux from 'react-redux';
 import thunkMiddleware from 'redux-thunk'
 import { mainReducer } from './reducers/mainReducer';
-import { initSocket } from './helpers/websocketHelper'
+import { restoreRoomState } from './actions/roomActions'
 
 
 const store = Redux.createStore(
@@ -15,7 +15,7 @@ const store = Redux.createStore(
     Redux.applyMiddleware(thunkMiddleware)
 )
 
-store.dispatch(initSocket());
+store.dispatch(restoreRoomState());
 
 const RootComponent = (
     <ReactRedux.Provider store={store}>

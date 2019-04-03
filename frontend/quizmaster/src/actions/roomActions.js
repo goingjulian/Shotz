@@ -1,5 +1,7 @@
 import environment from '../environments/environment'
 import { lobbyViewAction } from './viewActions'
+import { addMultipleTeams } from '../actions/lobbyActions'
+import { initSocket } from '../helpers/websocketHelper'
 
 export const roomActionTypes = {
     createRoom: " createRoom"
@@ -32,5 +34,30 @@ export function createRoom() {
         } catch (error) {
             console.log(error)
         }
+    }
+}
+
+export function restoreRoomState() {
+    return async dispatch => {
+        try {
+            const response = await fetch(`http://${environment.baseUrl}/room/restore`, {
+                credentials: 'include',
+                mode: 'cors',
+                method: "post"
+            })
+
+            if (response.ok) {
+                const parsedRes = await response.json()
+
+                dispatch(addMultipleTeams(parsedRes.teams));
+                dispatch(createRoomAction(parsedRes.roomKey))
+                dispatch(lobbyViewAction())
+                
+            }
+        } catch (error) {
+            // console.log(error)
+            console.log("No saved session")
+        }
+        dispatch(initSocket())
     }
 }

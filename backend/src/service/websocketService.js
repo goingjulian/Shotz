@@ -16,29 +16,31 @@ export function initWSServer(sessionParserParam, httpServer) {
 
 function _onConnection(websocket, req) {
     sessionParser(req, {}, async () => {
-        console.log(`INFO: New websocket connection with IP: ${req.connection.remoteAddress} `)
+        console.log(`INFO: New websocket connection with IP: ${req.connection.remoteAddress}, session: ${req.session.id} `)
+        // req.session.save(err => {
+        //     console.log("Session saved")
+        // })
         websocket.sessionId = req.session.id
 
-        req.session.websocket = websocket
+        // // req.session.websocket = websocket
 
-        const stateResponse = await GameService.restoreSession(req.session.roomKey, req.session.id)
+        // const stateResponse = await GameService.restoreSession(req.session.roomKey, req.session.id)
 
-        if (stateResponse) {
-            req.session.websocket.send(JSON.stringify(stateResponse))
-        }
+        // if (stateResponse) {
+        //     req.session.websocket.send(JSON.stringify(stateResponse))
+        // }
     });
 }
 
 export async function sendMessageTeams(roomKey, message) {
     const teams = await GameService.getTeams(roomKey);
-    websocketServer.clients.array.forEach(client => {
+    websocketServer.clients.forEach(client => {
         if (teams.includes(client.sessionId)) _sendMessage(client, message);
     });
 }
 
 export async function sendMessageQuizmaster(roomKey, message) {
     const quizmasterId = await GameService.getQuizmaster(roomKey);
-    // console.log(websocketServer.clients)
 
     for(let client of websocketServer.clients) {
         console.log("CLIENT: ", client.sessionId)
