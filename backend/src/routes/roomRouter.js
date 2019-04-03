@@ -45,9 +45,9 @@ router.route('/:roomKey/team/:teamSessionId').put((req, res, next) => {
             })
         })
         .catch(err => {
-            next(err.message)
+            next(err)
         })
-    res.status(200).send()
+    res.send("good job")
 })
 
 router.route('/:roomKey').post((req, res, next) => {
@@ -57,8 +57,6 @@ router.route('/:roomKey').post((req, res, next) => {
 
     GameService.joinRoom(roomKey, teamName, sessionId)
         .then(message => {
-            console.log("keys: ", roomKey, teamName)
-
             sendMessageQuizmaster(roomKey, {
                 type: 'addTeam',
                 roomKey: roomKey,
@@ -79,7 +77,7 @@ router.route('/:roomKey/teams').get((req, res, next) => {
         .then(teams => {
             res.json(teams)
         })
-        .catch(err => console.log(err))
+        .catch(err => next(err))
 })
 
 router.use((err, req, res, next) => {

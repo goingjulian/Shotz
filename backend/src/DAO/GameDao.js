@@ -41,7 +41,7 @@ export default class GameDAO {
             {
                 $push: {
                     teams: {
-                        name: teamName,
+                        teamName: teamName,
                         sessionId: sessionId,
                         accepted: false
                     }

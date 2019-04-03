@@ -93,8 +93,13 @@ export default class GameService {
     }
 
     static async getQuizmaster(roomKey) {
-        const game = await GameDAO.getGame(roomKey);
-        return game.quizmaster;
+        try {
+            const game = await GameDAO.getGame(roomKey);
+            return game.quizmaster;
+        } catch(error) {
+            throw new ShotzException("An error occured, please check the roomKey and sessionId", 404)
+        }
+        
     }
 
     static async alterTeamAcceptedStatus(roomKey, teamSessionId, accepted) {
@@ -104,17 +109,17 @@ export default class GameService {
         console.log("accept == ", accepted)
 
         try {
-            if(accepted) {
+            if (accepted) {
                 await GameDAO.setTeamAccepted(roomKey, teamSessionId)
-            } else if(accepted === false) {
+            } else if (accepted === false) {
                 await GameDAO.removeTeam(roomKey, teamSessionId)
             }
-        } catch(err) {
+        } catch (err) {
             throw new Error("Team not found")
         }
 
-        
-        
+
+
 
     }
 }
