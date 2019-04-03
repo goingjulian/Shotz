@@ -48,6 +48,8 @@ export default class GameService {
                     roomKey: roomKey,
                     gameState: game.gameState
                 };
+            } else {
+                throw new ShotzException('No valid session found!', 401);
             }
         }
     }
