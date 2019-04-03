@@ -33,8 +33,8 @@ export function joinRoom(roomKey, teamName) {
     return dispatch => {
         fetch(`${environment.API_URL}/room/${roomKey}`, method)
             .then(async response => {
+                const body = await response.json();
                 if (!response.ok) {
-                    const body = await response.body();
                     throw new Error(body.error);
                 } else {
                     dispatch(joinRoomAction(body));

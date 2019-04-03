@@ -1,55 +1,54 @@
-import environment from '../environments/environment'
-import { addTeam } from '../actions/lobbyActions'
+import environment from "../environments/environment";
+import { store } from "..";
+import { getTeamList } from "../actions/teamActions";
 
 //https://gist.github.com/dmichael/9dc767fca93624df58b423d01e485402
 
-let reconnects = 0
+let reconnects = 0;
 
 export function initSocket() {
-    console.log("Connecting to socket")
+    console.log("Connecting to socket");
     return async dispatch => {
-
-        const socket = await new WebSocket(`ws://${environment.baseUrl}/ws`)
+        const socket = await new WebSocket(`${environment.WS_URL}/ws`);
 
         socket.onopen = () => {
-            console.log("socket connected")
-            reconnects = 0
-        }
+            console.log("socket connected");
+            reconnects = 0;
+        };
 
-        socket.onmessage = (eventInfo) => {
-            const parsedMessage = JSON.parse(eventInfo.data)
-            handleMessage(parsedMessage, dispatch)
-        }
+        socket.onmessage = eventInfo => {
+            const parsedMessage = JSON.parse(eventInfo.data);
+            console.log(parsedMessage);
+            dispatch(handleMessage(parsedMessage));
+        };
 
         socket.onclose = () => {
-            console.log("Socket disconnected")
+            console.log("Socket disconnected");
 
             if (reconnects < 3) {
-                console.log("Trying reconnect")
-                reconnects++
+                console.log("Trying reconnect");
+                reconnects++;
                 setTimeout(() => {
-                    dispatch(initSocket())
-                }, 5000)
+                    dispatch(initSocket());
+                }, 5000);
             } else {
-                throw new Error("Socket connection could not be restored")
+                throw new Error("Socket connection could not be restored");
             }
-        }
-    }
+        };
+    };
 }
 
-function handleMessage(message, dispatch) {
-    console.log("websocket message received ", message)
-
-    if (message.type) {
+function handleMessage(message) {
+    console.log(message);
+    return dispatch => {
         switch (message.type) {
-            case "addTeam":
-                console.log("Adding a team")
-                dispatch(addTeam(message.id, message.name))
+            case "quizmaster_newTeam":
+                const roomKey = store.getState().room.roomKey;
+                console.log(roomKey);
+                dispatch(getTeamList(roomKey));
                 break;
             default:
-                console.log("Unknown messageType: ", message);
+                console.log("Unknown message: ", message);
         }
-    } else {
-        console.log("Unknown message: ", message);
-    }
+    };
 }

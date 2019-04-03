@@ -1,11 +1,9 @@
 import React from 'react';
 import * as ReactRedux from 'react-redux'
 
-import { loginViewAction, categorySelectViewAction } from '../../actions/viewActions'
-import { acceptTeamAction, rejectTeamAction, clearRejectedTeamsAction } from '../../actions/lobbyActions'
-
 import './Lobby.scss'
 import Team from './Team.jsx'
+import { rejectTeamAction, acceptTeamAction } from '../../actions/teamActions';
 
 function Lobby(props) {
     return (
@@ -37,18 +35,20 @@ function Lobby(props) {
 
 function mapStateToProps(state) {
     return {
-        teamList: state.lobby.teamList,
+        // teamList: state.lobby.teamList,
+        // roomKey: state.room.roomKey
+        teamList: state.teams.teamList,
         roomKey: state.room.roomKey
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        loginViewAction: () => dispatch(loginViewAction()),
-        categorySelectViewAction: () => dispatch(categorySelectViewAction()),
-        acceptTeamAction: (id) => dispatch(acceptTeamAction(id)),
-        rejectTeamAction: (id) => dispatch(rejectTeamAction(id)),
-        clearRejectedTeamsAction: () => dispatch(clearRejectedTeamsAction())
+        //loginViewAction: () => dispatch(loginViewAction()),
+        //categorySelectViewAction: () => dispatch(categorySelectViewAction()),
+        acceptTeamAction: (sessionId) => dispatch(acceptTeamAction(sessionId)),
+        rejectTeamAction: (sessionId) => dispatch(rejectTeamAction(sessionId))
+        //clearRejectedTeamsAction: () => dispatch(clearRejectedTeamsAction())
     }
 }
 

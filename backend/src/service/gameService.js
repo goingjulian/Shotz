@@ -89,6 +89,7 @@ export default class GameService {
 
     static async getTeams(roomKey) {
         const game = await GameDAO.getGame(roomKey).lean();
+        console.log(game);
         return game.teams;
     }
 

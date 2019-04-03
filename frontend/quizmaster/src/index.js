@@ -10,7 +10,7 @@ import { mainReducer } from './reducers/mainReducer';
 import { restoreRoomState } from './actions/roomActions'
 
 
-const store = Redux.createStore(
+export const store = Redux.createStore(
     mainReducer,
     Redux.applyMiddleware(thunkMiddleware)
 )
@@ -22,6 +22,7 @@ const RootComponent = (
         <App />
     </ReactRedux.Provider>
 )
+
 
 ReactDOM.render(RootComponent, document.getElementById('root'));
 

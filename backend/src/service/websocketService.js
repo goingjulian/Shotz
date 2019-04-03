@@ -1,31 +1,31 @@
-import ws from 'ws'
+import ws from "ws";
 import GameService from "./gameService";
 
-let websocketServer
+let websocketServer;
 
-let sessionParser
+let sessionParser;
 
 export function initWSServer(sessionParserParam, httpServer) {
     websocketServer = new ws.Server({
         server: httpServer,
         path: "/ws",
         verifyClient: (info, req) => parseSession(info, req)
-    })
-    sessionParser = sessionParserParam
-    websocketServer.on('connection', _onConnection)
+    });
+    sessionParser = sessionParserParam;
+    websocketServer.on("connection", _onConnection);
 }
 
 function parseSession(info, done) {
-    console.log("parsing session from request")
+    console.log("parsing session from request");
     sessionParser(info.req, {}, () => {
-        console.log("session parsed")
-        done(info.req.session)
-    })
+        console.log("session parsed");
+        done(info.req.session);
+    });
 }
 
 function _onConnection(websocket, req) {
-    console.log(`INFO: New websocket connection with IP: ${req.connection.remoteAddress}, session: ${req.session.id} `)
-    websocket.sessionId = req.session.id
+    console.log(`INFO: New websocket connection with IP: ${req.connection.remoteAddress}, session: ${req.session.id} `);
+    websocket.sessionId = req.session.id;
 }
 
 export async function sendMessageTeams(roomKey, message) {
@@ -39,17 +39,18 @@ export async function sendMessageQuizmaster(roomKey, message) {
     const quizmasterId = await GameService.getQuizmaster(roomKey);
 
     for (let client of websocketServer.clients) {
-        console.log("CLIENT: ", client.sessionId)
-        console.log(quizmasterId)
-        console.log(client.sessionId === quizmasterId)
-        if (client.sessionId === quizmasterId) _sendMessage(client, message)
+        // console.log("CLIENT: ", client.sessionId)
+        // console.log(quizmasterId)
+        // console.log(client.sessionId === quizmasterId)
+        if (client.sessionId === quizmasterId) _sendMessage(client, message);
     }
 }
 
 async function _sendMessage(client, message) {
-    if (message) client.send(JSON.stringify(message));
+    if (message) {
+        client.send(JSON.stringify(message));
+    }
 }
-
 
 // export default class WebsocketService {
 //     constructor(wsServer, sessionParser) {
@@ -73,7 +74,6 @@ async function _sendMessage(client, message) {
 //             }
 //         });
 //     }
-
 
 // }
 

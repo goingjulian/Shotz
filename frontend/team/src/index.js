@@ -17,5 +17,5 @@ const RootComponent = (
   </Provider>
 );
 
-store.dispatch(restoreSession());
+//store.dispatch(restoreSession());
 ReactDOM.render(RootComponent, document.getElementById("root"));
