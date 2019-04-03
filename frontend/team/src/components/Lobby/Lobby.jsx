@@ -1,13 +1,13 @@
 import React from "react";
 import * as ReactRedux from "react-redux";
 import "./Lobby.scss";
-import { joinRoomAction } from "../../actions/viewActions";
+import { joinRoom } from "../../actions/gameActions";
 
 class Lobby extends React.Component {
   constructor() {
     super();
     this.state = {
-      roomCode: "",
+      roomKey: "",
       teamName: ""
     };
   }
@@ -23,10 +23,10 @@ class Lobby extends React.Component {
 
   submitForm(e) {
     e.preventDefault();
-    if (this.state.roomCode === "" || this.state.teamName === "") {
+    if (this.state.roomKey === "" || this.state.teamName === "") {
       console.log("Vul alle velden in!");
     } else {
-      this.props.joinRoom(this.state.roomCode, this.state.teamName);
+      this.props.joinRoom(this.state.roomKey, this.state.teamName);
     }
   }
 
@@ -38,12 +38,12 @@ class Lobby extends React.Component {
         </header>
         <main>
           <div className="inputField">
-            <label htmlFor="roomCode">Room code:</label>
+            <label htmlFor="roomKey">Room code:</label>
             <input
-              value={this.state.roomCode}
+              value={this.state.roomKey}
               onChange={e => this.handleInput(e)}
-              id="roomCode"
-              name="roomCode"
+              id="roomKey"
+              name="roomKey"
               placeholder="Room code"
             />
           </div>
@@ -72,7 +72,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    joinRoom: (roomKey, teamName) => dispatch(joinRoomAction(roomKey, teamName))
+    joinRoom: (roomKey, teamName) => dispatch(joinRoom(roomKey, teamName))
   };
 }
 

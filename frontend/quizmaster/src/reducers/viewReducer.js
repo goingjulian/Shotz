@@ -1,7 +1,7 @@
 import Login from '../components/Login/Login.jsx'
 import Lobby from '../components/Lobby/Lobby.jsx'
 import CategorySelect from '../components/CategorySelect/CategorySelect.jsx'
-import ControlPanel from '../components/ControlPanel/ControlPanel'
+import ControlPanel from '../components/ControlPanel/ControlPanel.jsx'
 
 import { viewActionTypes } from '../actions/viewActions'
 
