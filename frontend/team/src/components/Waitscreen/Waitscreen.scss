@@ -1,1 +1,13 @@
 @import "../../assets/scss/variables";
+
+.Waitscreen {
+    nav {
+        .navCloseGame {
+            position: absolute;
+            left: 0;
+        }
+        .navRoomKey {
+            margin: auto;
+        }
+    }
+}

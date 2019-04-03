@@ -11,21 +11,23 @@ router.route('/').post((req, res, next) => {
             res.status(201).json({ roomKey: roomKey });
         })
         .catch(err => {
-            next(err.message);
+            next(err);
         });
 });
 
 router.route('/restore').post((req, res, next) => {
     const roomKey = req.session.roomKey;
     const sessionId = req.session.id;
-
-    GameService.restoreSession(roomKey, sessionId)
+    const loginRole = req.body.role;
+    
+    GameService.restoreSession(roomKey, loginRole, sessionId)
         .then(gameState => {
+            console.log(`Session for ${loginRole}: ${sessionId} restored in room ${roomKey}`)
             req.session.roomKey = roomKey;
             res.status(200).json(gameState);
         })
         .catch(err => {
-            next(err.message);
+            next(err);
         });
 });
 
@@ -51,7 +53,7 @@ router.route('/:roomKey/team/:teamSessionId').put((req, res, next) => {
 router.route('/:roomKey').post((req, res, next) => {
     const roomKey = req.params.roomKey;
     const sessionId = req.session.id;
-    const teamName = req.body.name
+    const teamName = req.body.teamName
 
     GameService.joinRoom(roomKey, teamName, sessionId)
         .then(message => {
@@ -62,12 +64,12 @@ router.route('/:roomKey').post((req, res, next) => {
                 roomKey: roomKey,
                 name: teamName
             })
-
+      
             req.session.roomKey = roomKey;
-            res.status(200).json({ message: message });
+            res.status(200).json(message);
         })
         .catch(err => {
-            next(err.message);
+            next(err);
         });
 });
 
@@ -81,7 +83,6 @@ router.route('/:roomKey/teams').get((req, res, next) => {
 })
 
 router.use((err, req, res, next) => {
-    console.error(err);
     const errMsg = err.message || "Couldn't find url";
     const errCode = err.htmlErrorCode || 404;
     res.status(errCode).json({ error: `${errMsg}` });
