@@ -128,12 +128,6 @@ router.route("/:roomKey/round").post((req, res, next) => {
             console.log(err);
             next(err)
         })
-})
-
-router.use((err, req, res, next) => {
-    const errMsg = err.message || "Couldn't find url";
-    const errCode = err.htmlErrorCode || 404;
-    res.status(errCode).json({ error: `${errMsg}` });
 });
 
 export default router;

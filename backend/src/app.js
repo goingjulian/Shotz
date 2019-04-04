@@ -21,7 +21,7 @@ import connectMongo from 'connect-mongo';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config();
-import cors from 'cors';9
+import cors from 'cors'; 9
 
 import room from './routes/roomRouter';
 import category from './routes/questionsRouter'
@@ -96,7 +96,13 @@ function runAPIServer() {
   app.use(sessionParser);
 
   app.use('/room', room);
-  app.use('/question', category)
+  app.use('/question', category);
+
+  app.use((err, req, res, next) => {
+    const errMsg = err.message || "Destination URL not found";
+    const errCode = err.htmlErrorCode || 404;
+    res.status(errCode).json({ error: `${errMsg}` });
+  });
 
   httpServer.listen(APIPort, () => {
     console.log(`INFO: API Server listening on port ${APIPort}`);

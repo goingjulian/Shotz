@@ -29,18 +29,11 @@ export default class GameDAO {
                     'teams.$.accepted': true
                 }
             }
-        )
-            .then(doc => {
-                console.log(doc)
-                if (doc.n < 1) {
-                    console.log('doc error')
-                    throw new Error(`Team not found`)
-                }
-            })
-            .catch(err => {
-                console.log(err)
+        ).then(doc => {
+            if (doc.n < 1) {
                 throw new Error(`Team not found`)
-            })
+            }
+        })
     }
 
     static removeTeam(roomKey, teamSessionId) {
@@ -51,16 +44,12 @@ export default class GameDAO {
                     'teams': { 'sessionId': teamSessionId }
                 }
             }
-        )
-            .then(doc => {
-                console.log(doc)
-                if (doc.n < 1) {
-                    throw new Error('Team not found')
-                }
-            })
-            .catch(err => {
-                throw new Error('Team not found')
-            })
+        ).then(doc => {
+            console.log(doc)
+            if (doc.n < 1) {
+                throw new Error('Team not found or registration is closed')
+            }
+        })
     }
 
     static removeUnacceptedTeams(roomKey, quizmasterSessionId) {
@@ -72,13 +61,6 @@ export default class GameDAO {
                 }
             }
         )
-            .then(doc => {
-                console.log(doc)
-                return "Success"
-            })
-            .catch(err => {
-                throw new Error('Not authorized or invalid roomKey')
-            })
     }
 
     static alterGameState(roomKey, quizmasterSessionId, newState) {
@@ -86,13 +68,6 @@ export default class GameDAO {
             { roomKey: roomKey, quizmaster: quizmasterSessionId },
             { gameState: newState }
         )
-            .then(doc => {
-                console.log(doc)
-                return "success"
-            })
-            .catch(err => {
-                throw new Error('Error gamestate')
-            })
     }
 
     static joinGameAsTeam(roomKey, teamName, sessionId) {
@@ -111,7 +86,6 @@ export default class GameDAO {
     }
 
     static addRound(roomKey, sessionId, chosenQuestions, categories) {
-        console.log(sessionId)
         return Game.updateOne(
             { roomKey: roomKey, quizmaster: sessionId },
             {
@@ -122,16 +96,14 @@ export default class GameDAO {
                     }
                 }
             }
-        )
-            .then(doc => {
-                console.log(doc)
-                if(doc.n < 1) {
-                    throw new Error('User not authorized')
-                }
-                return {
-                    categories: categories,
-                    questions: chosenQuestions
-                }
-            })
+        ).then(doc => {
+            if (doc.n < 1) {
+                throw new Error('User is not the quizmaster of this room or no room found')
+            }
+            return {
+                categories: categories,
+                questions: chosenQuestions
+            }
+        })
     }
 }

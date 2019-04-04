@@ -3,7 +3,6 @@ import GameDAO from "../DAO/GameDao";
 import QuestionDAO from '../DAO/QuestionDao'
 import ShotzException from "../exceptions/ShotzException";
 import gameStates from '../definitions/gameStates'
-import { questionSchema } from "../models/question";
 
 export default class GameService {
     static async createRoom(quizmasterId) {
@@ -13,7 +12,7 @@ export default class GameService {
             return roomKey;
         } catch (err) {
             console.log(`createRoom error: ${err.message}`);
-            throw new ShotzException("Error occured when trying to create a new game!");
+            throw new ShotzException("Error occured when trying to create a new game");
         }
     }
 
@@ -143,9 +142,10 @@ export default class GameService {
         try {
             const allQuestions = await QuestionDAO.getAllQuestionsByCategories(categories);
 
-            const chosenQuestions = this.pickRandomquestions(allQuestions, 12);
+            const chosenQuestions = this.pickRandomquestionsFromList(allQuestions, 12);
 
             const round = await GameDAO.addRound(roomKey, sessionId, chosenQuestions, categories);
+
             await GameDAO.alterGameState(roomKey, sessionId, gameStates.IN_ROUND);
 
             return {
@@ -157,7 +157,7 @@ export default class GameService {
         }
     }
 
-    static pickRandomquestions(questions, amount) {
+    static pickRandomquestionsFromList(questions, amount) {
         const chosenQuestions = []
         const questionAmount = questions.length > amount ? amount : questions.length
 
