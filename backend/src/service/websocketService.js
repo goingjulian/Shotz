@@ -18,7 +18,12 @@ export function initWSServer(sessionParserParam, httpServer) {
 
 function parseSession(info, done) {
     sessionParser(info.req, {}, () => {
-        done(info.req.session);
+        const sessionId = info.req.session.sessionId;
+        if (!sessionId || !getGameWithSessionId(sessionId)) {
+            done(false);
+        } else {
+            done(true);
+        }
     });
 }
 
@@ -49,12 +54,14 @@ export async function sendMessageQuizmaster(roomKey, message) {
 }
 
 export async function sendMessageTeam(roomKey, sessionId, message) {
-    const teams = await GameService.getTeams(roomKey);
-    if (!teams) {
-    } else {
-        websocketServer.clients.forEach(team => {
-            if (team.sessionId === sessionId) _sendMessage(team, message);
-        });
+    for (let client of websocketServer.clients) {
+        if (client.sessionId === sessionId) _sendMessage(team, message);
+    }
+}
+
+export function closeConnection(sessionId) {
+    for (let client of websocketServer.clients) {
+        if (client.sessionId === sessionId) client.close();
     }
 }
 

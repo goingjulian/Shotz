@@ -1,6 +1,6 @@
 import environment from "../environments/environment";
 import { store } from "..";
-import { getTeamList } from "../actions/teamActions";
+import { getTeamList, rejectTeamAction } from "../actions/teamActions";
 
 let reconnects = 0;
 
@@ -16,7 +16,6 @@ export function initSocket() {
 
         socket.onmessage = eventInfo => {
             const parsedMessage = JSON.parse(eventInfo.data);
-            console.log(parsedMessage);
             dispatch(handleMessage(parsedMessage));
         };
 
@@ -24,7 +23,7 @@ export function initSocket() {
             console.log("Socket disconnected");
 
             if (reconnects < 3) {
-                console.log("Trying reconnect");
+                console.log("Trying to reconnect");
                 reconnects++;
                 setTimeout(() => {
                     dispatch(initSocket());
@@ -37,16 +36,17 @@ export function initSocket() {
 }
 
 function handleMessage(message) {
+    console.log("WEBSOCKET MESSAGE:");
     console.log(message);
+    console.log("---------");
     return dispatch => {
         switch (message.type) {
             case "quizmaster_newTeam":
-            case "teamAccepted":
-            case "teamRejected":
-                console.log('fetching teams')
                 const roomKey = store.getState().room.roomKey;
-                console.log(roomKey);
                 dispatch(getTeamList(roomKey));
+                break;
+            case "quizmaster_teamLeft":
+                dispatch(rejectTeamAction(message.sessionId));
                 break;
             default:
                 console.log("Unknown message: ", message);

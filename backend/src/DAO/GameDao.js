@@ -1,11 +1,20 @@
-import Game from '../models/Game';
-import gameStates from '../definitions/gameStates'
+import Game from "../models/Game";
+import gameStates from "../definitions/gameStates";
 
 export default class GameDAO {
     static addNewGame(roomKey, quizmasterId) {
         return Game.create({
             roomKey: roomKey,
             quizmaster: quizmasterId
+        });
+    }
+
+    static getGameWithSessionId(sessionId) {
+        return Game.findOne({
+            $or: [
+                { quizmaster: sessionId },
+                { teams: { $elemMatch: { sessionId: sessionId } } }
+            ]
         });
     }
 
@@ -23,7 +32,7 @@ export default class GameDAO {
 
     static setTeamAccepted(roomKey, teamSessionId) {
         return Game.updateOne(
-            { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: gameStates.REGISTER },
+            { roomKey: roomKey, "teams.sessionId": teamSessionId, gameState: gameStates.REGISTER },
             {
                 $set: {
                     "teams.$.accepted": true
@@ -31,21 +40,19 @@ export default class GameDAO {
             }
         )
             .then(doc => {
-                console.log(doc)
                 if (doc.n < 1) {
-                    console.log('doc error')
-                    throw new Error(`Team not found`)
+                    console.log("doc error");
+                    throw new Error(`Team not found`);
                 }
             })
             .catch(err => {
-                console.log(err);
                 throw new Error(`Team not found`);
             });
     }
 
     static removeTeam(roomKey, teamSessionId) {
         return Game.updateOne(
-            { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: gameStates.REGISTER },
+            { roomKey: roomKey, "teams.sessionId": teamSessionId, gameState: gameStates.REGISTER },
             {
                 $pull: {
                     teams: { sessionId: teamSessionId }
@@ -53,9 +60,8 @@ export default class GameDAO {
             }
         )
             .then(doc => {
-                console.log(doc)
-                if(doc.n < 1) {
-                    throw new Error('Team not found')
+                if (doc.n < 1) {
+                    throw new Error("Team not found");
                 }
             })
             .catch(err => {
@@ -68,32 +74,29 @@ export default class GameDAO {
             { roomKey: roomKey, quizmaster: quizmasterSessionId, gameState: gameStates.REGISTER },
             {
                 $pull: {
-                    'teams': { 'accepted': false }
+                    teams: { accepted: false }
                 }
             }
         )
             .then(doc => {
-                console.log(doc)
-                if(doc.n < 1) throw new Error("Not authorized or invalid roomKey")
-                return "Success"
+                console.log(doc);
+                if (doc.n < 1) throw new Error("Not authorized or invalid roomKey");
+                return "Success";
             })
             .catch(err => {
-                throw new Error('Not authorized or invalid roomKey')
-            })
+                throw new Error("Not authorized or invalid roomKey");
+            });
     }
 
     static alterGameState(roomKey, quizmasterSessionId, newState) {
-        return Game.updateOne(
-            { roomKey: roomKey, quizmaster: quizmasterSessionId },
-            { gameState: newState }
-        )
+        return Game.updateOne({ roomKey: roomKey, quizmaster: quizmasterSessionId }, { gameState: newState })
             .then(doc => {
-                console.log(doc)
-                return "success"
+                console.log(doc);
+                return "success";
             })
             .catch(err => {
-                throw new Error('Error gamestate')
-            })
+                throw new Error("Error gamestate");
+            });
     }
 
     static joinGameAsTeam(roomKey, teamName, sessionId) {

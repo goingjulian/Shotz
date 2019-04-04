@@ -1,6 +1,8 @@
 import express from "express";
 import GameService from "../service/gameService";
 import { sendMessageQuizmaster, sendMessageTeam } from "../service/websocketService";
+import ShotzException from "./../exceptions/ShotzException";
+import { closeConnection } from "./../service/websocketService";
 const router = express.Router();
 
 router.route("/").post((req, res, next) => {
@@ -35,22 +37,30 @@ router.route("/:roomKey/team/:teamSessionId").put((req, res, next) => {
     const roomKey = req.params.roomKey;
     const teamSessionId = req.params.teamSessionId;
     const accepted = req.body.accepted;
-
-    console.log(`Altering accepted status ${accepted}`)
-
-    if (accepted === undefined) next(new Error("accepted not provided"));
-
-    GameService.alterTeamAcceptedStatus(roomKey, teamSessionId, accepted)
-        .then(message => {
-            sendMessageQuizmaster(roomKey, {
-                type: accepted ? 'teamAccepted' : 'teamRejected'
+    if (typeof accepted !== "boolean") {
+        next(new ShotzException("Accepted required in body!", 400));
+    } else {
+        GameService.alterTeamStatus(roomKey, teamSessionId, accepted)
+            .then(teamStatus => {
+                res.status(200).json(teamStatus);
+            })
+            .catch(err => {
+                next(err);
             });
-            sendMessageTeam(roomKey, teamSessionId, {
-                type: accepted ? 'team_accepted' : 'team_rejected'
-            });
+    }
+});
+
+router.route("/:roomKey/leave").delete((req, res, next) => {
+    const roomKey = req.params.roomKey;
+    const sessionId = req.session.id;
+
+    GameService.leaveGame(roomKey, sessionId)
+        .then(teams => {
+            res.json(teams);
         })
         .catch(err => {
-            next(err)
+            console.log(err);
+            next(err);
         });
 });
 
@@ -58,16 +68,16 @@ router.route("/:roomKey/team/:teamSessionId").put((req, res, next) => {
 router.route("/:roomKey/teams").delete((req, res, next) => {
     const roomKey = req.params.roomKey;
     const sessionId = req.session.id;
-    
+
     GameService.removeUnacceptedTeams(roomKey, sessionId)
-    .then(teams => {
-        res.json(teams)
-    })
-    .catch(err => {
-        console.log(err)
-        next(err)
-    })
-})
+        .then(teams => {
+            res.json(teams);
+        })
+        .catch(err => {
+            console.log(err);
+            next(err);
+        });
+});
 
 router.route("/:roomKey").post((req, res, next) => {
     const roomKey = req.params.roomKey;
@@ -91,11 +101,10 @@ router.route("/:roomKey/teams").get((req, res, next) => {
     const roomKey = req.params.roomKey;
     GameService.getTeams(roomKey)
         .then(teams => {
-            console.log(teams);
             res.status(200).json(teams);
         })
-        .catch(err => next(err))
-})
+        .catch(err => next(err));
+});
 
 router.use((err, req, res, next) => {
     const errMsg = err.message || "Couldn't find url";

@@ -1,4 +1,5 @@
 import environment from "../environments/environment";
+import { teamAcceptedAction, teamRejectedAction } from "./gameActions";
 
 let reconnects = 0;
 
@@ -37,12 +38,12 @@ export function initSocket() {
 function handleMessage(message) {
     return dispatch => {
         switch (message.type) {
-            case 'team_accepted' :
-            dispatch();
-            break;
-            case 'team_rejected' :
-            dispatch();
-            break;
+            case "team_accepted":
+                dispatch(teamAcceptedAction());
+                break;
+            case "team_rejected":
+                dispatch(teamRejectedAction());
+                break;
             default:
                 console.log("Unknown message: ", message);
         }

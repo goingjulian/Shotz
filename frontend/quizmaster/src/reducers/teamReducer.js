@@ -5,10 +5,20 @@ const initialTeamState = {
 };
 
 export default function teamReducer(state = initialTeamState, action) {
+    let teamIndex, teamList;
     switch (action.type) {
         case teamActionTypes.SET_TEAMS:
-            console.log(state.teamList, action.teamList)
             return { ...state, teamList: action.teamList };
+        case teamActionTypes.ACCEPT_TEAM:
+            teamIndex = state.teamList.findIndex(team => team.sessionid === action.sessionId);
+            teamList = state.teamList.slice();
+            teamList[teamIndex].accepted = true;
+            return { ...state, teamList: teamList };
+        case teamActionTypes.REJECT_TEAM:
+            teamIndex = state.teamList.findIndex(team => team.sessionId === action.sessionId);
+            teamList = state.teamList.slice();
+            teamList.splice(teamIndex, 1);
+            return { ...state, teamList: teamList };
         default:
             return { ...state };
     }
@@ -29,10 +39,10 @@ export default function teamReducer(state = initialTeamState, action) {
     //     const teamIndexAccept = state.teamList.findIndex(team => team.id === action.id);
     //     teamsCopy[teamIndexAccept].accept = true;
     //     return { ...state, teamList: teamsCopy }
-    // case lobbyActionTypes.rejectTeam:
-    //     const teamIndexReject = state.teamList.findIndex(team => team.id === action.id);
-    //     teamsCopy.splice(teamIndexReject, 1);
-    //     return { ...state, teamList: teamsCopy }
+    //case lobbyActionTypes.rejectTeam:
+    //   const teamIndexReject = state.teamList.findIndex(team => team.id === action.id);
+    // teamsCopy.splice(teamIndexReject, 1);
+    // return { ...state, teamList: teamsCopy }
     // case lobbyActionTypes.clearRejectedTeams:
     //     const acceptedTeams = teamsCopy.filter(team => team.accept)
     //     return { ...state, teamList: acceptedTeams }

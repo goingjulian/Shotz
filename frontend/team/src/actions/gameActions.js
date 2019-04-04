@@ -1,5 +1,5 @@
 import environment from "../environments/environment";
-import { viewWaitingscreenAction, restoreActiveScreenFromGameState } from "./viewActions";
+import { viewWaitingscreenAction, restoreActiveScreenFromGameState, viewLobbyAction } from "./viewActions";
 import { initSocket } from "./wsActions";
 
 export function joinRoomAction(gameState) {
@@ -28,6 +28,37 @@ export function teamAcceptedAction() {
 export function teamRejectedAction() {
     return {
         type: "team_rejected"
+    };
+}
+
+export function leaveGameAction() {
+    return {
+        type: "team_leaveGame"
+    };
+}
+
+export function leaveGame(roomKey) {
+    const method = {
+        method: "DELETE",
+        credentials: "include"
+    };
+    return dispatch => {
+        fetch(`${environment.API_URL}/room/${roomKey}/leave`, method)
+            .then(async response => {
+                const body = await response.json();
+                console.log("LEAVE ROOM");
+                console.log(body);
+                console.log("----------");
+                if (!response.ok) {
+                    throw new Error(body.error);
+                } else {
+                    dispatch(leaveGameAction());
+                    dispatch(viewLobbyAction());
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            });
     };
 }
 
