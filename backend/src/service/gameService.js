@@ -1,5 +1,6 @@
 import Game from "../models/Game";
 import GameDAO from "../DAO/GameDao";
+import QuestionDAO from '../DAO/QuestionDao'
 import ShotzException from "../exceptions/ShotzException";
 import gameStates from "../definitions/gameStates";
 import { sendMessageTeam, closeConnection, sendMessageQuizmaster, sendMessageTeams } from "./websocketService";
@@ -12,7 +13,7 @@ export default class GameService {
             return roomKey;
         } catch (err) {
             console.log(`createRoom error: ${err.message}`);
-            throw new ShotzException("Error occured when trying to create a new game!");
+            throw new ShotzException("Error occured when trying to create a new game");
         }
     }
 
@@ -190,5 +191,43 @@ export default class GameService {
             console.log(err);
             throw new ShotzException(`Error, ${err}`, 500);
         }
+    }
+
+    static async startNewRound(roomKey, sessionId, categories) {
+        try {
+            const allQuestions = await QuestionDAO.getAllQuestionsByCategories(categories);
+
+            const chosenQuestions = this.pickRandomquestionsFromList(allQuestions, 12);
+
+            const round = await GameDAO.addRound(roomKey, sessionId, chosenQuestions, categories);
+
+            await GameDAO.alterGameState(roomKey, sessionId, gameStates.IN_ROUND);
+
+            return {
+                gameState: gameStates.IN_ROUND,
+                round: round
+            };
+        } catch (err) {
+            throw new ShotzException(err.message, 401);
+        }
+    }
+
+    static pickRandomquestionsFromList(questions, amount) {
+        const chosenQuestions = []
+        const questionAmount = questions.length > amount ? amount : questions.length
+
+        for (let i = 0; i < questionAmount; i++) {
+            const randomNumber = Math.floor(Math.random() * questions.length);
+            const questionAlreadyPicked = chosenQuestions.find(question => question._id === questions[randomNumber]._id);
+
+            if (!questionAlreadyPicked) {
+                chosenQuestions.push(questions[randomNumber]);
+            } else {
+                console.log("Duplicate number!")
+                i--;
+            }
+        }
+
+        return chosenQuestions;
     }
 }

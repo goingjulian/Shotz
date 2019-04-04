@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 import { teamSchema } from './team';
+import { roundSchema } from './round'
+import gameStates from '../definitions/gameStates'
 
 const gameSchema = new mongoose.Schema(
     {
@@ -8,10 +10,11 @@ const gameSchema = new mongoose.Schema(
         teams: { type: [teamSchema], required: true, default: [] },
         gameState: {
             type: String,
-            enum: ['REGISTER'],
+            enum: Object.values(gameStates),
             require: true,
             default: 'REGISTER'
-        }
+        },
+        rounds: {type: [roundSchema], required: true, default: []}
     },
     { versionKey: false }
 );
