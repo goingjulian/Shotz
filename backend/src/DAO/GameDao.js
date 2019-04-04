@@ -14,7 +14,7 @@ export default class GameDAO {
     }
 
     static getTeam(roomKey, teamSessionId) {
-        return Game.findOne({ roomKey: roomKey, 'teams.sessionId': teamSessionId }, 'teams.$')
+        return Game.findOne({ roomKey: roomKey, "teams.sessionId": teamSessionId }, "teams.$");
     }
 
     static getTeams(roomKey) {
@@ -26,7 +26,7 @@ export default class GameDAO {
             { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: gameStates.REGISTER },
             {
                 $set: {
-                    'teams.$.accepted': true
+                    "teams.$.accepted": true
                 }
             }
         ).then(doc => {
@@ -41,7 +41,7 @@ export default class GameDAO {
             { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: gameStates.REGISTER },
             {
                 $pull: {
-                    'teams': { 'sessionId': teamSessionId }
+                    teams: { sessionId: teamSessionId }
                 }
             }
         ).then(doc => {

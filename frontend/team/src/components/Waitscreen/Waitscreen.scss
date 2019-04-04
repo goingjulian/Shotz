@@ -4,10 +4,27 @@
     nav {
         .navCloseGame {
             position: absolute;
+            top: 0;
             left: 0;
         }
-        .navRoomKey {
+        .navTeamName {
             margin: auto;
+        }
+        .navRoomKey {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+    }
+    main {
+        text-align: center;
+        .messageBox {
+            padding: 40px 0;
+            text-align: center;
+            h2 {
+                font-size: 1.6em;
+                font-weight: 600;
+            }
         }
     }
 }

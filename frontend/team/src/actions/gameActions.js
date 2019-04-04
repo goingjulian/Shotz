@@ -4,7 +4,7 @@ import { initSocket } from "./wsActions";
 
 export function joinRoomAction(gameState) {
     return {
-        type: "player_joinRoom",
+        type: "team_joinRoom",
         roomKey: gameState.roomKey,
         teamName: gameState.teamName
     };
@@ -12,24 +12,33 @@ export function joinRoomAction(gameState) {
 
 export function restoreSessionAction(gameState) {
     return {
-        type: "player_restoreSession",
+        type: "team_restoreSession",
         roomKey: gameState.roomKey,
         teamName: gameState.teamName,
         accepted: gameState.accepted
     };
 }
 
-export function joinRoom(roomKey, teamName) {
-    const body = {
-        teamName: teamName
+export function teamAcceptedAction() {
+    return {
+        type: "team_accepted"
     };
+}
+
+export function teamRejectedAction() {
+    return {
+        type: "team_rejected"
+    };
+}
+
+export function joinRoom(roomKey, teamName) {
     const method = {
         method: "POST",
         credentials: "include",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify({ teamName: teamName })
     };
     return dispatch => {
         fetch(`${environment.API_URL}/room/${roomKey}`, method)
