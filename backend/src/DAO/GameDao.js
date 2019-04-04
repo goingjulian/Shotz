@@ -13,6 +13,10 @@ export default class GameDAO {
         return Game.findOne({ roomKey: roomKey });
     }
 
+    static getTeam(roomKey, teamSessionId) {
+        return Game.findOne({ roomKey: roomKey, 'teams.sessionId': teamSessionId }, 'teams.$')
+    }
+
     static setTeamAccepted(roomKey, teamSessionId) {
         return Game.updateOne(
             { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: 'REGISTER' },
@@ -22,6 +26,17 @@ export default class GameDAO {
                 }
             }
         )
+            .then(doc => {
+                console.log(doc)
+                if(doc.n < 1) {
+                    console.log('doc error')
+                    throw new Error(`Team not found`)
+                }
+            })
+            .catch(err => {
+                console.log(err)
+                throw new Error(`Team not found`)
+            })
     }
 
     static removeTeam(roomKey, teamSessionId) {
@@ -29,10 +44,14 @@ export default class GameDAO {
             { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: 'REGISTER' },
             {
                 $pull: {
-                    'teams': {'sessionId': teamSessionId}
+                    'teams': { 'sessionId': teamSessionId }
                 }
             }
         )
+            .then(doc => console.log(doc))
+            .catch(err => {
+                throw new Error('Team not found')
+            })
     }
 
     static joinGameAsTeam(roomKey, teamName, sessionId) {
