@@ -1,11 +1,20 @@
-import Game from '../models/Game';
-import gameStates from '../definitions/gameStates'
+import Game from "../models/Game";
+import gameStates from "../definitions/gameStates";
 
 export default class GameDAO {
     static addNewGame(roomKey, quizmasterId) {
         return Game.create({
             roomKey: roomKey,
             quizmaster: quizmasterId
+        });
+    }
+
+    static getGameWithSessionId(sessionId) {
+        return Game.findOne({
+            $or: [
+                { quizmaster: sessionId },
+                { teams: { $elemMatch: { sessionId: sessionId } } }
+            ]
         });
     }
 
@@ -23,7 +32,7 @@ export default class GameDAO {
 
     static setTeamAccepted(roomKey, teamSessionId) {
         return Game.updateOne(
-            { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: gameStates.REGISTER },
+            { roomKey: roomKey, "teams.sessionId": teamSessionId, gameState: gameStates.REGISTER },
             {
                 $set: {
                     "teams.$.accepted": true
@@ -38,7 +47,7 @@ export default class GameDAO {
 
     static removeTeam(roomKey, teamSessionId) {
         return Game.updateOne(
-            { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: gameStates.REGISTER },
+            { roomKey: roomKey, "teams.sessionId": teamSessionId, gameState: gameStates.REGISTER },
             {
                 $pull: {
                     teams: { sessionId: teamSessionId }
@@ -57,7 +66,7 @@ export default class GameDAO {
             { roomKey: roomKey, quizmaster: quizmasterSessionId, gameState: gameStates.REGISTER },
             {
                 $pull: {
-                    'teams': { 'accepted': false }
+                    teams: { accepted: false }
                 }
             }
         )

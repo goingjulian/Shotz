@@ -28,6 +28,10 @@ export default function gameReducer(state = initialState, action) {
                 ...state,
                 rejected: true
             };
+        case "team_leaveGame":
+            return {
+                ...initialState
+            };
         default:
             return {
                 ...state

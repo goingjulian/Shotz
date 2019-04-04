@@ -2,6 +2,7 @@ import React from "react";
 import * as ReactRedux from "react-redux";
 
 import "./Waitscreen.scss";
+import { leaveGame } from './../../actions/gameActions';
 
 class Waitingscreen extends React.Component {
     render() {
@@ -10,7 +11,7 @@ class Waitingscreen extends React.Component {
                 <nav>
                     <div className="navInner">
                         <div className="navCloseGame">
-                            <p>x</p>
+                            <button onClick={() => this.props.leaveGame(this.props.roomKey)}>Leave</button>
                         </div>
                         <div className="navTeamName">
                             <span>Team: {this.props.teamName}</span>
@@ -50,7 +51,9 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-    return {};
+    return {
+        leaveGame: roomKey => dispatch(leaveGame(roomKey))
+    };
 }
 
 export default ReactRedux.connect(mapStateToProps, mapDispatchToProps)(Waitingscreen);

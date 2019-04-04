@@ -6,7 +6,6 @@ import Team from './Team.jsx'
 import { alterTeamAcceptedStatus, clearRejectedTeamsAction } from '../../actions/teamActions';
 
 function Lobby(props) {
-    console.log(props.teamList)
     return (
         <div className="lobby">
             <h1>Waiting for teams</h1>

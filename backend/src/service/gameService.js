@@ -2,7 +2,8 @@ import Game from "../models/Game";
 import GameDAO from "../DAO/GameDao";
 import QuestionDAO from '../DAO/QuestionDao'
 import ShotzException from "../exceptions/ShotzException";
-import gameStates from '../definitions/gameStates'
+import gameStates from "../definitions/gameStates";
+import { sendMessageTeam, closeConnection, sendMessageQuizmaster, sendMessageTeams } from "./websocketService";
 
 export default class GameService {
     static async createRoom(quizmasterId) {
@@ -25,6 +26,8 @@ export default class GameService {
                 throw new ShotzException("Registration is closed for this quiz", 403);
             } else if (game.quizmaster === sessionId || game.teams.find(team => team.sessionId === sessionId)) {
                 throw new ShotzException("You have already joined this quiz!", 403);
+            } else if (game.teams.find(team => team.teamName === teamName)) {
+                throw new ShotzException(`There is a already a team with the name ${teamName}!`, 403);
             } else {
                 await GameDAO.joinGameAsTeam(roomKey, teamName, sessionId);
                 return {
@@ -69,11 +72,8 @@ export default class GameService {
             }
         } catch (err) {
             console.log(`restoreSession error: ${err.message}`);
-            if (!err.hhtmlErrorCode) {
-                throw new ShotzException(err.message, 500);
-            } else {
-                throw err;
-            }
+            if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
+            else throw err;
         }
     }
 
@@ -99,42 +99,97 @@ export default class GameService {
     }
 
     static async getTeams(roomKey) {
-        const teams = await GameDAO.getTeams(roomKey).lean();
-        return teams.teams;
+        try {
+            const teams = await GameDAO.getTeams(roomKey).lean();
+            return teams.teams;
+        } catch (err) {
+            console.log(`getTeams error: ${err.message}`);
+            if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
+            else throw err;
+        }
     }
 
     static async getQuizmaster(roomKey) {
         try {
             const game = await GameDAO.getGame(roomKey);
             return game.quizmaster;
-        } catch (error) {
+        } catch (err) {
             throw new ShotzException("An error occured, please check the roomKey and sessionId", 404);
         }
     }
 
-    static async alterTeamAcceptedStatus(roomKey, teamSessionId, accepted) {
+    static async leaveGame(roomKey, sessionId) {
         try {
-            if (accepted) {
-                await GameDAO.setTeamAccepted(roomKey, teamSessionId);
-                return "team accepted";
-            } else if (accepted === false) {
-                await GameDAO.removeTeam(roomKey, teamSessionId);
-                return "Team rejected";
+            const game = await GameDAO.getGame(roomKey).lean();
+            console.log(game);
+            if (game) game.teams = [...game.teams];
+            if (game.quizmasterId === sessionId) {
+                GameDAO.removeGame(roomKey);
+                sendMessageTeams(roomKey, {
+                    type: "team_quizmasterLeft"
+                });
+                game.teams.forEach(team => {
+                    closeConnection(team.sessionId);
+                });
+                return {
+                    type: "quizmaster_leftGame"
+                };
+            } else if (game.teams.find(team => team.sessionId === sessionId)) {
+                GameDAO.removeTeam(roomKey, sessionId);
+                closeConnection(sessionId);
+                sendMessageQuizmaster(roomKey, {
+                    type: "quizmaster_teamLeft",
+                    sessionId: sessionId
+                });
+                return {
+                    type: "team_leftGame"
+                };
+            } else {
+                throw new ShotzException(`Unable to remove you from the game ${roomKey}!`, 500);
             }
         } catch (err) {
-            console.log(err);
+            console.log(`leaveGame error: ${err.message}`);
+            if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
+            else throw err;
+        }
+    }
+
+    static async alterTeamStatus(roomKey, sessionId, accepted) {
+        try {
+            if (accepted) {
+                await GameDAO.setTeamAccepted(roomKey, sessionId);
+                sendMessageTeam(roomKey, sessionId, {
+                    type: "team_accepted"
+                });
+                return {
+                    type: "quizmaster_teamAccepted",
+                    sessionId: sessionId
+                };
+            } else {
+                await GameDAO.removeTeam(roomKey, sessionId);
+                sendMessageTeam(roomKey, sessionId, {
+                    type: "team_rejected"
+                });
+                closeConnection(sessionId);
+                return {
+                    type: "quizmaster_teamRejected",
+                    sessionId: sessionId
+                };
+            }
+        } catch (err) {
+            console.log(`alterTeamStatus error: ${err.message}`);
             throw new ShotzException("Team not found", 404);
         }
     }
 
     static async removeUnacceptedTeams(roomKey, quizmasterSessionId) {
         try {
-            await GameDAO.removeUnacceptedTeams(roomKey, quizmasterSessionId)
-            await GameDAO.alterGameState(roomKey, quizmasterSessionId, gameStates.CATEGORY_SELECT)
-            return await this.getTeams(roomKey)
+            await GameDAO.removeUnacceptedTeams(roomKey, quizmasterSessionId);
+            await GameDAO.alterGameState(roomKey, quizmasterSessionId, gameStates.CATEGORY_SELECT);
+            return await this.getTeams(roomKey);
         } catch (err) {
-            console.log(err)
-            throw new ShotzException(`Error, ${err}`, 500)
+            console.log(err);
+            throw new ShotzException(`Error, ${err}`, 500);
         }
     }
 
