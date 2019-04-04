@@ -17,6 +17,10 @@ export default class GameDAO {
         return Game.findOne({ roomKey: roomKey, 'teams.sessionId': teamSessionId }, 'teams.$')
     }
 
+    static getTeams(roomKey) {
+        return Game.findOne({roomKey: roomKey}, {_id: 0, 'teams._id': 0});
+    }
+
     static setTeamAccepted(roomKey, teamSessionId) {
         return Game.updateOne(
             { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: 'REGISTER' },

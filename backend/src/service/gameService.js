@@ -9,7 +9,7 @@ export default class GameService {
             await GameDAO.addNewGame(roomKey, quizmasterId);
             return roomKey;
         } catch (err) {
-            console.log(err);
+            console.log(`createRoom error: ${err.message}`);
             throw new ShotzException("Error occured when trying to create a new game!");
         }
     }
@@ -32,14 +32,14 @@ export default class GameService {
                 };
             }
         } catch (err) {
-            console.log(`Error: ${err.message}`);
+            console.log(`joinRoom error: ${err.message}`);
             throw new ShotzException(err.message, 500);
         }
     }
 
     static async restoreSession(roomKey, loginRole, sessionId) {
         try {
-            const game = await GameDAO.getGame(roomKey).lean()
+            const game = await GameDAO.getGame(roomKey).lean();
             if (game) game.teams = [...game.teams];
             if (game && game.quizmaster === sessionId && loginRole === "Quizmaster") {
                 return {
@@ -48,7 +48,12 @@ export default class GameService {
                     gameState: game.gameState,
                     teams: game.teams
                 };
-            } else if (game && game.teams.length > 0 && game.teams.find(team => team.sessionId === sessionId) && loginRole === "Team") {
+            } else if (
+                game &&
+                game.teams.length > 0 &&
+                game.teams.find(team => team.sessionId === sessionId) &&
+                loginRole === "Team"
+            ) {
                 const team = game.teams.find(team => team.sessionId === sessionId);
                 return {
                     type: "team_restoreSession",
@@ -61,7 +66,12 @@ export default class GameService {
                 throw new ShotzException("No active sessions found for your role!", 404);
             }
         } catch (err) {
-            throw err;
+            console.log(`restoreSession error: ${err.message}`);
+            if (!err.hhtmlErrorCode) {
+                throw new ShotzException(err.message, 500);
+            } else {
+                throw err;
+            }
         }
     }
 
@@ -87,9 +97,8 @@ export default class GameService {
     }
 
     static async getTeams(roomKey) {
-        const game = await GameDAO.getGame(roomKey).lean();
-        console.log(game);
-        return game.teams;
+        const teams = await GameDAO.getTeams(roomKey).lean();
+        return teams.teams;
     }
 
     static async getQuizmaster(roomKey) {
@@ -97,29 +106,22 @@ export default class GameService {
             const game = await GameDAO.getGame(roomKey);
             return game.quizmaster;
         } catch (error) {
-            throw new ShotzException("An error occured, please check the roomKey and sessionId", 404)
+            throw new ShotzException("An error occured, please check the roomKey and sessionId", 404);
         }
-
     }
 
     static async alterTeamAcceptedStatus(roomKey, teamSessionId, accepted) {
-
         try {
             if (accepted) {
-                await GameDAO.setTeamAccepted(roomKey, teamSessionId)
-                return 'team accepted'
+                await GameDAO.setTeamAccepted(roomKey, teamSessionId);
+                return "team accepted";
             } else if (accepted === false) {
-                await GameDAO.removeTeam(roomKey, teamSessionId)
-                return 'Team rejected'
+                await GameDAO.removeTeam(roomKey, teamSessionId);
+                return "Team rejected";
             }
         } catch (err) {
-            console.log(err)
-            throw new ShotzException("Team not found", 404)
+            console.log(err);
+            throw new ShotzException("Team not found", 404);
         }
-
-        
-
-
-
     }
 }

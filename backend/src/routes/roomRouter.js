@@ -47,7 +47,7 @@ router.route("/:roomKey/team/:teamSessionId").put((req, res, next) => {
             });
             sendMessageTeam(roomKey, teamSessionId, {
                 type: accepted ? 'team_accepted' : 'team_rejected'
-            })
+            });
         })
         .catch(err => {
             next(err)
