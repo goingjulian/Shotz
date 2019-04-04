@@ -1,6 +1,7 @@
 import Game from "../models/Game";
 import GameDAO from "../DAO/GameDao";
 import ShotzException from "../exceptions/ShotzException";
+import gameStates from '../definitions/gameStates'
 
 export default class GameService {
     static async createRoom(quizmasterId) {
@@ -128,7 +129,7 @@ export default class GameService {
     static async removeUnacceptedTeams(roomKey, quizmasterSessionId) {
         try {
             await GameDAO.removeUnacceptedTeams(roomKey, quizmasterSessionId)
-            await GameDAO.alterGameState(roomKey, quizmasterSessionId, "CATEGORY_SELECT")
+            await GameDAO.alterGameState(roomKey, quizmasterSessionId, gameStates.CATEGORY_SELECT)
             return await this.getTeams(roomKey)
         } catch(err) {
             console.log(err)

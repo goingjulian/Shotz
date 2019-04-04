@@ -1,5 +1,5 @@
-import mongoose from 'mongoose'
 import Game from '../models/Game';
+import gameStates from '../definitions/gameStates'
 
 export default class GameDAO {
     static addNewGame(roomKey, quizmasterId) {
@@ -23,7 +23,7 @@ export default class GameDAO {
 
     static setTeamAccepted(roomKey, teamSessionId) {
         return Game.updateOne(
-            { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: 'REGISTER' },
+            { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: gameStates.REGISTER },
             {
                 $set: {
                     'teams.$.accepted': true
@@ -45,14 +45,19 @@ export default class GameDAO {
 
     static removeTeam(roomKey, teamSessionId) {
         return Game.updateOne(
-            { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: 'REGISTER' },
+            { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: gameStates.REGISTER },
             {
                 $pull: {
                     'teams': { 'sessionId': teamSessionId }
                 }
             }
         )
-            .then(doc => console.log(doc))
+            .then(doc => {
+                console.log(doc)
+                if(doc.n < 1) {
+                    throw new Error('Team not found')
+                }
+            })
             .catch(err => {
                 throw new Error('Team not found')
             })
@@ -60,7 +65,7 @@ export default class GameDAO {
 
     static removeUnacceptedTeams(roomKey, quizmasterSessionId) {
         return Game.updateOne(
-            { roomKey: roomKey, quizmaster: quizmasterSessionId, gameState: 'REGISTER' },
+            { roomKey: roomKey, quizmaster: quizmasterSessionId, gameState: gameStates.REGISTER },
             {
                 $pull: {
                     'teams': { 'accepted': false }
