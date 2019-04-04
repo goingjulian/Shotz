@@ -3,7 +3,7 @@ import * as ReactRedux from 'react-redux'
 
 import './Lobby.scss'
 import Team from './Team.jsx'
-import { rejectTeamAction, acceptTeamAction } from '../../actions/teamActions';
+import { alterTeamAcceptedStatus } from '../../actions/teamActions';
 
 function Lobby(props) {
     console.log(props.teamList)
@@ -18,6 +18,7 @@ function Lobby(props) {
                         <Team
                             team={team}
                             key={team.teamName}
+                            roomKey={props.roomKey}
                             onAccept={props.acceptTeamAction}
                             onReject={props.rejectTeamAction} />
                     )
@@ -47,8 +48,8 @@ function mapDispatchToProps(dispatch) {
     return {
         //loginViewAction: () => dispatch(loginViewAction()),
         //categorySelectViewAction: () => dispatch(categorySelectViewAction()),
-        acceptTeamAction: (sessionId) => dispatch(acceptTeamAction(sessionId)),
-        rejectTeamAction: (sessionId) => dispatch(rejectTeamAction(sessionId))
+        acceptTeamAction: (roomKey, sessionId) => dispatch(alterTeamAcceptedStatus(roomKey, sessionId, true)),
+        rejectTeamAction: (roomKey, sessionId) => dispatch(alterTeamAcceptedStatus(roomKey, sessionId, false))
         //clearRejectedTeamsAction: () => dispatch(clearRejectedTeamsAction())
     }
 }

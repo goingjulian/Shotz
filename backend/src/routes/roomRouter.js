@@ -36,12 +36,14 @@ router.route("/:roomKey/team/:teamSessionId").put((req, res, next) => {
     const teamSessionId = req.params.teamSessionId;
     const accepted = req.body.accepted;
 
+    console.log(`Altering accepted status ${accepted}`)
+
     if (accepted === undefined) next(new Error("accepted not provided"));
 
     GameService.alterTeamAcceptedStatus(roomKey, teamSessionId, accepted)
         .then(() => {
             sendMessageQuizmaster(roomKey, {
-                type: "teamAccepted"
+                type: accepted ? 'teamAccepted' : 'teamRejected'
             });
         })
         .catch(err => {

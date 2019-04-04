@@ -27,6 +27,29 @@ export function rejectTeamAction(sessionId) {
     };
 }
 
+export function alterTeamAcceptedStatus(roomKey, sessionId, accepted) {
+    return async dispatch => {
+        const response = await fetch(`${environment.API_URL}/room/${roomKey}/team/${sessionId}`, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ accepted: accepted })
+        })
+
+        if (response.ok) {
+            if (accepted) {
+                dispatch(acceptTeamAction(sessionId))
+            } else {
+                dispatch(rejectTeamAction(sessionId))
+            }
+
+        }
+
+    }
+}
+
 export function getTeamList(roomKey) {
     console.log("Getting teamlist");
     return dispatch => {

@@ -43,6 +43,8 @@ function handleMessage(message) {
     return dispatch => {
         switch (message.type) {
             case "quizmaster_newTeam":
+            case "teamAccepted":
+            case "teamRejected":
                 const roomKey = store.getState().room.roomKey;
                 console.log(roomKey);
                 dispatch(getTeamList(roomKey));
