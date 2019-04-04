@@ -1,6 +1,6 @@
 import express from "express";
 import GameService from "../service/gameService";
-import { sendMessageQuizmaster } from "../service/websocketService";
+import { sendMessageQuizmaster, sendMessageTeam } from "../service/websocketService";
 const router = express.Router();
 
 router.route("/").post((req, res, next) => {
@@ -45,8 +45,9 @@ router.route("/:roomKey/team/:teamSessionId").put((req, res, next) => {
             sendMessageQuizmaster(roomKey, {
                 type: accepted ? 'teamAccepted' : 'teamRejected'
             });
-
-            res.json({message: message})
+            sendMessageTeam(roomKey, teamSessionId, {
+                type: accepted ? 'team_accepted' : 'team_rejected'
+            })
         })
         .catch(err => {
             next(err)
