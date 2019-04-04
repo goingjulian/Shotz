@@ -29,6 +29,7 @@ export function startRound(roomKey, categories) {
         const response = await fetch(`${environment.API_URL}/room/${roomKey}/round`, method);
 
         if(!response.ok) throw new Error('Error starting round');
+
         const body = await response.json();
 
         dispatch(startRoundAction(body.round.categories, body.round.questions));

@@ -1,5 +1,5 @@
 import environment from '../environments/environment'
-import { setViewByGameState, lobbyViewAction } from './viewActions'
+import { setViewByGameState } from './viewActions'
 import { initSocket } from '../helpers/websocketHelper'
 import { setTeams } from './teamActions'
 
@@ -23,14 +23,10 @@ export function createRoom() {
                 method: "post"
             })
 
-            const parsedRes = await response.json()
+            const body = await response.json()
 
-            const roomKey = parsedRes.roomKey
-
-            console.log("ROOMKEY IS " + roomKey)
-
-            dispatch(createRoomAction(roomKey))
-            dispatch(lobbyViewAction())
+            dispatch(createRoomAction(body.roomKey))
+            dispatch(setViewByGameState(body.gameState))
         } catch (error) {
             console.log(error)
         }
@@ -58,7 +54,6 @@ export function restoreRoomState() {
                 dispatch(setViewByGameState(parsedRes.gameState));
             }
         } catch (error) {
-            // console.log(error)
             console.log("No saved session")
         }
         dispatch(initSocket())

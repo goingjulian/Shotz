@@ -3,6 +3,7 @@ import GameService from "../service/gameService";
 import { sendMessageQuizmaster, sendMessageTeam } from "../service/websocketService";
 import ShotzException from "./../exceptions/ShotzException";
 import { closeConnection } from "./../service/websocketService";
+import gameStates from '../definitions/gameStates'
 const router = express.Router();
 
 /**
@@ -13,7 +14,10 @@ router.route("/").post((req, res, next) => {
     GameService.createRoom(quizmasterId)
         .then(roomKey => {
             req.session.roomKey = roomKey;
-            res.status(201).json({ roomKey: roomKey });
+            res.status(201).json({
+                roomKey: roomKey,
+                gameState: gameStates.REGISTER
+            });
         })
         .catch(err => {
             next(err);

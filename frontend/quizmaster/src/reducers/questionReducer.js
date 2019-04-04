@@ -1,8 +1,7 @@
 import {questionActionTypes} from '../actions/questionActions'
 
 const initalQuestionState = {
-    allCategories: [],
-    allQuestions: []
+    allCategories: []
 }
 
 export default function questionReducer(state = initalQuestionState, action) {
