@@ -54,7 +54,20 @@ router.route("/:roomKey/team/:teamSessionId").put((req, res, next) => {
         });
 });
 
-// router.route("/:roomKey/teams")
+//delete all not-accepted teams
+router.route("/:roomKey/teams").delete((req, res, next) => {
+    const roomKey = req.params.roomKey;
+    const sessionId = req.session.id;
+    
+    GameService.removeUnacceptedTeams(roomKey, sessionId)
+    .then(teams => {
+        res.json(teams)
+    })
+    .catch(err => {
+        console.log(err)
+        next(err)
+    })
+})
 
 router.route("/:roomKey").post((req, res, next) => {
     const roomKey = req.params.roomKey;

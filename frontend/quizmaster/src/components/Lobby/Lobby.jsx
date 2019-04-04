@@ -3,7 +3,7 @@ import * as ReactRedux from 'react-redux'
 
 import './Lobby.scss'
 import Team from './Team.jsx'
-import { alterTeamAcceptedStatus } from '../../actions/teamActions';
+import { alterTeamAcceptedStatus, clearRejectedTeamsAction } from '../../actions/teamActions';
 
 function Lobby(props) {
     console.log(props.teamList)
@@ -27,8 +27,8 @@ function Lobby(props) {
             <button
                 disabled={props.teamList.filter(team => team.accepted === true).length < 2}
                 onClick={() => {
-                    props.clearRejectedTeamsAction();
-                    props.categorySelectViewAction();
+                    props.clearRejectedTeamsAction(props.roomKey);
+                    // props.categorySelectViewAction();
                 }}>Start quiz</button>
             <button onClick={props.loginViewAction}>This should be close</button>
         </div>
@@ -47,10 +47,10 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         //loginViewAction: () => dispatch(loginViewAction()),
-        //categorySelectViewAction: () => dispatch(categorySelectViewAction()),
+        // categorySelectViewAction: () => dispatch(categorySelectViewAction()),
         acceptTeamAction: (roomKey, sessionId) => dispatch(alterTeamAcceptedStatus(roomKey, sessionId, true)),
-        rejectTeamAction: (roomKey, sessionId) => dispatch(alterTeamAcceptedStatus(roomKey, sessionId, false))
-        //clearRejectedTeamsAction: () => dispatch(clearRejectedTeamsAction())
+        rejectTeamAction: (roomKey, sessionId) => dispatch(alterTeamAcceptedStatus(roomKey, sessionId, false)),
+        clearRejectedTeamsAction: (roomKey) => dispatch(clearRejectedTeamsAction(roomKey))
     }
 }
 
