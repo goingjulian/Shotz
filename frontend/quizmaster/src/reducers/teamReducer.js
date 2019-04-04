@@ -7,6 +7,7 @@ const initialTeamState = {
 export default function teamReducer(state = initialTeamState, action) {
     switch (action.type) {
         case teamActionTypes.SET_TEAMS:
+            console.log(state.teamList, action.teamList)
             return { ...state, teamList: action.teamList };
         default:
             return { ...state };

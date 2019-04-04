@@ -17,9 +17,7 @@ export function initWSServer(sessionParserParam, httpServer) {
 }
 
 function parseSession(info, done) {
-    console.log("parsing session from request");
     sessionParser(info.req, {}, () => {
-        console.log("session parsed");
         done(info.req.session);
     });
 }
@@ -55,7 +53,7 @@ export async function sendMessageTeam(roomKey, sessionId, message) {
     if (!teams) {
     } else {
         websocketServer.clients.forEach(team => {
-            if (team.sessionId === sessionId) _sendMessage(client, message);
+            if (team.sessionId === sessionId) _sendMessage(team, message);
         });
     }
 }

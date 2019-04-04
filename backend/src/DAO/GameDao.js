@@ -17,6 +17,10 @@ export default class GameDAO {
         return Game.findOne({ roomKey: roomKey, 'teams.sessionId': teamSessionId }, 'teams.$')
     }
 
+    static getTeams(roomKey) {
+        return Game.findOne({roomKey: roomKey}, {_id: 0, 'teams._id': 0});
+    }
+
     static setTeamAccepted(roomKey, teamSessionId) {
         return Game.updateOne(
             { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: 'REGISTER' },
@@ -65,10 +69,11 @@ export default class GameDAO {
         )
             .then(doc => {
                 console.log(doc)
-                return "success"
+                if(doc.n < 1) throw new Error("Not authorized or invalid roomKey")
+                return "Success"
             })
             .catch(err => {
-                throw new Error('Not authorized')
+                throw new Error('Not authorized or invalid roomKey')
             })
     }
 

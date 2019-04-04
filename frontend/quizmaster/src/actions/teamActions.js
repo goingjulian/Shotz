@@ -1,4 +1,5 @@
 import environment from '../environments/environment'
+import { categorySelectViewAction } from './viewActions'
 
 export const teamActionTypes = {
     SET_TEAMS: "SET_TEAMS",
@@ -68,14 +69,14 @@ export function getTeamList(roomKey) {
     };
 }
 
-export function clearRejectedTeams(roomKey) {
+export function clearRejectedTeamsAction(roomKey) {
     return async dispatch => {
         const method = {
             method: 'DELETE',
             credentials: 'include',
         }
 
-        const response = await fetch(`${environment.API_URL}/room/${roomKey}/teams`)
+        const response = await fetch(`${environment.API_URL}/room/${roomKey}/teams`, method)
 
         if(!response.ok) {
             throw new Error('Server error')
@@ -85,6 +86,7 @@ export function clearRejectedTeams(roomKey) {
 
         console.log(body)
 
-        dispatch(setTeams(body.teamList))
+        dispatch(setTeams(body))
+        dispatch(categorySelectViewAction())
     }
 }
