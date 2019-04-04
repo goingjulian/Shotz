@@ -8,25 +8,44 @@ class Waitingscreen extends React.Component {
         return (
             <div className="Waitscreen Component">
                 <nav>
-                    <div className="navCloseGame">
-                        <p>x</p>
-                    </div>
-                    <div className="navRoomKey">
-                        <span>Room: {this.props.roomKey}</span>
+                    <div className="navInner">
+                        <div className="navCloseGame">
+                            <p>x</p>
+                        </div>
+                        <div className="navTeamName">
+                            <span>Team: {this.props.teamName}</span>
+                        </div>
+                        <div className="navRoomKey">
+                            <span>Room: {this.props.roomKey}</span>
+                        </div>
                     </div>
                 </nav>
                 <main>
-                    <p>{this.props.teamName}</p>
+                    <div className="messageBox">
+                        <h2>{getWaitingscreenMessage(this.props.accepted, this.props.rejected)}</h2>
+                    </div>
                 </main>
             </div>
         );
     }
 }
 
+function getWaitingscreenMessage(accepted, rejected) {
+    if (!accepted && !rejected) {
+        return "Waiting for approval from the quizmaster!";
+    } else if (rejected) {
+        return "The quizmaster rejected your request to join the game!";
+    } else {
+        return "The quizmaster approved your team! The quiz starts soon...";
+    }
+}
+
 function mapStateToProps(state) {
     return {
         roomKey: state.game.roomKey,
-        teamName: state.game.teamName
+        teamName: state.game.teamName,
+        accepted: state.game.accepted,
+        rejected: state.game.rejected
     };
 }
 

@@ -14,7 +14,7 @@ export default class GameDAO {
     }
 
     static getTeam(roomKey, teamSessionId) {
-        return Game.findOne({ roomKey: roomKey, 'teams.sessionId': teamSessionId }, 'teams.$')
+        return Game.findOne({ roomKey: roomKey, "teams.sessionId": teamSessionId }, "teams.$");
     }
 
     static getTeams(roomKey) {
@@ -26,7 +26,7 @@ export default class GameDAO {
             { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: gameStates.REGISTER },
             {
                 $set: {
-                    'teams.$.accepted': true
+                    "teams.$.accepted": true
                 }
             }
         )
@@ -38,9 +38,9 @@ export default class GameDAO {
                 }
             })
             .catch(err => {
-                console.log(err)
-                throw new Error(`Team not found`)
-            })
+                console.log(err);
+                throw new Error(`Team not found`);
+            });
     }
 
     static removeTeam(roomKey, teamSessionId) {
@@ -48,7 +48,7 @@ export default class GameDAO {
             { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: gameStates.REGISTER },
             {
                 $pull: {
-                    'teams': { 'sessionId': teamSessionId }
+                    teams: { sessionId: teamSessionId }
                 }
             }
         )
@@ -59,8 +59,8 @@ export default class GameDAO {
                 }
             })
             .catch(err => {
-                throw new Error('Team not found')
-            })
+                throw new Error("Team not found");
+            });
     }
 
     static removeUnacceptedTeams(roomKey, quizmasterSessionId) {
