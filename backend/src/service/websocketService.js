@@ -44,7 +44,7 @@ export async function sendMessageTeams(roomKey, message) {
 export async function sendMessageQuizmaster(roomKey, message) {
     const quizmasterId = await GameService.getQuizmaster(roomKey);
 
-    if (!quizmaster) throw new ShotzException(`No teams found for roomKey ${roomKey}`)
+    if (!quizmasterId) throw new ShotzException(`No teams found for roomKey ${roomKey}`)
 
     for (let client of websocketServer.clients) {
         // console.log("CLIENT: ", client.sessionId)

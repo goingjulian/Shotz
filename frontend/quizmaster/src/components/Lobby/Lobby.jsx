@@ -6,24 +6,25 @@ import Team from './Team.jsx'
 import { rejectTeamAction, acceptTeamAction } from '../../actions/teamActions';
 
 function Lobby(props) {
+    console.log(props.teamList)
     return (
         <div className="lobby">
             <h1>Waiting for teams</h1>
             <h2>Room key: <span className="highlight">{props.roomKey}</span></h2>
-            <h2><span className="highlight">{props.teamList.filter(team => team.accept).length}</span> teams joined</h2>
+            <h2><span className="highlight">{props.teamList.filter(team => team.accepted).length}</span> teams joined</h2>
             <div className="teamsContainer">
                 {
                     props.teamList.map(team =>
                         <Team
                             team={team}
-                            key={team.name}
+                            key={team.teamName}
                             onAccept={props.acceptTeamAction}
                             onReject={props.rejectTeamAction} />
                     )
                 }
             </div>
             <button
-                disabled={props.teamList.filter(team => team.accept === true).length < 2}
+                disabled={props.teamList.filter(team => team.accepted === true).length < 2}
                 onClick={() => {
                     props.clearRejectedTeamsAction();
                     props.categorySelectViewAction();

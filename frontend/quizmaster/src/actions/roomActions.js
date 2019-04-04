@@ -1,6 +1,7 @@
 import environment from '../environments/environment'
 import { lobbyViewAction } from './viewActions'
 import { initSocket } from '../helpers/websocketHelper'
+import { setTeams } from './teamActions'
 
 export const roomActionTypes = {
     createRoom: " createRoom"
@@ -42,15 +43,19 @@ export function restoreRoomState() {
             const response = await fetch(`${environment.API_URL}/room/restore`, {
                 credentials: 'include',
                 mode: 'cors',
-                method: "post"
+                method: "post",
+                body: JSON.stringify({role: 'Quizmaster'}),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             })
 
             if (response.ok) {
                 const parsedRes = await response.json()
 
-                //dispatch(addMultipleTeams(parsedRes.teams));
-                dispatch(createRoomAction(parsedRes.roomKey))
-                dispatch(lobbyViewAction())
+                dispatch(setTeams(parsedRes.teams));
+                dispatch(createRoomAction(parsedRes.roomKey));
+                dispatch(lobbyViewAction());
                 
             }
         } catch (error) {
