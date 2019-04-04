@@ -37,6 +37,12 @@ export function initSocket() {
 function handleMessage(message) {
     return dispatch => {
         switch (message.type) {
+            case 'team_accepted' :
+            dispatch();
+            break;
+            case 'team_rejected' :
+            dispatch();
+            break;
             default:
                 console.log("Unknown message: ", message);
         }
