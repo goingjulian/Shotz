@@ -2,8 +2,6 @@ import environment from "../environments/environment";
 import { store } from "..";
 import { getTeamList } from "../actions/teamActions";
 
-//https://gist.github.com/dmichael/9dc767fca93624df58b423d01e485402
-
 let reconnects = 0;
 
 export function initSocket() {
@@ -45,6 +43,7 @@ function handleMessage(message) {
             case "quizmaster_newTeam":
             case "teamAccepted":
             case "teamRejected":
+                console.log('fetching teams')
                 const roomKey = store.getState().room.roomKey;
                 console.log(roomKey);
                 dispatch(getTeamList(roomKey));
