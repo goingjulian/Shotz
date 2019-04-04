@@ -33,15 +33,14 @@ export default class GameService {
             }
         } catch (err) {
             console.log(`Error: ${err.message}`);
-            throw new ShotzException("Unable to join room!", 500);
+            throw new ShotzException(err.message, 500);
         }
     }
 
     static async restoreSession(roomKey, loginRole, sessionId) {
         try {
-            const game = await GameDAO.getGame(roomKey).lean(); //Makes it a JS obj
-            game.teams = [...game.teams];
-
+            const game = await GameDAO.getGame(roomKey).lean()
+            if (game) game.teams = [...game.teams];
             if (game && game.quizmaster === sessionId && loginRole === "Quizmaster") {
                 return {
                     type: "quizmaster_restoreSession",
@@ -49,7 +48,7 @@ export default class GameService {
                     gameState: game.gameState,
                     teams: game.teams
                 };
-            } else if (game && game.teams.find(team => team.sessionId === sessionId) && loginRole === "Team") {
+            } else if (game && game.teams.length > 0 && game.teams.find(team => team.sessionId === sessionId) && loginRole === "Team") {
                 const team = game.teams.find(team => team.sessionId === sessionId);
                 return {
                     type: "team_restoreSession",

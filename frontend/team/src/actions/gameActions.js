@@ -1,5 +1,6 @@
 import environment from "../environments/environment";
 import { viewWaitingscreenAction, restoreActiveScreenFromGameState } from "./viewActions";
+import { initSocket } from "./wsActions";
 
 export function joinRoomAction(gameState) {
     return {
@@ -34,11 +35,15 @@ export function joinRoom(roomKey, teamName) {
         fetch(`${environment.API_URL}/room/${roomKey}`, method)
             .then(async response => {
                 const body = await response.json();
+                console.log("JOIN ROOM");
+                console.log(body);
+                console.log("----------");
                 if (!response.ok) {
                     throw new Error(body.error);
                 } else {
                     dispatch(joinRoomAction(body));
                     dispatch(viewWaitingscreenAction());
+                    dispatch(initSocket());
                 }
             })
             .catch(err => {
@@ -60,11 +65,15 @@ export function restoreSession() {
         fetch(`${environment.API_URL}/room/restore`, method)
             .then(async response => {
                 const body = await response.json();
+                console.log("RESTORE");
+                console.log(body);
+                console.log("----------");
                 if (!response.ok) {
                     throw new Error(body.error);
                 } else {
                     dispatch(restoreSessionAction(body));
                     dispatch(restoreActiveScreenFromGameState(body.gameState));
+                    dispatch(initSocket());
                 }
             })
             .catch(err => {

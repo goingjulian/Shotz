@@ -1,6 +1,6 @@
 import ws from "ws";
 import GameService from "./gameService";
-import ShotzException from '../exceptions/ShotzException';
+import ShotzException from "../exceptions/ShotzException";
 
 let websocketServer;
 
@@ -31,26 +31,32 @@ function _onConnection(websocket, req) {
 
 export async function sendMessageTeams(roomKey, message) {
     const teams = await GameService.getTeams(roomKey);
-
     if (!teams) {
-        throw new ShotzException(`No teams found for roomKey ${roomKey}`)
+        throw new ShotzException(`No teams found for roomKey ${roomKey}`);
+    } else {
+        websocketServer.clients.forEach(client => {
+            if (teams.includes(client.sessionId)) _sendMessage(client, message);
+        });
     }
-
-    websocketServer.clients.forEach(client => {
-        if (teams.includes(client.sessionId)) _sendMessage(client, message);
-    });
 }
 
 export async function sendMessageQuizmaster(roomKey, message) {
     const quizmasterId = await GameService.getQuizmaster(roomKey);
 
-    if (!quizmasterId) throw new ShotzException(`No teams found for roomKey ${roomKey}`)
+    if (!quizmasterId) throw new ShotzException(`No teams found for roomKey ${roomKey}`);
 
     for (let client of websocketServer.clients) {
-        // console.log("CLIENT: ", client.sessionId)
-        // console.log(quizmasterId)
-        // console.log(client.sessionId === quizmasterId)
         if (client.sessionId === quizmasterId) _sendMessage(client, message);
+    }
+}
+
+export async function sendMessageTeam(roomKey, sessionId, message) {
+    const teams = await GameService.getTeams(roomKey);
+    if (!teams) {
+    } else {
+        websocketServer.clients.forEach(team => {
+            if (team.sessionId === sessionId) _sendMessage(client, message);
+        });
     }
 }
 
