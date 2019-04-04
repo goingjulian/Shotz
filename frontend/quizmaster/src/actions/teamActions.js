@@ -38,15 +38,13 @@ export function alterTeamAcceptedStatus(roomKey, sessionId, accepted) {
             body: JSON.stringify({ accepted: accepted })
         })
 
-        if (response.ok) {
-            if (accepted) {
-                dispatch(acceptTeamAction(sessionId))
-            } else {
-                dispatch(rejectTeamAction(sessionId))
-            }
+        const body = await response.json()
 
+        if (!response.ok) {
+            throw new Error(body.error);
+        } else {
+            accepted ? dispatch(acceptTeamAction(sessionId)) : dispatch(rejectTeamAction(sessionId));
         }
-
     }
 }
 
@@ -68,29 +66,29 @@ export function getTeamList(roomKey) {
     };
 }
 
-export function editTeamStatus(roomKey, sessionId, accepted) {
-    return dispatch => {
-        const body = {
-            accepted: accepted
-        };
-        const method = {
-            method: "PUT",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body)
-        };
-        fetch(`${environment.API_URL}/room/${roomKey}/team/${sessionId}`, method).then(async response => {
-            const body = await response.json();
-            if (!response.ok) {
-                throw new Error(body.error);
-            } else {
-                accepted ? dispatch(acceptTeamAction(sessionId)) : dispatch(rejectTeamAction(sessionId));
-            }
-        });
-    };
-}
+// export function editTeamStatus(roomKey, sessionId, accepted) {
+//     return dispatch => {
+//         const body = {
+//             accepted: accepted
+//         };
+//         const method = {
+//             method: "PUT",
+//             credentials: "include",
+//             headers: {
+//                 "Content-Type": "application/json"
+//             },
+//             body: JSON.stringify(body)
+//         };
+//         fetch(`${environment.API_URL}/room/${roomKey}/team/${sessionId}`, method).then(async response => {
+//             const body = await response.json();
+//             if (!response.ok) {
+
+//             } else {
+                
+//             }
+//         });
+//     };
+// }
 
 
 
