@@ -66,50 +66,14 @@ export function getTeamList(roomKey) {
     };
 }
 
-// export function editTeamStatus(roomKey, sessionId, accepted) {
-//     return dispatch => {
-//         const body = {
-//             accepted: accepted
-//         };
-//         const method = {
-//             method: "PUT",
-//             credentials: "include",
-//             headers: {
-//                 "Content-Type": "application/json"
-//             },
-//             body: JSON.stringify(body)
-//         };
-//         fetch(`${environment.API_URL}/room/${roomKey}/team/${sessionId}`, method).then(async response => {
-//             const body = await response.json();
-//             if (!response.ok) {
+export function clearRejectedTeamsAction() {
 
-//             } else {
-                
-//             }
-//         });
-//     };
-// }
+}
 
-
-
-// export function addTeam(teamId, name) {
-//     return {
-//         type: lobbyActionTypes.addTeam,
-//         teamId: teamId,
-//         teamName: name
-//     }
-// }
-
-// export function addMultipleTeams(teamList) {
-//     return {
-//         type: lobbyActionTypes.addMultipleTeams,
-//         teamList: teamList
-//     }
-// }
-
-
-// export function clearRejectedTeamsAction() {
-//     return {
-//         type: lobbyActionTypes.clearRejectedTeams
-//     }
-// }
+export function clearRejectedTeams() {
+    return async dispatch => {
+        const method = {
+            
+        }
+    }
+}
