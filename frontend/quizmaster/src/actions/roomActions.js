@@ -1,5 +1,5 @@
 import environment from '../environments/environment'
-import { lobbyViewAction } from './viewActions'
+import { setViewByGameState, lobbyViewAction } from './viewActions'
 import { initSocket } from '../helpers/websocketHelper'
 import { setTeams } from './teamActions'
 
@@ -55,8 +55,7 @@ export function restoreRoomState() {
 
                 dispatch(setTeams(parsedRes.teams));
                 dispatch(createRoomAction(parsedRes.roomKey));
-                dispatch(lobbyViewAction());
-                
+                dispatch(setViewByGameState(parsedRes.gameState));
             }
         } catch (error) {
             // console.log(error)

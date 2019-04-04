@@ -18,7 +18,7 @@ export default class GameDAO {
     }
 
     static getTeams(roomKey) {
-        return Game.findOne({roomKey: roomKey}, {_id: 0, 'teams._id': 0});
+        return Game.findOne({ roomKey: roomKey }, { _id: 0, 'teams._id': 0 });
     }
 
     static setTeamAccepted(roomKey, teamSessionId) {
@@ -54,7 +54,7 @@ export default class GameDAO {
         )
             .then(doc => {
                 console.log(doc)
-                if(doc.n < 1) {
+                if (doc.n < 1) {
                     throw new Error('Team not found')
                 }
             })
@@ -74,7 +74,6 @@ export default class GameDAO {
         )
             .then(doc => {
                 console.log(doc)
-                if(doc.n < 1) throw new Error("Not authorized or invalid roomKey")
                 return "Success"
             })
             .catch(err => {
@@ -109,5 +108,30 @@ export default class GameDAO {
                 }
             }
         );
+    }
+
+    static addRound(roomKey, sessionId, chosenQuestions, categories) {
+        console.log(sessionId)
+        return Game.updateOne(
+            { roomKey: roomKey, quizmaster: sessionId },
+            {
+                $push: {
+                    rounds: {
+                        categories: categories,
+                        questions: chosenQuestions
+                    }
+                }
+            }
+        )
+            .then(doc => {
+                console.log(doc)
+                if(doc.n < 1) {
+                    throw new Error('User not authorized')
+                }
+                return {
+                    categories: categories,
+                    questions: chosenQuestions
+                }
+            })
     }
 }

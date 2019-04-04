@@ -24,6 +24,7 @@ dotenv.config();
 import cors from 'cors';9
 
 import room from './routes/roomRouter';
+import category from './routes/questionsRouter'
 import { initWSServer } from './service/websocketService'
 
 const app = express();
@@ -95,6 +96,7 @@ function runAPIServer() {
   app.use(sessionParser);
 
   app.use('/room', room);
+  app.use('/question', category)
 
   httpServer.listen(APIPort, () => {
     console.log(`INFO: API Server listening on port ${APIPort}`);
@@ -105,28 +107,3 @@ function shutdownAPIServer() {
   console.log(`WARNING: API Server shutting down`);
   httpServer.close(() => console.log(`WARNING: API server is offline`));
 }
-
-// function runWsServer() {
-//     websocketServer = new ws.Server({
-//         server: httpServer,
-//         path: "/ws"
-//     })
-
-//     new WebsocketService(websocketServer, sessionParser)
-
-//     // websocketServer.on("connection", (websocket, req) => {
-        
-
-//     //     websocket.on("message", message => {
-//     //         console.log("WS message received: ", message, " from ", websocket.sessionId)
-//     //     })
-
-//     // websocket.on('message', message => {
-//     //   console.log('WS message received: ', message, ' from ', websocket.sessionId);
-//     // });
-
-//     // websocket.on('close', () => {
-//     //   console.log('Websocket connection closed');
-//     // });
-// //   });
-// }

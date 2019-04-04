@@ -3,6 +3,9 @@ import GameService from "../service/gameService";
 import { sendMessageQuizmaster, sendMessageTeam } from "../service/websocketService";
 const router = express.Router();
 
+/**
+ * Create a room as a quizmaster
+ */
 router.route("/").post((req, res, next) => {
     const quizmasterId = req.session.id;
     GameService.createRoom(quizmasterId)
@@ -15,6 +18,9 @@ router.route("/").post((req, res, next) => {
         });
 });
 
+/**
+ * Restore a session
+ */
 router.route("/restore").post((req, res, next) => {
     const roomKey = req.session.roomKey;
     const sessionId = req.session.id;
@@ -31,6 +37,9 @@ router.route("/restore").post((req, res, next) => {
         });
 });
 
+/**
+ * Accept or reject teams
+ */
 router.route("/:roomKey/team/:teamSessionId").put((req, res, next) => {
     const roomKey = req.params.roomKey;
     const teamSessionId = req.params.teamSessionId;
@@ -54,21 +63,26 @@ router.route("/:roomKey/team/:teamSessionId").put((req, res, next) => {
         });
 });
 
-//delete all not-accepted teams
+/**
+ * delete all not-accepted teams
+ */
 router.route("/:roomKey/teams").delete((req, res, next) => {
     const roomKey = req.params.roomKey;
     const sessionId = req.session.id;
-    
+
     GameService.removeUnacceptedTeams(roomKey, sessionId)
-    .then(teams => {
-        res.json(teams)
-    })
-    .catch(err => {
-        console.log(err)
-        next(err)
-    })
+        .then(teams => {
+            res.json(teams)
+        })
+        .catch(err => {
+            console.log(err)
+            next(err)
+        })
 })
 
+/**
+ * Join a room as a team
+ */
 router.route("/:roomKey").post((req, res, next) => {
     const roomKey = req.params.roomKey;
     const sessionId = req.session.id;
@@ -87,6 +101,9 @@ router.route("/:roomKey").post((req, res, next) => {
         });
 });
 
+/**
+ * Get all teams in a room as quizmaster
+ */
 router.route("/:roomKey/teams").get((req, res, next) => {
     const roomKey = req.params.roomKey;
     GameService.getTeams(roomKey)
@@ -95,6 +112,22 @@ router.route("/:roomKey/teams").get((req, res, next) => {
             res.status(200).json(teams);
         })
         .catch(err => next(err))
+});
+
+router.route("/:roomKey/round").post((req, res, next) => {
+    const roomKey = req.params.roomKey;
+    const categories = req.body.categories;
+    const sessionId = req.session.id;
+    console.log(roomKey, sessionId, categories)
+    GameService.startNewRound(roomKey, sessionId, categories)
+        .then(response => {
+            console.log(response);
+            res.json(response);
+        })
+        .catch(err => {
+            console.log(err);
+            next(err)
+        })
 })
 
 router.use((err, req, res, next) => {

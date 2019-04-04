@@ -1,7 +1,9 @@
 import Game from "../models/Game";
 import GameDAO from "../DAO/GameDao";
+import QuestionDAO from '../DAO/QuestionDao'
 import ShotzException from "../exceptions/ShotzException";
 import gameStates from '../definitions/gameStates'
+import { questionSchema } from "../models/question";
 
 export default class GameService {
     static async createRoom(quizmasterId) {
@@ -131,9 +133,46 @@ export default class GameService {
             await GameDAO.removeUnacceptedTeams(roomKey, quizmasterSessionId)
             await GameDAO.alterGameState(roomKey, quizmasterSessionId, gameStates.CATEGORY_SELECT)
             return await this.getTeams(roomKey)
-        } catch(err) {
+        } catch (err) {
             console.log(err)
             throw new ShotzException(`Error, ${err}`, 500)
         }
+    }
+
+    static async startNewRound(roomKey, sessionId, categories) {
+        try {
+            const allQuestions = await QuestionDAO.getAllQuestionsByCategories(categories);
+
+            const chosenQuestions = this.pickRandomquestions(allQuestions, 12);
+
+            const round = await GameDAO.addRound(roomKey, sessionId, chosenQuestions, categories);
+            await GameDAO.alterGameState(roomKey, sessionId, gameStates.IN_ROUND);
+
+            return {
+                gameState: gameStates.IN_ROUND,
+                round: round
+            };
+        } catch (err) {
+            throw new ShotzException(err.message, 401);
+        }
+    }
+
+    static pickRandomquestions(questions, amount) {
+        const chosenQuestions = []
+        const questionAmount = questions.length > amount ? amount : questions.length
+
+        for (let i = 0; i < questionAmount; i++) {
+            const randomNumber = Math.floor(Math.random() * questions.length);
+            const questionAlreadyPicked = chosenQuestions.find(question => question._id === questions[randomNumber]._id);
+
+            if (!questionAlreadyPicked) {
+                chosenQuestions.push(questions[randomNumber]);
+            } else {
+                console.log("Duplicate number!")
+                i--;
+            }
+        }
+
+        return chosenQuestions;
     }
 }
