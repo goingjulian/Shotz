@@ -3,7 +3,8 @@ import environment from '../environments/environment'
 export const teamActionTypes = {
     SET_TEAMS: "SET_TEAMS",
     ACCEPT_TEAM: "ACCEPT_TEAM",
-    REJECT_TEAM: "REJECT_TEAM"
+    REJECT_TEAM: "REJECT_TEAM",
+    CLEAR_REJECTED: "CLEAR_REJECTED"
 };
 
 export function setTeams(teamList) {
@@ -29,14 +30,16 @@ export function rejectTeamAction(sessionId) {
 
 export function alterTeamAcceptedStatus(roomKey, sessionId, accepted) {
     return async dispatch => {
-        const response = await fetch(`${environment.API_URL}/room/${roomKey}/team/${sessionId}`, {
+        const method = {
             method: 'PUT',
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ accepted: accepted })
-        })
+        }
+
+        const response = await fetch(`${environment.API_URL}/room/${roomKey}/team/${sessionId}`, method)
 
         const body = await response.json()
 
@@ -49,7 +52,6 @@ export function alterTeamAcceptedStatus(roomKey, sessionId, accepted) {
 }
 
 export function getTeamList(roomKey) {
-    console.log("Getting teamlist");
     return dispatch => {
         const method = {
             method: "GET",
@@ -66,14 +68,23 @@ export function getTeamList(roomKey) {
     };
 }
 
-export function clearRejectedTeamsAction() {
-
-}
-
-export function clearRejectedTeams() {
+export function clearRejectedTeams(roomKey) {
     return async dispatch => {
         const method = {
-            
+            method: 'DELETE',
+            credentials: 'include',
         }
+
+        const response = await fetch(`${environment.API_URL}/room/${roomKey}/teams`)
+
+        if(!response.ok) {
+            throw new Error('Server error')
+        }
+
+        const body = await response.json()
+
+        console.log(body)
+
+        dispatch(setTeams(body.teamList))
     }
 }

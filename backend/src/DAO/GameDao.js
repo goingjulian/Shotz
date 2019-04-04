@@ -28,7 +28,7 @@ export default class GameDAO {
         )
             .then(doc => {
                 console.log(doc)
-                if(doc.n < 1) {
+                if (doc.n < 1) {
                     console.log('doc error')
                     throw new Error(`Team not found`)
                 }
@@ -51,6 +51,38 @@ export default class GameDAO {
             .then(doc => console.log(doc))
             .catch(err => {
                 throw new Error('Team not found')
+            })
+    }
+
+    static removeUnacceptedTeams(roomKey, quizmasterSessionId) {
+        return Game.updateOne(
+            { roomKey: roomKey, quizmaster: quizmasterSessionId, gameState: 'REGISTER' },
+            {
+                $pull: {
+                    'teams': { 'accepted': false }
+                }
+            }
+        )
+            .then(doc => {
+                console.log(doc)
+                return "success"
+            })
+            .catch(err => {
+                throw new Error('Not authorized')
+            })
+    }
+
+    static alterGameState(roomKey, quizmasterSessionId, newState) {
+        return Game.updateOne(
+            { roomKey: roomKey, quizmaster: quizmasterSessionId },
+            { gameState: newState }
+        )
+            .then(doc => {
+                console.log(doc)
+                return "success"
+            })
+            .catch(err => {
+                throw new Error('Error gamestate')
             })
     }
 

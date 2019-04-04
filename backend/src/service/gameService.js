@@ -116,10 +116,17 @@ export default class GameService {
             console.log(err)
             throw new ShotzException("Team not found", 404)
         }
+    }
 
-        
-
-
-
+    static async removeUnacceptedTeams(roomKey, quizmasterSessionId) {
+        try {
+            await GameDAO.removeUnacceptedTeams(roomKey, quizmasterSessionId)
+            await GameDAO.alterGameState(roomKey, quizmasterSessionId, "CATEGORY_SELECT")
+            const teamList = await getTeams(roomKey)
+            return {teamList: teamList}
+        } catch(err) {
+            console.log(err)
+            throw new ShotzException(`Error, ${err}`, 500)
+        }
     }
 }
