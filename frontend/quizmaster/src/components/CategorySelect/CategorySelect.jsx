@@ -2,6 +2,7 @@ import React from 'react'
 import * as ReactRedux from 'react-redux'
 
 import { startRound } from '../../actions/roundsActions'
+import { getAllCategories } from '../../actions/questionActions'
 import { controlPanelViewAction } from '../../actions/viewActions'
 import './CategorySelect.scss'
 
@@ -15,6 +16,10 @@ class CategorySelect extends React.Component {
         }
     }
 
+    componentDidMount() {
+        this.props.getAllCategories()
+    }
+
     render() {
         return (
             <div className="categorySelect">
@@ -22,7 +27,7 @@ class CategorySelect extends React.Component {
                 <h2>Select min. 1 and max. 3 question categories</h2>
 
                 <select multiple onChange={this.onSelectCategory.bind(this)}>
-                    {this.props.categories.map(cat => <option value={cat.id} key={cat.id}>{cat.name}</option>)}
+                    {this.props.allCategories.map(cat => <option value={cat} key={cat}>{cat}</option>)}
                 </select>
 
                 <p>Hold down the <span className="key">ctr</span> button on Windows,
@@ -32,7 +37,7 @@ class CategorySelect extends React.Component {
 
                 <button
                     disabled={!this.state.selectedCategories.length > 0 || this.state.error}
-                    onClick={() => this.props.startRound(this.state.selectedCategories)}>
+                    onClick={() => this.props.startRound(this.props.roomKey, this.state.selectedCategories)}>
                     Start round</button>
             </div>
         )
@@ -64,14 +69,16 @@ class CategorySelect extends React.Component {
 function mapStateToProps(state) {
     console.log(state)
     return {
-        categories: state.questions.categories
+        roomKey: state.room.roomKey,
+        allCategories: state.questions.allCategories
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        startRound: (selectedCategories) => {
-            dispatch(startRound(selectedCategories));
+        getAllCategories: () => dispatch(getAllCategories()),
+        startRound: (roomKey, selectedCategories) => {
+            dispatch(startRound(roomKey, selectedCategories));
             dispatch(controlPanelViewAction());
         }
     }

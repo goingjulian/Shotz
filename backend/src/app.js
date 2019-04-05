@@ -21,9 +21,10 @@ import connectMongo from 'connect-mongo';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config();
-import cors from 'cors';9
+import cors from 'cors'; 9
 
 import room from './routes/roomRouter';
+import category from './routes/questionsRouter'
 import { initWSServer } from './service/websocketService'
 
 const app = express();
@@ -95,6 +96,13 @@ function runAPIServer() {
   app.use(sessionParser);
 
   app.use('/room', room);
+  app.use('/question', category);
+
+  app.use((err, req, res, next) => {
+    const errMsg = err.message || "Destination URL not found";
+    const errCode = err.htmlErrorCode || 404;
+    res.status(errCode).json({ error: `${errMsg}` });
+  });
 
   httpServer.listen(APIPort, () => {
     console.log(`INFO: API Server listening on port ${APIPort}`);
@@ -105,28 +113,3 @@ function shutdownAPIServer() {
   console.log(`WARNING: API Server shutting down`);
   httpServer.close(() => console.log(`WARNING: API server is offline`));
 }
-
-// function runWsServer() {
-//     websocketServer = new ws.Server({
-//         server: httpServer,
-//         path: "/ws"
-//     })
-
-//     new WebsocketService(websocketServer, sessionParser)
-
-//     // websocketServer.on("connection", (websocket, req) => {
-        
-
-//     //     websocket.on("message", message => {
-//     //         console.log("WS message received: ", message, " from ", websocket.sessionId)
-//     //     })
-
-//     // websocket.on('message', message => {
-//     //   console.log('WS message received: ', message, ' from ', websocket.sessionId);
-//     // });
-
-//     // websocket.on('close', () => {
-//     //   console.log('Websocket connection closed');
-//     // });
-// //   });
-// }

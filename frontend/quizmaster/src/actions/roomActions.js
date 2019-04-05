@@ -1,7 +1,7 @@
-import environment from "../environments/environment";
-import { lobbyViewAction, loginViewAction } from "./viewActions";
-import { initSocket } from "../helpers/websocketHelper";
-import { removeTeamsAction, setTeamsAction } from "./teamActions";
+import environment from '../environments/environment'
+import { lobbyViewAction } from './viewActions'
+import { initSocket } from '../helpers/websocketHelper'
+import { setTeams } from './teamActions'
 
 export const roomActionTypes = {
     createRoom: " createRoom",
@@ -34,7 +34,7 @@ export function createRoom() {
                 throw new Error(body.error);
             } else {
                 dispatch(createRoomAction(body.roomKey));
-                dispatch(lobbyViewAction());
+            dispatch(setViewByGameState(body.gameState))
                 dispatch(initSocket());
             }
         } catch (err) {
@@ -87,7 +87,7 @@ export function restoreSession() {
             } else {
                 dispatch(setTeamsAction(body.teams));
                 dispatch(createRoomAction(body.roomKey));
-                dispatch(lobbyViewAction());
+                dispatch(setViewByGameState(body.gameState));
                 dispatch(initSocket());
             }
         } catch (err) {

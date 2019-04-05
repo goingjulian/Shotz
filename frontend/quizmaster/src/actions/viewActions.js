@@ -29,3 +29,23 @@ export function controlPanelViewAction() {
         type: viewActionTypes.ControlPanelView
     }
 }
+
+export function setViewByGameState(gameState) {
+    return async dispatch => {
+        console.log("state = ", gameState)
+        switch (gameState) {
+            case "REGISTER":
+                dispatch(lobbyViewAction())
+                break;
+            case "CATEGORY_SELECT":
+                dispatch(categorySelectViewAction())
+                break;
+            case "IN_ROUND":
+                dispatch(controlPanelViewAction())
+                break;
+            default:
+                dispatch(loginViewAction())
+                break;
+        }
+    }
+}
