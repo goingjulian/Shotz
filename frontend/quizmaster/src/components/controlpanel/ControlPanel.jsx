@@ -9,7 +9,7 @@ import './ControlPanel.scss';
 
 class ControlPanel extends React.Component {
   render() {
-    console.log("ROUNDS CONTROL", this.props.rounds);
+    console.log("ROUNDS CONTROL");
     return (
       <div className="ControlPanel">
         <Scoreboard 
@@ -17,8 +17,8 @@ class ControlPanel extends React.Component {
         />
         <QuestionInfo />
         <QuestionQueue
-          questions={this.props.rounds.currentRound.questions}
-          currentQuestionIndex={this.props.rounds.currentQuestionIndex}
+          questions={this.props.rounds[this.props.rounds.length - 1].questions}
+          currentQuestionIndex={this.props.rounds[this.props.rounds.length - 1].activeQuestionIndex}
         />
       </div>
     );

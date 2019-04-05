@@ -2,6 +2,7 @@ import environment from '../environments/environment'
 import { initSocket } from '../helpers/websocketHelper'
 import { setViewByGameState, loginViewAction } from './viewActions';
 import { removeTeamsAction, setTeamsAction } from './teamActions';
+import { setRoundsAction } from './roundsActions'
 
 export const roomActionTypes = {
     createRoom: " createRoom",
@@ -82,11 +83,14 @@ export function restoreSession() {
                 }
             });
             const body = await response.json();
+
             if (!response.ok) {
                 throw new Error(body.error);
             } else {
+                console.log(body)
                 dispatch(setTeamsAction(body.teams));
                 dispatch(createRoomAction(body.roomKey));
+                dispatch(setRoundsAction(body.rounds, body.currentQuestionIndex));
                 dispatch(setViewByGameState(body.gameState));
                 dispatch(initSocket());
             }
