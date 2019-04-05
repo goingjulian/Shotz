@@ -49,15 +49,12 @@ export function leaveGame(roomKey) {
                 console.log("LEAVE ROOM");
                 console.log(body);
                 console.log("----------");
-                if (!response.ok) {
-                    throw new Error(body.error);
-                } else {
-                    dispatch(leaveGameAction());
-                    dispatch(viewLobbyAction());
-                }
+                dispatch(leaveGameAction());
+                dispatch(viewLobbyAction());
+                throw new Error(body.error);
             })
             .catch(err => {
-                console.log(err);
+                console.log(err.message);
             });
     };
 }
@@ -87,7 +84,7 @@ export function joinRoom(roomKey, teamName) {
                 }
             })
             .catch(err => {
-                console.log(err);
+                console.log(err.message);
             });
     };
 }

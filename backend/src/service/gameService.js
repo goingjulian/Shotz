@@ -47,7 +47,6 @@ export default class GameService {
 
     static async restoreSession(roomKey, loginRole, sessionId) {
         try {
-            console.log(typeof loginRole)
             if (typeof loginRole !== "string") throw new ShotzException("Invalid format: role must be a string", 400);
 
             const game = await GameDAO.getGame(roomKey).lean();
@@ -151,7 +150,7 @@ export default class GameService {
                     type: "team_leftGame"
                 };
             } else {
-                throw new ShotzException(`Unable to remove you from the game ${roomKey}!`, 500);
+                throw new ShotzException(`You already were removed or we're unable to remove you from the game ${roomKey}!`, 500);
             }
         } catch (err) {
             console.log(`leaveGame error: ${err.message}`);
