@@ -9,6 +9,15 @@
   overflow: hidden;
 
   border-bottom: 1px solid $border-grey;
+
+  &.current {
+    background-color: lightblue;
+  }
+
+  &.greyedOut {
+    background-color: grey;
+  }
+
   .itemIndex {
     padding-right: 10px;
   }

@@ -4,7 +4,8 @@ import Item from "../General/Item";
 
 class QuestionInfo extends React.Component {
   render() {
-    const answers = [
+
+    const STATICanswers = [
       {
         team: "Fritzzers",
         answer: "Frankrijk?"
@@ -22,27 +23,30 @@ class QuestionInfo extends React.Component {
         answer: "This is the voice of PARIS"
       }
     ];
-    const answerItems = answers.map((answer, index) => (
+    const answerItems = STATICanswers.map((answer, index) => (
       <Item
         key={index}
         text={answer.answer}
         team={answer.team}
         itemClass="AnswerItem"
-        closeHandler={() => {}}
-        acceptHandler={() => {}}
+        closeHandler={() => { }}
+        acceptHandler={() => { }}
       />
     ));
     return (
       <div className="QuestionInfo">
         <div className="infoActions">
-          <h2>Round 1</h2>
+          <button>Show answer to teams</button>
+          <h2>Round {this.props.rounds.currentRoundIndex + 1}</h2>
+          <button>Next question</button>
         </div>
         <div className="infoQuestion">
           <h2>
-            Question 1/12: <span>What's the capital of Paris?</span>
+            Question {this.props.rounds.currentQuestionIndex + 1}/{this.props.rounds.currentRound.questions.length + 1}:
+            <span> {this.props.rounds.currentQuestion}</span>
           </h2>
           <h2>
-            Answer: <span>Don't do drugs kids.</span>
+            Answer: <span>{this.props.rounds.currentAnswer}</span>
           </h2>
         </div>
         <div className="infoAnswers">
@@ -55,7 +59,10 @@ class QuestionInfo extends React.Component {
 }
 
 function mapStateToProps(state) {
-  return {};
+  console.log(state)
+  return {
+    rounds: state.rounds.rounds
+  };
 }
 
 function mapDispatchToProps(dispatch) {
