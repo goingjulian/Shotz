@@ -1,7 +1,7 @@
 import environment from '../environments/environment'
-import { lobbyViewAction } from './viewActions'
 import { initSocket } from '../helpers/websocketHelper'
-import { setTeams } from './teamActions'
+import { setViewByGameState, loginViewAction } from './viewActions';
+import { removeTeamsAction, setTeamsAction } from './teamActions';
 
 export const roomActionTypes = {
     createRoom: " createRoom",
