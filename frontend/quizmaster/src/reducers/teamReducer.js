@@ -10,7 +10,7 @@ export default function teamReducer(state = initialTeamState, action) {
         case teamActionTypes.SET_TEAMS:
             return { ...state, teamList: action.teamList };
         case teamActionTypes.ACCEPT_TEAM:
-            teamIndex = state.teamList.findIndex(team => team.sessionid === action.sessionId);
+            teamIndex = state.teamList.findIndex(team => team.sessionId === action.sessionId);
             teamList = state.teamList.slice();
             teamList[teamIndex].accepted = true;
             return { ...state, teamList: teamList };
