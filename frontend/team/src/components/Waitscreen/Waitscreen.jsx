@@ -10,13 +10,13 @@ class Waitingscreen extends React.Component {
             <div className="Waitscreen Component">
                 <nav>
                     <div className="navInner">
-                        <div className="navCloseGame">
+                        <div className="navLeft">
                             <button onClick={() => this.props.leaveGame(this.props.roomKey)}>Leave</button>
                         </div>
-                        <div className="navTeamName">
-                            <span>Team: {this.props.teamName}</span>
+                        <div className="navMiddle">
+                            <h2>Team: {this.props.teamName}</h2>
                         </div>
-                        <div className="navRoomKey">
+                        <div className="navRight">
                             <span>Room: {this.props.roomKey}</span>
                         </div>
                     </div>

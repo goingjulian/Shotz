@@ -1,12 +1,5 @@
-@import url("https://fonts.googleapis.com/css?family=Nunito+Sans:400,400i,600,600i,700,700i");
-
-body,
-html,
-.App,
-#root {
-    width: 100%;
-    min-height: 100%;
-}
+@import "variables";
+@import url("https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700");
 
 * {
     margin: 0;
@@ -14,7 +7,7 @@ html,
 
     box-sizing: border-box;
 
-    font-family: "Nunito Sans", verdana, sans-serif;
+    font-family: "Montserrat", verdana, sans-serif;
     font-size: 1em;
     line-height: 1em;
     font-weight: normal;
@@ -29,11 +22,25 @@ ol {
     list-style: none;
 }
 
-button {
+button,
+input {
     background: transparent;
     border: none;
     outline: none;
     box-shadow: none;
+    cursor: pointer;
+}
+
+.bttn {
+    padding: 15px 30px;
+    font-size: 1.2em;
+    font-weight: 500;
+    color: $text-color-dark;
+    border: 1px solid $border-grey;
+    cursor: pointer;
+    &:hover {
+        background-color: $border-grey;
+    }
 }
 
 .Component {
@@ -42,9 +49,11 @@ button {
     nav {
         width: 100%;
         height: 50px;
+        padding: 5px 20px;
         display: flex;
         position: relative;
-        padding: 5px 20px;
+
+        background-color: $text-color-dark;
 
         .navInner {
             width: 100%;
@@ -52,16 +61,41 @@ button {
             display: flex;
             line-height: 50px;
             position: relative;
+
+            .navLeft {
+                position: absolute;
+                top: 0;
+                left: 0;
+                button {
+                  color: $white;
+                  &:hover {
+                    color: $theme;
+                  }
+                }
+            }
+            .navMiddle {
+                margin: auto;
+                h2 {
+                    color: $white;
+                }
+            }
+            .navRight {
+                position: absolute;
+                top: 0;
+                right: 0;
+            }
+
             > div {
                 height: 100%;
                 display: flex;
+                h1,
+                h2,
                 span {
                     margin: auto 0;
+                    color: $white;
                 }
             }
         }
-
-        background-color: yellow;
     }
     main {
         padding: 40px;

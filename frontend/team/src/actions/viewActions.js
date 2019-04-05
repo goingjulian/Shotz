@@ -1,6 +1,7 @@
 export const viewActionTypes = {
     VIEW_LOBBY: 1,
-    VIEW_WAITINGSCREEN: 2
+    VIEW_WAITINGSCREEN: 2,
+    VIEW_QUESTIONSCREEN: 3
 };
 
 export function viewLobbyAction() {
@@ -12,6 +13,12 @@ export function viewLobbyAction() {
 export function viewWaitingscreenAction() {
     return {
         type: viewActionTypes.VIEW_WAITINGSCREEN
+    };
+}
+
+export function viewQuestionScreenAction() {
+    return {
+        type: viewActionTypes.VIEW_QUESTIONSCREEN
     };
 }
 

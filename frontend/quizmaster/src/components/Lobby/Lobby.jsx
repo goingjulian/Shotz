@@ -57,8 +57,6 @@ function Lobby(props) {
 
 function mapStateToProps(state) {
     return {
-        // teamList: state.lobby.teamList,
-        // roomKey: state.room.roomKey
         teamList: state.teams.teamList,
         roomKey: state.room.roomKey
     };
@@ -67,8 +65,6 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         leaveRoomAction: roomKey => dispatch(leaveRoom(roomKey)),
-        //loginViewAction: () => dispatch(loginViewAction()),
-        // categorySelectViewAction: () => dispatch(categorySelectViewAction()),
         acceptTeamAction: (roomKey, sessionId) => dispatch(alterTeamAcceptedStatus(roomKey, sessionId, true)),
         rejectTeamAction: (roomKey, sessionId) => dispatch(alterTeamAcceptedStatus(roomKey, sessionId, false)),
         clearRejectedTeamsAction: roomKey => dispatch(clearRejectedTeams(roomKey))
