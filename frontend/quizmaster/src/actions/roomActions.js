@@ -1,67 +1,97 @@
-import environment from '../environments/environment'
-import { lobbyViewAction } from './viewActions'
-import { initSocket } from '../helpers/websocketHelper'
-import { setTeams } from './teamActions'
+import environment from "../environments/environment";
+import { lobbyViewAction, loginViewAction } from "./viewActions";
+import { initSocket } from "../helpers/websocketHelper";
+import { removeTeamsAction, setTeamsAction } from "./teamActions";
 
 export const roomActionTypes = {
-    createRoom: " createRoom"
-}
+    createRoom: " createRoom",
+    LEAVE_ROOM: "LEAVE_ROOM"
+};
 
 export function createRoomAction(roomKey) {
     return {
         type: roomActionTypes.createRoom,
         roomKey: roomKey
-    }
+    };
+}
+
+export function leaveRoomAction() {
+    return {
+        type: roomActionTypes.LEAVE_ROOM
+    };
 }
 
 export function createRoom() {
     return async dispatch => {
         try {
             const response = await fetch(`${environment.API_URL}/room`, {
-                credentials: 'include',
-                mode: 'cors',
+                credentials: "include",
+                mode: "cors",
                 method: "post"
-            })
-
-            const parsedRes = await response.json()
-
-            const roomKey = parsedRes.roomKey
-
-            console.log("ROOMKEY IS " + roomKey)
-
-            dispatch(createRoomAction(roomKey))
-            dispatch(lobbyViewAction())
-        } catch (error) {
-            console.log(error)
+            });
+            const body = await response.json();
+            if (!response.ok) {
+                throw new Error(body.error);
+            } else {
+                dispatch(createRoomAction(body.roomKey));
+                dispatch(lobbyViewAction());
+                dispatch(initSocket());
+            }
+        } catch (err) {
+            console.log(err.message);
         }
-    }
+    };
 }
 
-export function restoreRoomState() {
+export function leaveRoom(roomKey) {
+    const method = {
+        method: "DELETE",
+        credentials: "include"
+    };
+    return dispatch => {
+        fetch(`${environment.API_URL}/room/${roomKey}/leave`, method)
+            .then(async response => {
+                const body = await response.json();
+                console.log("LEAVE ROOM");
+                console.log(body);
+                console.log("----------");
+                if (!response.ok) {
+                    throw new Error(body.error);
+                } else {
+                    dispatch(leaveRoomAction());
+                    dispatch(removeTeamsAction());
+                    dispatch(loginViewAction());
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    };
+}
+
+export function restoreSession() {
     return async dispatch => {
         try {
             const response = await fetch(`${environment.API_URL}/room/restore`, {
-                credentials: 'include',
-                mode: 'cors',
+                credentials: "include",
+                mode: "cors",
                 method: "post",
-                body: JSON.stringify({role: 'Quizmaster'}),
+                body: JSON.stringify({ role: "Quizmaster" }),
                 headers: {
-                    'Content-Type': 'application/json'
+                    "Content-Type": "application/json"
                 }
-            })
-
-            if (response.ok) {
-                const parsedRes = await response.json()
-
-                dispatch(setTeams(parsedRes.teams));
-                dispatch(createRoomAction(parsedRes.roomKey));
+            });
+            const body = await response.json();
+            if (!response.ok) {
+                throw new Error(body.error);
+            } else {
+                dispatch(setTeamsAction(body.teams));
+                dispatch(createRoomAction(body.roomKey));
                 dispatch(lobbyViewAction());
-                
+                dispatch(initSocket());
             }
-        } catch (error) {
-            // console.log(error)
-            console.log("No saved session")
+        } catch (err) {
+            console.log(err.message);
         }
-        dispatch(initSocket())
-    }
+    };
 }

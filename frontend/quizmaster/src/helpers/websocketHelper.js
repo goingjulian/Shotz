@@ -5,12 +5,12 @@ import { getTeamList, rejectTeamAction } from "../actions/teamActions";
 let reconnects = 0;
 
 export function initSocket() {
-    console.log("Connecting to socket");
+    console.log("Connecting to websocket");
     return async dispatch => {
         const socket = await new WebSocket(`${environment.WS_URL}/ws`);
 
         socket.onopen = () => {
-            console.log("socket connected");
+            console.log("Websocket connected");
             reconnects = 0;
         };
 
@@ -29,7 +29,7 @@ export function initSocket() {
                     dispatch(initSocket());
                 }, 5000);
             } else {
-                throw new Error("Socket connection could not be restored");
+                console.log("Websocket connection could not be restored");
             }
         };
     };

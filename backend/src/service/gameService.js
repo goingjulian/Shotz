@@ -120,16 +120,16 @@ export default class GameService {
     static async leaveGame(roomKey, sessionId) {
         try {
             const game = await GameDAO.getGame(roomKey).lean();
-            console.log(game);
             if (game) game.teams = [...game.teams];
-            if (game.quizmasterId === sessionId) {
-                GameDAO.removeGame(roomKey);
-                sendMessageTeams(roomKey, {
+            if (game.quizmaster === sessionId) {
+                await sendMessageTeams(roomKey, {
                     type: "team_quizmasterLeft"
                 });
                 game.teams.forEach(team => {
                     closeConnection(team.sessionId);
                 });
+                closeConnection(sessionId);
+                await GameDAO.deleteGame(roomKey);
                 return {
                     type: "quizmaster_leftGame"
                 };
