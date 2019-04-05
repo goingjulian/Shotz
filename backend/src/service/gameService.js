@@ -19,6 +19,8 @@ export default class GameService {
 
     static async joinRoom(roomKey, teamName, sessionId) {
         try {
+            if (typeof teamName !== "string") throw new ShotzException("Invalid format: teamName must be a string", 400);
+
             const game = await GameDAO.getGame(roomKey).lean();
             if (!game) {
                 throw new ShotzException(`There was no room found with room key ${roomKey}`, 404);
@@ -38,12 +40,16 @@ export default class GameService {
             }
         } catch (err) {
             console.log(`joinRoom error: ${err.message}`);
-            throw new ShotzException(err.message, 500);
+            if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
+            else throw err;
         }
     }
 
     static async restoreSession(roomKey, loginRole, sessionId) {
         try {
+            console.log(typeof loginRole)
+            if (typeof loginRole !== "string") throw new ShotzException("Invalid format: role must be a string", 400);
+
             const game = await GameDAO.getGame(roomKey).lean();
             if (game) game.teams = [...game.teams];
             if (game && game.quizmaster === sessionId && loginRole === "Quizmaster") {
@@ -156,6 +162,8 @@ export default class GameService {
 
     static async alterTeamStatus(roomKey, sessionId, accepted) {
         try {
+            if (typeof accepted !== "boolean") throw new ShotzException("Invalid format: accepted must be a boolean", 400);
+
             if (accepted) {
                 await GameDAO.setTeamAccepted(roomKey, sessionId);
                 sendMessageTeam(roomKey, sessionId, {
@@ -178,7 +186,8 @@ export default class GameService {
             }
         } catch (err) {
             console.log(`alterTeamStatus error: ${err.message}`);
-            throw new ShotzException("Team not found", 404);
+            if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
+            else throw err;
         }
     }
 
@@ -189,12 +198,20 @@ export default class GameService {
             return await this.getTeams(roomKey);
         } catch (err) {
             console.log(err);
-            throw new ShotzException(`Error, ${err}`, 500);
+            if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
+            else throw err;
         }
     }
 
     static async startNewRound(roomKey, sessionId, categories) {
         try {
+            if (!Array.isArray(categories)) {
+                throw new ShotzException('Invalid format: the chosen categories have to be in an array', 400);
+            }
+            if (categories.length < 1 || categories.length > 3) {
+                throw new ShotzException('Invalid length: you need at leat 1 and max 3 categories to start a round', 400);
+            }
+
             const allQuestions = await QuestionDAO.getAllQuestionsByCategories(categories);
 
             const chosenQuestions = this.pickRandomquestionsFromList(allQuestions, 12);
@@ -208,7 +225,8 @@ export default class GameService {
                 round: round
             };
         } catch (err) {
-            throw new ShotzException(err.message, 401);
+            if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
+            else throw err;
         }
     }
 

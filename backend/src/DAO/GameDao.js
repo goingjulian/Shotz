@@ -1,5 +1,6 @@
 import Game from "../models/Game";
 import gameStates from "../definitions/gameStates";
+import ShotzException from "../exceptions/ShotzException";
 
 export default class GameDAO {
     static addNewGame(roomKey, quizmasterId) {
@@ -107,7 +108,7 @@ export default class GameDAO {
             }
         ).then(doc => {
             if (doc.n < 1) {
-                throw new Error('User is not the quizmaster of this room or no room found')
+                throw new ShotzException('User is not the quizmaster of this room or no room found', 401);
             }
             return {
                 categories: categories,

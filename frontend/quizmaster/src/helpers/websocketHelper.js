@@ -29,7 +29,7 @@ export function initSocket() {
                     dispatch(initSocket());
                 }, 5000);
             } else {
-                throw new Error("Socket connection could not be restored");
+                // throw new Error("Socket connection could not be restored");
             }
         };
     };
