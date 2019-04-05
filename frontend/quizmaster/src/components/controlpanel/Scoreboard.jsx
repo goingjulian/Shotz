@@ -2,14 +2,9 @@ import React from "react";
 import Item from "../General/Item";
 
 export default function Scoreboard(props) {
-  const teams = [
-    "Fritzzers",
-    "Meronnetjes",
-    "Hardleers",
-    "Da voice"
-  ];
-  const scoreboard = teams.map((team, index) => (
-    <Item key={index} index={index} text={team} closeHandler={() => {}} />
+  console.log(props.teams)
+  const scoreboard = props.teams.map((team, index) => (
+    <Item key={index} index={index + 1} text={team.teamName} closeHandler={() => {}} />
   ));
   return (
     <div className="Scoreboard">

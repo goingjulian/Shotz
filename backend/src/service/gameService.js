@@ -56,7 +56,8 @@ export default class GameService {
                     type: "quizmaster_restoreSession",
                     roomKey: roomKey,
                     gameState: game.gameState,
-                    teams: game.teams
+                    teams: game.teams,
+                    rounds: this.formatRoundsResponse(game.rounds)
                 };
             } else if (
                 game &&
@@ -215,13 +216,16 @@ export default class GameService {
 
             const chosenQuestions = this.pickRandomquestionsFromList(allQuestions, 12);
 
-            const round = await GameDAO.addRound(roomKey, sessionId, chosenQuestions, categories);
+            await GameDAO.addRound(roomKey, sessionId, chosenQuestions, categories);
 
             await GameDAO.alterGameState(roomKey, sessionId, gameStates.IN_ROUND);
 
+            const rounds = await GameDAO.getRounds(roomKey, sessionId).lean();
+            console.log("ROUNDS", rounds)
+
             return {
                 gameState: gameStates.IN_ROUND,
-                round: round
+                rounds: this.formatRoundsResponse(rounds.rounds)
             };
         } catch (err) {
             if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
@@ -246,5 +250,22 @@ export default class GameService {
         }
 
         return chosenQuestions;
+    }
+
+    static formatRoundsResponse(rounds) {
+        const currentRoundIndex = rounds.length > 0 ? rounds.length - 1 : undefined
+        const currentRound = rounds.length > 0 ? rounds[currentRoundIndex] : undefined
+        const currentQuestionIndex = rounds.length > 0 ? currentRound.activeQuestionIndex : undefined
+        
+        return {
+            allRounds: rounds,
+            currentRound: currentRound,
+            currentRoundIndex: currentRoundIndex,
+            currentQuestionIndex: currentQuestionIndex,
+            currentQuestion: rounds.length > 0 ? currentRound.questions[currentQuestionIndex].question : undefined,
+            currentAnswer: rounds.length > 0 ? currentRound.questions[currentQuestionIndex].answer : undefined,
+            currentCategory: rounds.length > 0 ? currentRound.questions[currentQuestionIndex].category : undefined,
+            currentRoundCategories: rounds.length > 0 ? currentRound.categories : undefined
+        }
     }
 }

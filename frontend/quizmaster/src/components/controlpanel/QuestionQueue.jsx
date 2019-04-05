@@ -2,15 +2,15 @@ import React from "react";
 import Item from './../General/Item';
 
 export default function QuestionQueue(props) {
-  const questions = [
-    "1 + 1 = ?",
-    "Wat is de hoofdstad van Parijs?",
-    "Hoe heet een mannelijke eend?",
-    "4 + 4 = ?"
-  ];
-  const questionQueue = questions.map((question, index) => (
-    <Item key={index} index={index} text={question} />
-  ));
+  const questionQueue = props.questions.map((question, index) => {
+    let cssClass = ""
+    if (index === props.currentQuestionIndex) cssClass = "current"
+    else if (index < props.currentQuestionIndex) cssClass = "greyedOut"
+
+    return <Item key={index} index={index + 1} text={question.question} itemClass={cssClass}/>
+  }
+
+  );
 
   return (
     <div className="QuestionQueue">

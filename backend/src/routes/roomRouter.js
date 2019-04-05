@@ -50,17 +50,13 @@ router.route("/:roomKey/team/:teamSessionId").put((req, res, next) => {
     const roomKey = req.params.roomKey;
     const teamSessionId = req.params.teamSessionId;
     const accepted = req.body.accepted;
-    if (typeof accepted !== "boolean") {
-        next(new ShotzException("Accepted required in body!", 400));
-    } else {
-        GameService.alterTeamStatus(roomKey, teamSessionId, accepted)
-            .then(teamStatus => {
-                res.status(200).json(teamStatus);
-            })
-            .catch(err => {
-                next(err);
-            });
-    }
+    GameService.alterTeamStatus(roomKey, teamSessionId, accepted)
+        .then(teamStatus => {
+            res.status(200).json(teamStatus);
+        })
+        .catch(err => {
+            next(err);
+        });
 });
 
 router.route("/:roomKey/leave").delete((req, res, next) => {

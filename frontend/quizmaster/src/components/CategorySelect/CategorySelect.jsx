@@ -3,7 +3,6 @@ import * as ReactRedux from 'react-redux'
 
 import { startRound } from '../../actions/roundsActions'
 import { getAllCategories } from '../../actions/questionActions'
-import { controlPanelViewAction } from '../../actions/viewActions'
 import './CategorySelect.scss'
 
 class CategorySelect extends React.Component {
@@ -77,10 +76,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         getAllCategories: () => dispatch(getAllCategories()),
-        startRound: (roomKey, selectedCategories) => {
-            dispatch(startRound(roomKey, selectedCategories));
-            dispatch(controlPanelViewAction());
-        }
+        startRound: (roomKey, selectedCategories) => dispatch(startRound(roomKey, selectedCategories))
     }
 }
 

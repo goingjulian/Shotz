@@ -96,25 +96,25 @@ export default class GameDAO {
         );
     }
 
-    static addRound(roomKey, sessionId, chosenQuestions, categories) {
+    static addRound(roomKey, sessionId, randomQuestions, categories) {
         return Game.updateOne(
             { roomKey: roomKey, quizmaster: sessionId },
             {
                 $push: {
                     rounds: {
                         categories: categories,
-                        questions: chosenQuestions
+                        questions: randomQuestions
                     }
                 }
             }
         ).then(doc => {
             if (doc.n < 1) {
-                throw new ShotzException('User is not the quizmaster of this room or no room found', 401);
-            }
-            return {
-                categories: categories,
-                questions: chosenQuestions
+                throw new ShotzException('User is not the quizmaster of this room or no room found', 400);
             }
         })
+    }
+
+    static getRounds(roomKey, sessionId) {
+        return Game.findOne({roomKey: roomKey, quizmaster: sessionId}, "rounds")
     }
 }

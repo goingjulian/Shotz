@@ -9,18 +9,27 @@ import './ControlPanel.scss';
 
 class ControlPanel extends React.Component {
   render() {
+    console.log("ROUNDS CONTROL", this.props.rounds);
     return (
       <div className="ControlPanel">
-        <Scoreboard />
+        <Scoreboard 
+          teams={this.props.teams}
+        />
         <QuestionInfo />
-        <QuestionQueue />
+        <QuestionQueue
+          questions={this.props.rounds.currentRound.questions}
+          currentQuestionIndex={this.props.rounds.currentQuestionIndex}
+        />
       </div>
     );
   }
 }
 
 function mapStateToProps(state) {
-  return {};
+  return {
+    rounds: state.rounds.rounds,
+    teams: state.teams.teamList
+  };
 }
 
 function mapDispatchToProps(dispatch) {
