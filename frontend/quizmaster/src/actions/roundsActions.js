@@ -3,7 +3,8 @@ import { setViewByGameState } from './viewActions'
 
 export const roundsActionTypes = {
     startRound: "startRound",
-    setRounds: "setRounds"
+    setRounds: "setRounds",
+    nextQuestion: "nextQuestion"
 }
 
 export function startRound(roomKey, categories) {
@@ -26,16 +27,33 @@ export function startRound(roomKey, categories) {
 
         const body = await response.json();
         console.log("BODY: ", body)
-        dispatch(setRoundsAction(body.rounds));
+        dispatch(setRoundsAction(body.rounds, body.currentQuestionIndex));
         dispatch(setViewByGameState(body.gameState));
     }
 }
 
-export function setRoundsAction(rounds) {
-    console.log("ROUNDS", rounds)
+export function setRoundsAction(rounds, currentQuestionIndex) {
+    console.log("ROUNDS", rounds, currentQuestionIndex)
     return {
         type: roundsActionTypes.setRounds,
-        rounds: rounds
+        rounds: rounds,
+        currentQuestionIndex: currentQuestionIndex
+    }
+}
+
+export function nextquestionAction(activeQuestionIndex) {
+    return {
+        type: roundsActionTypes.nextQuestion,
+        activeQuestionIndex: activeQuestionIndex
+    }
+    //todo: reducer
+}
+
+export function nextQuestion() {
+    return async dispatch => {
+        //fetch endpoint
+        //call action
+
     }
 }
 

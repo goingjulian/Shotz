@@ -123,6 +123,9 @@ router.route("/:roomKey/teams").get((req, res, next) => {
         .catch(err => next(err));
 });
 
+/**
+ * start new round
+ */
 router.route("/:roomKey/round").post((req, res, next) => {
     const roomKey = req.params.roomKey;
     const categories = req.body.categories;
@@ -138,5 +141,28 @@ router.route("/:roomKey/round").post((req, res, next) => {
             next(err)
         })
 });
+
+/**
+ * next question in round
+ */
+router.route('/:roomKey/round/question/next').put((req, res, next) => {
+    const sessionId = req.session.id;
+    const roomKey = req.params.roomKey;
+
+    GameService.goTonextQuestionInRound(roomKey, sessionId)
+        .then(response => {
+            res.json(response)
+        })
+        .catch(err => {
+            next(err);
+        })
+});
+
+/**
+ * get current round
+ */
+router.route('/:roomKey/round/question').get((req, res, next) => {
+
+})
 
 export default router;

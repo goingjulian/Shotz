@@ -115,6 +115,20 @@ export default class GameDAO {
     }
 
     static getRounds(roomKey, sessionId) {
-        return Game.findOne({roomKey: roomKey, quizmaster: sessionId}, "rounds")
+        return Game.findOne({ roomKey: roomKey, quizmaster: sessionId }, { rounds: 1, _id: 0 }).lean()
+    }
+
+    static goTonextQuestionInRound(roomKey, sessionId, currentRoundMongoId) {
+        return Game.updateOne(
+            { roomKey: roomKey, quizmaster: sessionId, rounds: { $elemMatch: { _id: currentRoundMongoId } } },
+            {
+                $inc: {
+                    "rounds.$.activeQuestionIndex": 1
+                }
+            }
+        )
+            .then(doc => {
+                console.log(doc);
+            })
     }
 }

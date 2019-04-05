@@ -58,7 +58,8 @@ export default class GameService {
                     roomKey: roomKey,
                     gameState: game.gameState,
                     teams: game.teams,
-                    rounds: this.formatRoundsResponse(game.rounds)
+                    rounds: game.rounds,
+                    currentQuestionIndex: game.rounds[game.rounds.length - 1].activeQuestionIndex
                 };
             } else if (
                 game &&
@@ -226,7 +227,8 @@ export default class GameService {
 
             return {
                 gameState: gameStates.IN_ROUND,
-                rounds: this.formatRoundsResponse(rounds.rounds)
+                rounds: rounds,
+                currentQuestionIndex: rounds[rounds.length - 1].activeQuestionIndex
             };
         } catch (err) {
             if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
@@ -249,24 +251,21 @@ export default class GameService {
                 i--;
             }
         }
-
         return chosenQuestions;
     }
 
-    static formatRoundsResponse(rounds) {
-        const currentRoundIndex = rounds.length > 0 ? rounds.length - 1 : undefined
-        const currentRound = rounds.length > 0 ? rounds[currentRoundIndex] : undefined
-        const currentQuestionIndex = rounds.length > 0 ? currentRound.activeQuestionIndex : undefined
-        
-        return {
-            allRounds: rounds,
-            currentRound: currentRound,
-            currentRoundIndex: currentRoundIndex,
-            currentQuestionIndex: currentQuestionIndex,
-            currentQuestion: rounds.length > 0 ? currentRound.questions[currentQuestionIndex].question : undefined,
-            currentAnswer: rounds.length > 0 ? currentRound.questions[currentQuestionIndex].answer : undefined,
-            currentCategory: rounds.length > 0 ? currentRound.questions[currentQuestionIndex].category : undefined,
-            currentRoundCategories: rounds.length > 0 ? currentRound.categories : undefined
+    static async goTonextQuestionInRound(roomKey, sessionId) {
+        try {
+            const rounds = await GameDAO.getRounds(roomKey, sessionId);
+            const currentRound = rounds.rounds[rounds.rounds.length - 1];
+
+            if(currentRound.questions.length <= currentRound.activeQuestionIndex) throw new ShotzException('Last question reached', 500);
+
+            await GameDAO.goTonextQuestionInRound(roomKey, sessionId, currentRound._id);
+            return {activeQuestionIndex: currentRound.activeQuestionIndex};
+        } catch(err) {
+            if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
+            else throw err;
         }
     }
 }

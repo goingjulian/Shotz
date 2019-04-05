@@ -87,9 +87,10 @@ export function restoreSession() {
             if (!response.ok) {
                 throw new Error(body.error);
             } else {
+                console.log(body)
                 dispatch(setTeamsAction(body.teams));
                 dispatch(createRoomAction(body.roomKey));
-                dispatch(setRoundsAction(body.rounds));
+                dispatch(setRoundsAction(body.rounds, body.currentQuestionIndex));
                 dispatch(setViewByGameState(body.gameState));
                 dispatch(initSocket());
             }
