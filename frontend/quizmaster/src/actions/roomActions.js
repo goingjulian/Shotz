@@ -2,6 +2,7 @@ import environment from '../environments/environment'
 import { setViewByGameState } from './viewActions'
 import { initSocket } from '../helpers/websocketHelper'
 import { setTeams } from './teamActions'
+import { setRoundsAction } from './roundsActions'
 
 export const roomActionTypes = {
     createRoom: " createRoom"
@@ -51,6 +52,7 @@ export function restoreRoomState() {
 
                 dispatch(setTeams(parsedRes.teams));
                 dispatch(createRoomAction(parsedRes.roomKey));
+                dispatch(setRoundsAction(parsedRes.rounds))
                 dispatch(setViewByGameState(parsedRes.gameState));
             }
         } catch (error) {

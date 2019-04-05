@@ -13,12 +13,14 @@
 
 .QuestionQueue {
   border-left: 1px solid $border-grey;
+  overflow: auto;
 }
 
 .Scoreboard,
 .QuestionQueue {
   width: 275px;
   height: 100%;
+  overflow: auto;
   header {
     padding: 10px 20px;
     border-bottom: 1px solid $border-grey;
@@ -30,15 +32,33 @@
 }
 
 .QuestionInfo {
-
+  overflow: auto;
   padding: 40px;
   flex: 1;
+
   .infoActions {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-between;
+
     padding: 20px;
     h2 {
       font-size: 1.2em;
       font-weight: 700;
     }
+
+    button {
+      padding: 15px 30px;
+      font-size: 1.2em;
+      font-weight: 700;
+      color: $text-color-dark;
+      border: 1px solid $border-grey;
+      cursor: pointer;
+      &:hover {
+          background-color: $border-grey;
+      }
+  }
   }
   .infoQuestion {
     padding: 20px;

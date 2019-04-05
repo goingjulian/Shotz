@@ -1,15 +1,9 @@
 import environment from '../environments/environment'
+import { setViewByGameState } from './viewActions'
 
 export const roundsActionTypes = {
-    startRound: "startRound"
-}
-
-export function startRoundAction(categories, questions) {
-    return {
-        type: roundsActionTypes.startRound,
-        categories: categories,
-        questions: questions
-    }
+    startRound: "startRound",
+    setRounds: "setRounds"
 }
 
 export function startRound(roomKey, categories) {
@@ -31,8 +25,17 @@ export function startRound(roomKey, categories) {
         if(!response.ok) throw new Error('Error starting round');
 
         const body = await response.json();
+        console.log("BODY: ", body)
+        dispatch(setRoundsAction(body.rounds));
+        dispatch(setViewByGameState(body.gameState));
+    }
+}
 
-        dispatch(startRoundAction(body.round.categories, body.round.questions));
+export function setRoundsAction(rounds) {
+    console.log("ROUNDS", rounds)
+    return {
+        type: roundsActionTypes.setRounds,
+        rounds: rounds
     }
 }
 
