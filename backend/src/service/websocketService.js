@@ -1,6 +1,7 @@
 import ws from "ws";
 import GameService from "./gameService";
 import ShotzException from "../exceptions/ShotzException";
+import GameDAO from './../DAO/GameDao';
 
 let websocketServer;
 
@@ -17,9 +18,10 @@ export function initWSServer(sessionParserParam, httpServer) {
 }
 
 function parseSession(info, done) {
-    sessionParser(info.req, {}, () => {
-        const sessionId = info.req.session.sessionId;
-        if (!sessionId || !getGameWithSessionId(sessionId)) {
+    sessionParser(info.req, {}, async () => {
+        const sessionId = info.req.sessionID;
+        const ids = await GameDAO.getGameWithSessionId(sessionId);
+        if (!sessionId || !ids) {
             done(false);
         } else {
             done(true);
@@ -37,9 +39,11 @@ export async function sendMessageTeams(roomKey, message) {
     if (!teams) {
         throw new ShotzException(`No teams found for roomKey ${roomKey}`);
     } else {
-        websocketServer.clients.forEach(client => {
-            if (teams.includes(client.sessionId)) _sendMessage(client, message);
-        });
+        for (let client of websocketServer.clients) {
+            for(let team of teams) {
+                if (team.sessionId === client.sessionId) _sendMessage(client, message);
+            }
+        }
     }
 }
 
@@ -55,7 +59,7 @@ export async function sendMessageQuizmaster(roomKey, message) {
 
 export async function sendMessageTeam(roomKey, sessionId, message) {
     for (let client of websocketServer.clients) {
-        if (client.sessionId === sessionId) _sendMessage(team, message);
+        if (client.sessionId === sessionId) _sendMessage(client, message);
     }
 }
 

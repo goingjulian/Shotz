@@ -19,6 +19,8 @@ export default function teamReducer(state = initialTeamState, action) {
             teamList = state.teamList.slice();
             teamList.splice(teamIndex, 1);
             return { ...state, teamList: teamList };
+        case teamActionTypes.REMOVE_TEAMS:
+            return { ...initialTeamState };
         default:
             return { ...state };
     }

@@ -12,15 +12,16 @@ export default class GameDAO {
 
     static getGameWithSessionId(sessionId) {
         return Game.findOne({
-            $or: [
-                { quizmaster: sessionId },
-                { teams: { $elemMatch: { sessionId: sessionId } } }
-            ]
+            $or: [{ quizmaster: sessionId }, { teams: { $elemMatch: { sessionId: sessionId } } }]
         });
     }
 
     static getGame(roomKey) {
         return Game.findOne({ roomKey: roomKey });
+    }
+
+    static deleteGame(roomKey) {
+        return Game.deleteOne({ roomKey: roomKey });
     }
 
     static getTeam(roomKey, teamSessionId) {

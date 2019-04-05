@@ -3,7 +3,8 @@ import * as ReactRedux from 'react-redux'
 
 import './Lobby.scss'
 import Team from './Team.jsx'
-import { alterTeamAcceptedStatus, clearRejectedTeamsAction } from '../../actions/teamActions';
+import { alterTeamAcceptedStatus, clearRejectedTeams } from '../../actions/teamActions';
+import { leaveRoom } from '../../actions/roomActions';
 
 function Lobby(props) {
     return (
@@ -29,7 +30,7 @@ function Lobby(props) {
                     props.clearRejectedTeamsAction(props.roomKey);
                     // props.categorySelectViewAction();
                 }}>Start quiz</button>
-            <button onClick={props.loginViewAction}>This should be close</button>
+            <button onClick={() => props.leaveRoomAction(props.roomKey)}>Leave this game!</button>
         </div>
     )
 }
@@ -45,11 +46,12 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
+        leaveRoomAction: (roomKey) => dispatch(leaveRoom(roomKey)), 
         //loginViewAction: () => dispatch(loginViewAction()),
         // categorySelectViewAction: () => dispatch(categorySelectViewAction()),
         acceptTeamAction: (roomKey, sessionId) => dispatch(alterTeamAcceptedStatus(roomKey, sessionId, true)),
         rejectTeamAction: (roomKey, sessionId) => dispatch(alterTeamAcceptedStatus(roomKey, sessionId, false)),
-        clearRejectedTeamsAction: (roomKey) => dispatch(clearRejectedTeamsAction(roomKey))
+        clearRejectedTeamsAction: (roomKey) => dispatch(clearRejectedTeams(roomKey))
     }
 }
 

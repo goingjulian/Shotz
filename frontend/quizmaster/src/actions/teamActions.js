@@ -5,10 +5,17 @@ export const teamActionTypes = {
     SET_TEAMS: "SET_TEAMS",
     ACCEPT_TEAM: "ACCEPT_TEAM",
     REJECT_TEAM: "REJECT_TEAM",
-    CLEAR_REJECTED: "CLEAR_REJECTED"
+    CLEAR_REJECTED: "CLEAR_REJECTED",
+    REMOVE_TEAMS: "REMOVE_TEAMS"
 };
 
-export function setTeams(teamList) {
+export function removeTeamsAction() {
+    return {
+        type: teamActionTypes.REMOVE_TEAMS
+    };
+}
+
+export function setTeamsAction(teamList) {
     return {
         type: teamActionTypes.SET_TEAMS,
         teamList: teamList
@@ -31,66 +38,73 @@ export function rejectTeamAction(sessionId) {
 
 export function alterTeamAcceptedStatus(roomKey, sessionId, accepted) {
     return async dispatch => {
-        const method = {
-            method: "PUT",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ accepted: accepted })
-        };
+        try {
+            const method = {
+                method: "PUT",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ accepted: accepted })
+            };
 
-        const response = await fetch(`${environment.API_URL}/room/${roomKey}/team/${sessionId}`, method);
-        const body = await response.json();
-        if (!response.ok) {
-            throw new Error(body.error);
-        } else {
-            console.log("ALTER TEAM STATUS BODY:");
-            console.log(body);
-            console.log("----------");
-            accepted ? dispatch(acceptTeamAction(body.sessionId)) : dispatch(rejectTeamAction(body.sessionId));
+            const response = await fetch(`${environment.API_URL}/room/${roomKey}/team/${sessionId}`, method);
+            const body = await response.json();
+            if (!response.ok) {
+                throw new Error(body.error);
+            } else {
+                console.log("ALTER TEAM STATUS BODY:");
+                console.log(body);
+                console.log("----------");
+                accepted ? dispatch(acceptTeamAction(body.sessionId)) : dispatch(rejectTeamAction(body.sessionId));
+            }
+        } catch (err) {
+            console.log(err.message);
         }
     };
 }
 
 export function getTeamList(roomKey) {
     return dispatch => {
-        const method = {
-            method: "GET",
-            credentials: "include"
-        };
-        fetch(`${environment.API_URL}/room/${roomKey}/teams`, method).then(async response => {
-            const body = await response.json();
-            if (!response.ok) {
-                throw new Error(body.error);
-            } else {
-                console.log("TEAM LIST BODY:");
-                console.log(body);
-                console.log("----------");
-                dispatch(setTeams(body));
-            }
-        });
+        try {
+            const method = {
+                method: "GET",
+                credentials: "include"
+            };
+            fetch(`${environment.API_URL}/room/${roomKey}/teams`, method).then(async response => {
+                const body = await response.json();
+                if (!response.ok) {
+                    throw new Error(body.error);
+                } else {
+                    console.log("TEAM LIST BODY:");
+                    console.log(body);
+                    console.log("----------");
+                    dispatch(setTeamsAction(body));
+                }
+            });
+        } catch (err) {
+            console.log(err.message);
+        }
     };
 }
 
-export function clearRejectedTeamsAction(roomKey) {
+export function clearRejectedTeams(roomKey) {
     return async dispatch => {
-        const method = {
-            method: "DELETE",
-            credentials: "include"
-        };
-
-        const response = await fetch(`${environment.API_URL}/room/${roomKey}/teams`, method);
-
-        if (!response.ok) {
-            throw new Error("Server error");
+        try {
+            const method = {
+                method: "DELETE",
+                credentials: "include"
+            };
+            const response = await fetch(`${environment.API_URL}/room/${roomKey}/teams`, method);
+            const body = await response.json();
+            if (!response.ok) {
+                throw new Error("Server error");
+            } else {
+                dispatch(setTeamsAction(body));
+                dispatch(categorySelectViewAction());
+            }
+        } catch (err) {
+            console.log(err.message);
         }
-
-        const body = await response.json();
-
-        console.log(body);
-
-        dispatch(setTeams(body));
-        dispatch(categorySelectViewAction());
     };
 }

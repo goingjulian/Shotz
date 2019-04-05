@@ -2,20 +2,20 @@ import environment from "../environments/environment";
 import { viewWaitingscreenAction, restoreActiveScreenFromGameState, viewLobbyAction } from "./viewActions";
 import { initSocket } from "./wsActions";
 
-export function joinRoomAction(gameState) {
+export function joinRoomAction(roomKey, teamName) {
     return {
         type: "team_joinRoom",
-        roomKey: gameState.roomKey,
-        teamName: gameState.teamName
+        roomKey: roomKey,
+        teamName: teamName
     };
 }
 
-export function restoreSessionAction(gameState) {
+export function restoreSessionAction(roomKey, teamName, accepted) {
     return {
         type: "team_restoreSession",
-        roomKey: gameState.roomKey,
-        teamName: gameState.teamName,
-        accepted: gameState.accepted
+        roomKey: roomKey,
+        teamName: teamName,
+        accepted: accepted
     };
 }
 
@@ -81,7 +81,7 @@ export function joinRoom(roomKey, teamName) {
                 if (!response.ok) {
                     throw new Error(body.error);
                 } else {
-                    dispatch(joinRoomAction(body));
+                    dispatch(joinRoomAction(body.roomKey, body.teamName));
                     dispatch(viewWaitingscreenAction());
                     dispatch(initSocket());
                 }
@@ -111,13 +111,13 @@ export function restoreSession() {
                 if (!response.ok) {
                     throw new Error(body.error);
                 } else {
-                    dispatch(restoreSessionAction(body));
+                    dispatch(restoreSessionAction(body.roomKey, body.teamName, body.accepted));
                     dispatch(restoreActiveScreenFromGameState(body.gameState));
                     dispatch(initSocket());
                 }
             })
             .catch(err => {
-                console.log(err);
+                console.log(err.message);
             });
     };
 }

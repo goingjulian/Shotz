@@ -7,7 +7,7 @@ import * as Redux from 'redux';
 import * as ReactRedux from 'react-redux';
 import thunkMiddleware from 'redux-thunk'
 import { mainReducer } from './reducers/mainReducer';
-import { restoreRoomState } from './actions/roomActions'
+import { restoreSession } from './actions/roomActions';
 
 
 export const store = Redux.createStore(
@@ -15,15 +15,13 @@ export const store = Redux.createStore(
     Redux.applyMiddleware(thunkMiddleware)
 )
 
-store.dispatch(restoreRoomState());
-
 const RootComponent = (
     <ReactRedux.Provider store={store}>
         <App />
     </ReactRedux.Provider>
 )
 
-
+store.dispatch(restoreSession());
 ReactDOM.render(RootComponent, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
