@@ -18,7 +18,7 @@ export default function Item(props) {
       <div className="itemButtonsHolder">
         {props.acceptHandler !== undefined && (
           <span className="itemButtonHolder">
-            <button className="itemButton__accept">
+            <button className="itemButton__accept" onClick={props.acceptHandler}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -32,7 +32,7 @@ export default function Item(props) {
         )}
         {props.closeHandler !== undefined && (
           <span className="itemButtonHolder">
-            <button className="itemButton__close">
+            <button className="itemButton__close" onClick={props.closeHandler}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"

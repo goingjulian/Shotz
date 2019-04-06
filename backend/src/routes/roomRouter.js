@@ -68,7 +68,6 @@ router.route("/:roomKey/leave").delete((req, res, next) => {
             res.json(teams);
         })
         .catch(err => {
-            console.log(err);
             next(err);
         });
 });
@@ -85,7 +84,6 @@ router.route("/:roomKey/teams").delete((req, res, next) => {
             res.json(teams);
         })
         .catch(err => {
-            console.log(err);
             next(err);
         });
 });

@@ -1,6 +1,33 @@
-.login {
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: center;
+@import "../../assets/scss/variables";
+
+
+.Login {
+    main {
+        text-align: center;
+        h1 {
+            margin-bottom: 40px;
+            font-size: 2em;
+        }
+        .startContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: baseline;
+            justify-content: center;
+            text-align: center;
+            .createRoomBttn {
+                margin: 0 auto;
+            }
+            a {
+                margin: 20px auto 0 auto;
+                display: block;
+
+                font-size: 1em;
+                text-decoration: underline;
+                color: $text-color-dark;
+                &:hover {
+                    color: $theme;
+                }
+            }
+        }
+    }
 }

@@ -1,4 +1,13 @@
 @import "variables";
+
+body,
+html,
+.App,
+#root {
+    width: 100%;
+    min-height: 100%;
+}
+
 @import url("https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700");
 
 * {
@@ -16,12 +25,10 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-
 ul,
 ol {
     list-style: none;
 }
-
 button,
 input {
     background: transparent;
@@ -29,18 +36,31 @@ input {
     outline: none;
     box-shadow: none;
     cursor: pointer;
-}
+} 
 
 .bttn {
-    padding: 15px 30px;
+  padding: 15px 30px;
+  font-size: 1.2em;
+  font-weight: 500;
+  color: $text-color-dark;
+  border: 1px solid $border-grey;
+  cursor: pointer;
+  &:hover {
+      background-color: $border-grey;
+  }
+}
+
+h1 {
+    font-size: 1.5em;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: $text-color-dark;
+}
+h2 {
     font-size: 1.2em;
     font-weight: 500;
+    letter-spacing: 1px;
     color: $text-color-dark;
-    border: 1px solid $border-grey;
-    cursor: pointer;
-    &:hover {
-        background-color: $border-grey;
-    }
 }
 
 .Component {
@@ -92,7 +112,6 @@ input {
                 h2,
                 span {
                     margin: auto 0;
-                    color: $white;
                 }
             }
         }
