@@ -1,6 +1,7 @@
 import environment from "../environments/environment";
-import { teamAcceptedAction, teamRejectedAction, leaveGameAction } from "./gameActions";
+import { teamAcceptedAction, teamRejectedAction, leaveGameAction, getCurrentQuestion } from "./gameActions";
 import { viewLobbyAction } from "./viewActions";
+import store from '../store'
 
 let reconnects = 0;
 
@@ -50,6 +51,9 @@ function handleMessage(message) {
             case "team_quizmasterLeft":
                 dispatch(viewLobbyAction());
                 dispatch(leaveGameAction());
+                break;
+            case "team_nextQuestion":
+                dispatch(getCurrentQuestion(store.getState().game.roomKey));
                 break;
             default:
                 console.log("Unknown message: ", message);

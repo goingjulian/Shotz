@@ -1,6 +1,9 @@
 const initialState = {
+    roomKey: null,
+    teamName: null,
     accepted: false,
-    rejected: false
+    rejected: false,
+    question: null
 };
 export default function gameReducer(state = initialState, action) {
     switch (action.type) {
@@ -15,7 +18,8 @@ export default function gameReducer(state = initialState, action) {
                 ...state,
                 roomKey: action.roomKey,
                 teamName: action.teamName,
-                accepted: action.accepted
+                accepted: action.accepted,
+                question: action.question
             };
 
         case "team_accepted":
@@ -32,6 +36,11 @@ export default function gameReducer(state = initialState, action) {
             return {
                 ...initialState
             };
+        case "team_setQuestion":
+            return {
+                ...state,
+                question: action.question
+            }
         default:
             return {
                 ...state

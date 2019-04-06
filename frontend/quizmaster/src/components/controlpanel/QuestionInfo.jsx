@@ -1,11 +1,12 @@
 import React from "react";
 import * as ReactRedux from "react-redux";
 import Item from "../General/Item";
+import { nextQuestion } from '../../actions/roundsActions'
 
 class QuestionInfo extends React.Component {
   render() {
 
-    const totalQuestions = this.props.currentRound.questions.length + 1;
+    const totalQuestionsAmount = this.props.currentRound.questions.length;
     const currentQuestion = this.props.currentRound.questions[this.props.activeQuestionIndex].question;
     const currentAnswer = this.props.currentRound.questions[this.props.activeQuestionIndex].answer;
 
@@ -42,11 +43,13 @@ class QuestionInfo extends React.Component {
         <div className="infoActions">
           <button>Show answer to teams</button>
           <h2>Round {this.props.rounds.length}</h2>
-          <button>Next question</button>
+          {totalQuestionsAmount === this.props.activeQuestionIndex + 1
+            ? <button>End round</button>
+            : <button onClick={() => this.props.nextQuestion(this.props.roomKey)}>Next question</button>}
         </div>
         <div className="infoQuestion">
           <h2>
-            Question {this.props.activeQuestionIndex + 1}/{totalQuestions}:
+            Question {this.props.activeQuestionIndex + 1}/{totalQuestionsAmount}:
             <span> {currentQuestion}</span>
           </h2>
           <h2>
@@ -65,6 +68,7 @@ class QuestionInfo extends React.Component {
 function mapStateToProps(state) {
   console.log(state)
   return {
+    roomKey: state.room.roomKey,
     rounds: state.rounds.rounds,
     activeQuestionIndex: state.rounds.rounds[state.rounds.rounds.length - 1].activeQuestionIndex,
     currentRound: state.rounds.rounds[state.rounds.rounds.length - 1]
@@ -72,7 +76,9 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {};
+  return {
+    nextQuestion: (roomKey) => dispatch(nextQuestion(roomKey))
+  };
 }
 
 export default ReactRedux.connect(mapStateToProps, mapDispatchToProps)(

@@ -41,18 +41,29 @@ export function setRoundsAction(rounds, currentQuestionIndex) {
     }
 }
 
-export function nextquestionAction(activeQuestionIndex) {
+export function nextQuestionAction(activeQuestionIndex) {
     return {
         type: roundsActionTypes.nextQuestion,
         activeQuestionIndex: activeQuestionIndex
     }
-    //todo: reducer
 }
 
-export function nextQuestion() {
+export function nextQuestion(roomKey) {
     return async dispatch => {
-        //fetch endpoint
-        //call action
+        const options = {
+            method: "PUT",
+            credentials: 'include',
+            mode: 'cors'
+        }
+
+        const response = await fetch(`${environment.API_URL}/room/${roomKey}/round/question/next`, options);
+        console.log(response.ok)
+        if(!response.ok) throw new Error(`Error proceeding to next question`);
+
+        const body = await response.json();
+        console.log(body);
+
+        dispatch(nextQuestionAction(body.activeQuestionIndex));
 
     }
 }

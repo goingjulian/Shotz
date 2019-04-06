@@ -1,5 +1,5 @@
 import environment from "../environments/environment";
-import { viewWaitingscreenAction, restoreActiveScreenFromGameState, viewLobbyAction } from "./viewActions";
+import { viewWaitingscreenAction, restoreActiveScreenFromGameState, viewLobbyAction, viewQuestionScreenAction } from "./viewActions";
 import { initSocket } from "./wsActions";
 
 export function joinRoomAction(roomKey, teamName) {
@@ -10,12 +10,13 @@ export function joinRoomAction(roomKey, teamName) {
     };
 }
 
-export function restoreSessionAction(roomKey, teamName, accepted) {
+export function restoreSessionAction(roomKey, teamName, accepted, question) {
     return {
         type: "team_restoreSession",
         roomKey: roomKey,
         teamName: teamName,
-        accepted: accepted
+        accepted: accepted,
+        question: question
     };
 }
 
@@ -35,6 +36,31 @@ export function leaveGameAction() {
     return {
         type: "team_leaveGame"
     };
+}
+
+export function setQuestionAction(question) {
+    return {
+        type: "team_setQuestion",
+        question: question
+    }
+}
+
+export function getCurrentQuestion(roomKey) {
+    return async dispatch => {
+        const options = {
+            method: "GET",
+            credentials: "include"
+        }
+
+        const response = await fetch(`${environment.API_URL}/room/${roomKey}/round/question`, options);
+        
+        if(!response.ok) throw new Error(`Error while getting question`);
+
+        const body = await response.json();
+
+        dispatch(setQuestionAction(body));
+        dispatch(viewQuestionScreenAction())
+    }
 }
 
 export function leaveGame(roomKey) {
@@ -108,7 +134,7 @@ export function restoreSession() {
                 if (!response.ok) {
                     throw new Error(body.error);
                 } else {
-                    dispatch(restoreSessionAction(body.roomKey, body.teamName, body.accepted));
+                    dispatch(restoreSessionAction(body.roomKey, body.teamName, body.accepted, body.question));
                     dispatch(restoreActiveScreenFromGameState(body.gameState));
                     dispatch(initSocket());
                 }

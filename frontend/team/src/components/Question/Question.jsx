@@ -21,7 +21,21 @@ function Question(props) {
                 </div>
             </nav>
             <main>
-                <p>Hello world</p>
+                <h1 className="question">{props.question.question}</h1>
+                <h2 className="category">{props.question.category}</h2>
+                <div className="inputField">
+                    <label htmlFor="answer">Answer:</label>
+                    <input
+                        onChange={e => this.handleInput(e)}
+                        id="answer"
+                        name="answer"
+                        placeholder="Your answer"
+                        autoComplete="off"
+                    />
+                </div>
+                <div className="inputField">
+                    <button onClick={(e) => this.submitForm(e)}>Submit</button>
+                </div>
             </main>
         </div>
     );
@@ -30,7 +44,8 @@ function Question(props) {
 function mapStateToProps(state) {
     return {
         roomKey: state.game.roomKey,
-        teamName: state.game.teamName
+        teamName: state.game.teamName,
+        question: state.game.question
     };
 }
 

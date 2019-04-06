@@ -1,6 +1,6 @@
 import express from "express";
 import GameService from "../service/gameService";
-import { sendMessageQuizmaster, sendMessageTeam } from "../service/websocketService";
+import { sendMessageQuizmaster, sendMessageTeam, sendMessageTeams } from "../service/websocketService";
 import ShotzException from "./../exceptions/ShotzException";
 import { closeConnection } from "./../service/websocketService";
 import gameStates from '../definitions/gameStates'
@@ -131,8 +131,10 @@ router.route("/:roomKey/round").post((req, res, next) => {
     console.log(roomKey, sessionId, categories)
     GameService.startNewRound(roomKey, sessionId, categories)
         .then(response => {
-            console.log(response);
             res.json(response);
+            sendMessageTeams(roomKey, {
+                type: "team_nextQuestion"
+            });
         })
         .catch(err => {
             console.log(err);
@@ -149,18 +151,30 @@ router.route('/:roomKey/round/question/next').put((req, res, next) => {
 
     GameService.goTonextQuestionInRound(roomKey, sessionId)
         .then(response => {
-            res.json(response)
+            res.json(response);
+            sendMessageTeams(roomKey, {
+                type: "team_nextQuestion"
+            });
         })
         .catch(err => {
+            throw err;
             next(err);
         })
 });
 
 /**
- * get current round
+ * get current question
  */
 router.route('/:roomKey/round/question').get((req, res, next) => {
+    const roomKey = req.params.roomKey;
 
+    GameService.getCurrentQuestion(roomKey)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(err => {
+            next(err);
+        })
 })
 
 export default router;
