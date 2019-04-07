@@ -196,8 +196,7 @@ router.route('/:roomKey/round/question/answer').post((req, res, next) => {
             })
         })
         .catch(err => {
-            throw err
-            next(err)
+            next(err);
         })
 })
 

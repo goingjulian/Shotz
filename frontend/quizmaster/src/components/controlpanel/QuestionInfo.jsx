@@ -5,39 +5,28 @@ import { nextQuestion } from '../../actions/roundsActions'
 
 class QuestionInfo extends React.Component {
   render() {
-
+    const currentQuestionObj = this.props.currentRound.questions[this.props.activeQuestionIndex];
     const totalQuestionsAmount = this.props.currentRound.questions.length;
-    const currentQuestion = this.props.currentRound.questions[this.props.activeQuestionIndex].question;
+    const currentQuestion = currentQuestionObj.question;
     const currentAnswer = this.props.currentRound.questions[this.props.activeQuestionIndex].answer;
 
-    const STATICanswers = [
-      {
-        team: "Fritzzers",
-        answer: "Frankrijk?"
-      },
-      {
-        team: "Meronnetjes",
-        answer: "Gele hesjes"
-      },
-      {
-        team: "Hardleers",
-        answer: "Huh..."
-      },
-      {
-        team: "Da voice",
-        answer: "This is the voice of PARIS"
+    const answers = [];
+    this.props.teamList.forEach(team => {
+      console.log(team)
+      const answer = team.answers.find(answer => answer.questionId === currentQuestionObj._id);
+      console.log(answer)
+      if (answer) {
+        answers.push(<Item
+          key={team.teamName}
+          text={answer.answer}
+          team={team.teamName}
+          itemClass="AnswerItem"
+          closeHandler={() => { }}
+          acceptHandler={() => { }}
+        />)
       }
-    ];
-    const answerItems = STATICanswers.map((answer, index) => (
-      <Item
-        key={index}
-        text={answer.answer}
-        team={answer.team}
-        itemClass="AnswerItem"
-        closeHandler={() => { }}
-        acceptHandler={() => { }}
-      />
-    ));
+    })
+
     return (
       <div className="QuestionInfo">
         <div className="infoActions">
@@ -57,8 +46,8 @@ class QuestionInfo extends React.Component {
           </h2>
         </div>
         <div className="infoAnswers">
-          <h2>Answers (6/8);</h2>
-          <div className="infoAnswersList">{answerItems}</div>
+          <h2>Answers ({answers.length}/{this.props.teamList.length}):</h2>
+          <div className="infoAnswersList">{answers}</div>
         </div>
       </div>
     );
@@ -71,7 +60,8 @@ function mapStateToProps(state) {
     roomKey: state.room.roomKey,
     rounds: state.rounds.rounds,
     activeQuestionIndex: state.rounds.rounds[state.rounds.rounds.length - 1].activeQuestionIndex,
-    currentRound: state.rounds.rounds[state.rounds.rounds.length - 1]
+    currentRound: state.rounds.rounds[state.rounds.rounds.length - 1],
+    teamList: state.teams.teamList
   };
 }
 

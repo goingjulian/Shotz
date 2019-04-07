@@ -138,7 +138,7 @@ export default class GameDAO {
 
     static submitAnswer(roomKey, sessionId, questionId, answer) {
         return Game.updateOne(
-            { roomKey: roomKey, "teams.sessionId": sessionId, "teams.answers.questionId": { $nin: [questionId] } },
+            { roomKey: roomKey, teams: {$elemMatch: {"answers.questionId": {$ne: questionId}, sessionId: sessionId}} },
             {
                 $push: {
                     "teams.$.answers": {
@@ -154,14 +154,3 @@ export default class GameDAO {
         })
     }
 }
-/*
-
-db.getCollection('games').find(
-{
-    roomKey: "5570",
-    $and: [
-        { "teams.answers.questionId": { $ne: ["5ca1e9fef13f9a4c4cc6748c"]}},
-        { "teams.sessionId":  "pf2hYNkAcFUyWlNYmU2aN8p0Ie5JtoMi"}
-     ]
-})
-*/

@@ -6,7 +6,8 @@ export const teamActionTypes = {
     ACCEPT_TEAM: "ACCEPT_TEAM",
     REJECT_TEAM: "REJECT_TEAM",
     CLEAR_REJECTED: "CLEAR_REJECTED",
-    REMOVE_TEAMS: "REMOVE_TEAMS"
+    REMOVE_TEAMS: "REMOVE_TEAMS",
+    ADD_ANSWER: "ADD_ANSWER"
 };
 
 export function removeTeamsAction() {
@@ -34,6 +35,15 @@ export function rejectTeamAction(sessionId) {
         type: teamActionTypes.REJECT_TEAM,
         sessionId: sessionId
     };
+}
+
+export function addSubmittedAnswerAction(teamSessionId, questionId, answer) {
+    return {
+        type: teamActionTypes.ADD_ANSWER,
+        teamSessionId: teamSessionId,
+        questionId: questionId,
+        answer: answer
+    }
 }
 
 export function alterTeamAcceptedStatus(roomKey, sessionId, accepted) {
