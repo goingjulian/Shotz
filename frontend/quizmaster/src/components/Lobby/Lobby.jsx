@@ -11,6 +11,7 @@ function getItemClass(accepted) {
 }
 
 function Lobby(props) {
+    const startNotAllowed = props.teamList.filter(team => team.accepted === true).length < 2;
     return (
         <div className="Component Lobby">
             <nav>
@@ -40,11 +41,10 @@ function Lobby(props) {
                     {props.teamList.length < 1 && <span className='lobbyTeamListNoTeams'>There are no teams!</span>}
                 </div>
                 <div className="lobbyStartQuizContainer">
-                    <button className="bttn"
-                        disabled={props.teamList.filter(team => team.accepted === true).length < 2}
+                    <button className={startNotAllowed ? "bttn disabled" : "bttn"}
+                        disabled={startNotAllowed}
                         onClick={() => {
                             props.clearRejectedTeamsAction(props.roomKey);
-                            // props.categorySelectViewAction();
                         }} 
                     >
                         Start quiz

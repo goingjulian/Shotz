@@ -26,7 +26,11 @@ export function restoreActiveScreenFromGameState(gameState) {
     return dispatch => {
         switch (gameState) {
             case "REGISTER":
+            case "CATEGORY_SELECT":
                 dispatch(viewWaitingscreenAction());
+                break;
+            case "IN_ROUND":
+                dispatch(viewQuestionScreenAction());
                 break;
             default:
                 dispatch(viewLobbyAction());

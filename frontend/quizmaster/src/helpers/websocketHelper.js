@@ -1,6 +1,6 @@
 import environment from "../environments/environment";
 import { store } from "..";
-import { getTeamList, rejectTeamAction } from "../actions/teamActions";
+import { getTeamList, rejectTeamAction, addSubmittedAnswerAction } from "../actions/teamActions";
 
 let reconnects = 0;
 
@@ -47,6 +47,9 @@ function handleMessage(message) {
                 break;
             case "quizmaster_teamLeft":
                 dispatch(rejectTeamAction(message.sessionId));
+                break;
+            case "quizmaster_answerSubmitted":
+                dispatch(addSubmittedAnswerAction(message.teamSessionId, message.questionId, message.answer));
                 break;
             default:
                 console.log("Unknown message: ", message);

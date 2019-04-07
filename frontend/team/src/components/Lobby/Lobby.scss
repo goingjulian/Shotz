@@ -15,33 +15,5 @@
   }
   main {
       padding: 20px 0;
-    .inputField {
-        padding: 20px 40px;
-        label {
-            display: block;
-            margin-bottom: 10px;
-            font-size: 1.2em;
-            font-weight: 700;
-            color: $text-color-dark;
-        }
-        input {
-            width: 100%;
-            padding: 10px 20px;
-            font-size: 1em;
-            color: $text-color-dark;
-            border: 1px solid $border-grey;
-        }
-        button {
-            padding: 15px 30px;
-            font-size: 1.2em;
-            font-weight: 700;
-            color: $text-color-dark;
-            border: 1px solid $border-grey;
-            cursor: pointer;
-            &:hover {
-                background-color: $border-grey;
-            }
-        }
-    }
   }
 }

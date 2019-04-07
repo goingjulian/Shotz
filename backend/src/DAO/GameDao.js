@@ -49,7 +49,7 @@ export default class GameDAO {
 
     static removeTeam(roomKey, teamSessionId) {
         return Game.updateOne(
-            { roomKey: roomKey, "teams.sessionId": teamSessionId, gameState: gameStates.REGISTER },
+            { roomKey: roomKey, "teams.sessionId": teamSessionId, $or: [{ gameState: gameStates.REGISTER }, { gameState: gameStates.IN_ROUND }] },
             {
                 $pull: {
                     teams: { sessionId: teamSessionId }
@@ -115,7 +115,7 @@ export default class GameDAO {
     }
 
     static getRounds(roomKey, sessionId) {
-        return Game.findOne({ roomKey: roomKey, quizmaster: sessionId }, { rounds: 1, _id: 0 }).lean()
+        return Game.findOne({ roomKey: roomKey, quizmaster: sessionId }, { rounds: 1, _id: 0 })
     }
 
     static goTonextQuestionInRound(roomKey, sessionId, currentRoundMongoId) {
@@ -127,8 +127,30 @@ export default class GameDAO {
                 }
             }
         )
-            .then(doc => {
-                console.log(doc);
-            })
+    }
+
+    static getCurrentQuestion(roomKey) {
+        return Game.aggregate([
+            { $match: { roomKey: roomKey } },
+            { $project: { _id: 0, round: { $slice: ["$rounds", -1] } } }
+        ])
+    }
+
+    static submitAnswer(roomKey, sessionId, questionId, answer) {
+        return Game.updateOne(
+            { roomKey: roomKey, teams: {$elemMatch: {"answers.questionId": {$ne: questionId}, sessionId: sessionId}} },
+            {
+                $push: {
+                    "teams.$.answers": {
+                        questionId: questionId,
+                        answer: answer
+                    }
+                }
+            }
+        ).then(doc => {
+            if (doc.n < 1) {
+                throw new ShotzException('User not found or answer already given', 400);
+            }
+        })
     }
 }

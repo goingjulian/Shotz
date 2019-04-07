@@ -1,6 +1,6 @@
 import express from "express";
 import GameService from "../service/gameService";
-import { sendMessageQuizmaster, sendMessageTeam } from "../service/websocketService";
+import { sendMessageQuizmaster, sendMessageTeam, sendMessageTeams } from "../service/websocketService";
 import ShotzException from "./../exceptions/ShotzException";
 import { closeConnection } from "./../service/websocketService";
 import gameStates from '../definitions/gameStates'
@@ -47,6 +47,7 @@ router.route("/restore").post((req, res, next) => {
  * Accept or reject teams
  */
 router.route("/:roomKey/team/:teamSessionId").put((req, res, next) => {
+    console.log('acceptReject teamId: ', req.params.teamSessionId)
     const roomKey = req.params.roomKey;
     const teamSessionId = req.params.teamSessionId;
     const accepted = req.body.accepted;
@@ -131,8 +132,10 @@ router.route("/:roomKey/round").post((req, res, next) => {
     console.log(roomKey, sessionId, categories)
     GameService.startNewRound(roomKey, sessionId, categories)
         .then(response => {
-            console.log(response);
             res.json(response);
+            sendMessageTeams(roomKey, {
+                type: "team_nextQuestion"
+            });
         })
         .catch(err => {
             console.log(err);
@@ -149,18 +152,52 @@ router.route('/:roomKey/round/question/next').put((req, res, next) => {
 
     GameService.goTonextQuestionInRound(roomKey, sessionId)
         .then(response => {
-            res.json(response)
+            res.json(response);
+            sendMessageTeams(roomKey, {
+                type: "team_nextQuestion"
+            });
         })
         .catch(err => {
+            throw err;
             next(err);
         })
 });
 
 /**
- * get current round
+ * get current question
  */
 router.route('/:roomKey/round/question').get((req, res, next) => {
+    const roomKey = req.params.roomKey;
 
+    GameService.getCurrentQuestion(roomKey)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(err => {
+            next(err);
+        })
+})
+
+router.route('/:roomKey/round/question/answer').post((req, res, next) => {
+    const roomKey = req.params.roomKey;
+    const sessionId = req.session.id;
+    const questionId = req.body.questionId;
+    const answer = req.body.answer;
+
+    GameService.submitAnswer(roomKey, sessionId, questionId, answer)
+        .then(response => {
+            res.json(response);
+
+            sendMessageQuizmaster(roomKey, {
+                type: "quizmaster_answerSubmitted",
+                teamSessionId: sessionId,
+                questionId: questionId,
+                answer: answer
+            })
+        })
+        .catch(err => {
+            next(err);
+        })
 })
 
 export default router;

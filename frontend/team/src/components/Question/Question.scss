@@ -1,1 +1,19 @@
 @import "../../assets/scss/variables";
+
+main {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    .question {
+        font-size: 30px;
+        margin-bottom: 10px;
+    }
+
+    .category {
+        font-size: 20px;
+    }
+}

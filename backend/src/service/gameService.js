@@ -58,7 +58,7 @@ export default class GameService {
                     gameState: game.gameState,
                     teams: game.teams,
                     rounds: game.rounds,
-                    currentQuestionIndex: game.rounds[game.rounds.length - 1].activeQuestionIndex
+                    currentQuestionIndex: game.rounds.length > 0 ? game.rounds[game.rounds.length - 1].activeQuestionIndex : 0
                 };
             } else if (
                 game &&
@@ -67,12 +67,14 @@ export default class GameService {
                 loginRole === "Team"
             ) {
                 const team = game.teams.find(team => team.sessionId === sessionId);
+                const currentQuestion = await this.getCurrentQuestion(roomKey);
                 return {
                     type: "team_restoreSession",
                     roomKey: roomKey,
                     gameState: game.gameState,
                     teamName: team.teamName,
-                    accepted: team.accepted
+                    accepted: team.accepted,
+                    question: currentQuestion
                 };
             } else {
                 throw new ShotzException("No active sessions found for your role!", 404);
@@ -194,9 +196,19 @@ export default class GameService {
 
     static async removeUnacceptedTeams(roomKey, quizmasterSessionId) {
         try {
+            const teams = await this.getTeams(roomKey);
+            const rejectedTeams = teams.filter(team => team.accepted === false);
+            const acceptedTeams = teams.filter(team => team.accepted === true);
             await GameDAO.removeUnacceptedTeams(roomKey, quizmasterSessionId);
             await GameDAO.alterGameState(roomKey, quizmasterSessionId, gameStates.CATEGORY_SELECT);
-            return await this.getTeams(roomKey);
+
+            rejectedTeams.forEach(team => {
+                sendMessageTeam(roomKey, team.sessionId, {
+                    type: "team_rejected"
+                });
+            })
+
+            return await acceptedTeams;
         } catch (err) {
             console.log(err);
             if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
@@ -222,12 +234,11 @@ export default class GameService {
             await GameDAO.alterGameState(roomKey, sessionId, gameStates.IN_ROUND);
 
             const rounds = await GameDAO.getRounds(roomKey, sessionId).lean();
-            console.log("ROUNDS", rounds)
 
             return {
                 gameState: gameStates.IN_ROUND,
-                rounds: rounds,
-                currentQuestionIndex: rounds[rounds.length - 1].activeQuestionIndex
+                rounds: rounds.rounds,
+                currentQuestionIndex: rounds.rounds.length > 0 ? rounds.rounds[rounds.rounds.length - 1].activeQuestionIndex : 0 //This doesn't go well when you start a new round
             };
         } catch (err) {
             if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
@@ -255,14 +266,57 @@ export default class GameService {
 
     static async goTonextQuestionInRound(roomKey, sessionId) {
         try {
-            const rounds = await GameDAO.getRounds(roomKey, sessionId);
+            const rounds = await GameDAO.getRounds(roomKey, sessionId).lean();
+
+            if (!rounds) throw new ShotzException(`Error while proceeding to next question, roomKey invalid or not authorized`, 400);
+
             const currentRound = rounds.rounds[rounds.rounds.length - 1];
 
-            if(currentRound.questions.length <= currentRound.activeQuestionIndex) throw new ShotzException('Last question reached', 500);
+            if (currentRound.questions.length <= currentRound.activeQuestionIndex + 1) throw new ShotzException('Last question reached', 400);
 
             await GameDAO.goTonextQuestionInRound(roomKey, sessionId, currentRound._id);
-            return {activeQuestionIndex: currentRound.activeQuestionIndex};
+            return { activeQuestionIndex: currentRound.activeQuestionIndex + 1 };
+        } catch (err) {
+            console.log(err)
+            if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
+            else throw err;
+        }
+    }
+
+    static async getCurrentQuestion(roomKey) {
+        try {
+            const result = await GameDAO.getCurrentQuestion(roomKey);
+            if (!result || result.length < 1) throw new ShotzException(`RoomKey not found`, 400);
+
+            if (result[0].round.length < 1) {
+                return {
+                    question: null,
+                    category: null
+                }
+            }
+            
+            const currentRound = result[0].round[0];
+            const currentQuestion = currentRound.questions[currentRound.activeQuestionIndex];
+            return {
+                questionId: currentQuestion._id,
+                question: currentQuestion.question,
+                category: currentQuestion.category
+            };
+        } catch (err) {
+            console.log(err)
+            if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
+            else throw err;
+        }
+    }
+
+    static async submitAnswer(roomKey, sessionId, questionId, answer) {
+        try {
+            await GameDAO.submitAnswer(roomKey, sessionId, questionId, answer);
+            return {
+                success: "answer submitted"
+            }
         } catch(err) {
+            console.log(err)
             if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
             else throw err;
         }

@@ -45,6 +45,7 @@ class Lobby extends React.Component {
               id="roomKey"
               name="roomKey"
               placeholder="Room code"
+              autoComplete="off"
             />
           </div>
           <div className="inputField">
@@ -55,6 +56,7 @@ class Lobby extends React.Component {
               id="teamName"
               name="teamName"
               placeholder="Team name"
+              autoComplete="off"
             />
           </div>
           <div className="inputField">

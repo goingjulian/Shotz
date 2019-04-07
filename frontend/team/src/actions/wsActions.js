@@ -1,6 +1,8 @@
 import environment from "../environments/environment";
-import { teamAcceptedAction, teamRejectedAction, leaveGameAction } from "./gameActions";
+import { teamAcceptedAction, teamRejectedAction, leaveGameAction, getCurrentQuestion } from "./gameActions";
 import { viewLobbyAction } from "./viewActions";
+import store from '../store'
+import Lobby from "../components/Lobby/Lobby.jsx";
 
 let reconnects = 0;
 
@@ -22,7 +24,7 @@ export function initSocket() {
         socket.onclose = () => {
             console.log("Socket disconnected");
 
-            if (reconnects < 3) {
+            if (reconnects < 3 && store.getState().views.activeView !== Lobby) {
                 console.log("Trying to reconnect");
                 reconnects++;
                 setTimeout(() => {
@@ -46,10 +48,14 @@ function handleMessage(message) {
                 break;
             case "team_rejected":
                 dispatch(teamRejectedAction());
+                dispatch(viewLobbyAction());
                 break;
             case "team_quizmasterLeft":
                 dispatch(viewLobbyAction());
                 dispatch(leaveGameAction());
+                break;
+            case "team_nextQuestion":
+                dispatch(getCurrentQuestion(store.getState().game.roomKey));
                 break;
             default:
                 console.log("Unknown message: ", message);
