@@ -37,6 +37,7 @@ export function rejectTeamAction(sessionId) {
 }
 
 export function alterTeamAcceptedStatus(roomKey, sessionId, accepted) {
+    console.log('alter stat: ', sessionId, roomKey, accepted);
     return async dispatch => {
         try {
             const method = {

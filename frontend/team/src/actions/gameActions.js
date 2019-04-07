@@ -59,7 +59,7 @@ export function getCurrentQuestion(roomKey) {
         const body = await response.json();
 
         dispatch(setQuestionAction(body));
-        dispatch(viewQuestionScreenAction())
+        dispatch(viewQuestionScreenAction());
     }
 }
 
@@ -75,9 +75,9 @@ export function leaveGame(roomKey) {
                 console.log("LEAVE ROOM");
                 console.log(body);
                 console.log("----------");
-                dispatch(leaveGameAction());
                 dispatch(viewLobbyAction());
-                throw new Error(body.error);
+                dispatch(leaveGameAction());
+                // throw new Error(body.error);
             })
             .catch(err => {
                 console.log(err.message);
@@ -143,4 +143,27 @@ export function restoreSession() {
                 console.log(err.message);
             });
     };
+}
+
+export function submitAnswer(roomKey, questionId, answer) {
+    return async dispatch => {
+        const options = {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                questionId: questionId,
+                answer: answer
+            })
+        }
+        const response = await fetch(`${environment.API_URL}/room/${roomKey}/round/question/answer`, options)
+
+        if(!response.ok) throw new Error(`Error while submitting answer`);
+
+        const body = await response.json();
+
+        console.log(body);
+    }
 }

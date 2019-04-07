@@ -131,8 +131,37 @@ export default class GameDAO {
 
     static getCurrentQuestion(roomKey) {
         return Game.aggregate([
-            { $match: {roomKey: roomKey}},
-            { $project: {_id: 0, round: {$slice: ["$rounds", -1]} }}
+            { $match: { roomKey: roomKey } },
+            { $project: { _id: 0, round: { $slice: ["$rounds", -1] } } }
         ])
     }
+
+    static submitAnswer(roomKey, sessionId, questionId, answer) {
+        return Game.updateOne(
+            { roomKey: roomKey, "teams.sessionId": sessionId, "teams.answers.questionId": { $nin: [questionId] } },
+            {
+                $push: {
+                    "teams.$.answers": {
+                        questionId: questionId,
+                        answer: answer
+                    }
+                }
+            }
+        ).then(doc => {
+            if (doc.n < 1) {
+                throw new ShotzException('User not found or answer already given', 400);
+            }
+        })
+    }
 }
+/*
+
+db.getCollection('games').find(
+{
+    roomKey: "5570",
+    $and: [
+        { "teams.answers.questionId": { $ne: ["5ca1e9fef13f9a4c4cc6748c"]}},
+        { "teams.sessionId":  "pf2hYNkAcFUyWlNYmU2aN8p0Ie5JtoMi"}
+     ]
+})
+*/

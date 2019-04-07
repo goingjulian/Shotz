@@ -196,9 +196,19 @@ export default class GameService {
 
     static async removeUnacceptedTeams(roomKey, quizmasterSessionId) {
         try {
+            const teams = await this.getTeams(roomKey);
+            const rejectedTeams = teams.filter(team => team.accepted === false);
+            const acceptedTeams = teams.filter(team => team.accepted === true);
             await GameDAO.removeUnacceptedTeams(roomKey, quizmasterSessionId);
             await GameDAO.alterGameState(roomKey, quizmasterSessionId, gameStates.CATEGORY_SELECT);
-            return await this.getTeams(roomKey);
+
+            rejectedTeams.forEach(team => {
+                sendMessageTeam(roomKey, team.sessionId, {
+                    type: "team_rejected"
+                });
+            })
+
+            return await acceptedTeams;
         } catch (err) {
             console.log(err);
             if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
@@ -288,10 +298,24 @@ export default class GameService {
             const currentRound = result[0].round[0];
             const currentQuestion = currentRound.questions[currentRound.activeQuestionIndex];
             return {
+                questionId: currentQuestion._id,
                 question: currentQuestion.question,
                 category: currentQuestion.category
             };
         } catch (err) {
+            console.log(err)
+            if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
+            else throw err;
+        }
+    }
+
+    static async submitAnswer(roomKey, sessionId, questionId, answer) {
+        try {
+            await GameDAO.submitAnswer(roomKey, sessionId, questionId, answer);
+            return {
+                success: "answer submitted"
+            }
+        } catch(err) {
             console.log(err)
             if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
             else throw err;

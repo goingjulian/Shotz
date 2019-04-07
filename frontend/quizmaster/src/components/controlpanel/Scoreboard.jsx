@@ -4,6 +4,7 @@ import Item from "../General/Item";
 export default function Scoreboard(props) {
   console.log(props.teams)
   const scoreboard = props.teams.map((team, index) => {
+    console.log('Removing teamSessId: ', team.sessionId)
     return props.teams.length > 2
       ? <Item key={index} index={index + 1} text={team.teamName} closeHandler={() => { props.removeTeam(team.sessionId) }} />
       : <Item key={index} index={index + 1} text={team.teamName} />
