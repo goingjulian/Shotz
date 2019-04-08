@@ -1,5 +1,5 @@
 import React from "react";
-import Item from './../General/Item';
+import Item from '../General/Item';
 
 export default function QuestionQueue(props) {
   const questionQueue = props.questions.map((question, index) => {

@@ -4,10 +4,6 @@ import Navigation from "../Navigation/Navigation";
 import { viewCategorySelectionScreen } from "../../actions/viewActions";
 
 class EndRound extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         return (
             <div className="Component EndRound">
