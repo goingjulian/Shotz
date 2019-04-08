@@ -335,17 +335,24 @@ export default class GameService {
     }
 
     static async setCorrectStatusStatusAnswer(roomKey, sessionId, teamSessionId, questionId, correct) {
-        console.log(correct, typeof correct)
         if(typeof questionId !== "string") throw new ShotzException('questionId must be a string', 400);
         if(typeof correct !== "boolean") throw new ShotzException('correct must be a boolean', 400);
 
         try {
             const teams = await GameDAO.setCorrectStatusStatusAnswer(roomKey, sessionId, teamSessionId, questionId, correct);
-            console.log(teams)
             return teams;
             
         } catch(err) {
-            console.log(err)
+            if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
+            else throw err;
+        }
+    }
+
+    static async deleteQuestionFromCurrentRound(roomKey, sessionId, questionId) {
+        try {
+            const questions = await GameDAO.deleteQuestionFromCurrentRound(roomKey, sessionId, questionId);
+            return questions;
+        } catch(err) {
             if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
             else throw err;
         }

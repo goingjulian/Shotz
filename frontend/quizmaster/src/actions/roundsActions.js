@@ -5,7 +5,8 @@ import { setTeamsAction } from "./teamActions";
 export const roundsActionTypes = {
     startRound: "startRound",
     setRounds: "setRounds",
-    nextQuestion: "nextQuestion"
+    nextQuestion: "nextQuestion",
+    setQuestions: "setQuestions"
 };
 
 // TODO combine actions
@@ -23,6 +24,13 @@ export function nextQuestionAction(activeQuestionIndex) {
         type: roundsActionTypes.nextQuestion,
         activeQuestionIndex: activeQuestionIndex
     };
+}
+
+export function setQuestionsAction(questions) {
+    return {
+        type: roundsActionTypes.setQuestions,
+        questions: questions
+    }
 }
 
 export function newRound(roomKey, categories) {
@@ -91,4 +99,25 @@ export function nextQuestion(roomKey) {
 
         dispatch(nextQuestionAction(body.activeQuestionIndex));
     };
+}
+
+export function removeQuestionFromQueue(roomKey, questionId) {
+    return async dispatch => {
+        try {
+            const options = {
+                method: "DELETE",
+                credentials: "include"
+            }
+
+            const response = await fetch(`${environment.API_URL}/room/${roomKey}/round/questions/${questionId}`, options);
+
+            if (!response.ok) throw new Error('Error while removing question from queue');
+
+            const body = await response.json();
+
+            dispatch(setQuestionsAction(body));
+        } catch (err) {
+            console.log(err);
+        }
+    }
 }

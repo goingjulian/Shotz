@@ -5,6 +5,7 @@ import QuestionInfo from "./QuestionInfo";
 import QuestionQueue from "./QuestionQueue";
 import Scoreboard from "./Scoreboard";
 import { alterTeamAcceptedStatus } from "../../actions/teamActions";
+import { removeQuestionFromQueue } from '../../actions/roundsActions';
 
 import "./ControlPanel.scss";
 import Navigation from "../Navigation/Navigation";
@@ -24,6 +25,7 @@ class ControlPanel extends React.Component {
           <QuestionQueue
             questions={this.props.rounds[this.props.rounds.length - 1].questions}
             currentQuestionIndex={this.props.rounds[this.props.rounds.length - 1].activeQuestionIndex}
+            removeQuestionFromQueue={(questionId) => this.props.removeQuestionFromQueue(this.props.roomKey, questionId)}
           />
         </div>
       </div>
@@ -41,7 +43,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    removeTeam: (roomKey, sessionId) => dispatch(alterTeamAcceptedStatus(roomKey, sessionId, false))
+    removeTeam: (roomKey, sessionId) => dispatch(alterTeamAcceptedStatus(roomKey, sessionId, false)),
+    removeQuestionFromQueue: (roomKey, questionId) => dispatch(removeQuestionFromQueue(roomKey, questionId))
   };
 }
 

@@ -174,9 +174,32 @@ export default class GameDAO {
 
                 result.teams[team].answers[answer].correct = correct;
 
-                if(correct) result.teams[team].score += 10;
+                if (correct) result.teams[team].score += 10;
                 result.save();
                 return result.teams.toObject();
             })
+    }
+
+    static deleteQuestionFromCurrentRound(roomKey, sessionId, questionId) {
+        return Game.findOne(
+            { roomKey: roomKey } //, "teams.sessionId": sessionId
+        ).then(result => {
+            if (result === undefined) throw new ShotzException('Game not found', 400);
+
+            const curRound = result.rounds.length - 1;
+
+            if (curRound === undefined) throw new ShotzException('No round active', 400);
+
+            const questionIndex = result.rounds[curRound].questions.findIndex(question => question._id.toString() === questionId);
+
+            if (questionIndex === undefined) throw new ShotzException('Question not found', 400);
+
+            if (result.rounds[curRound].activeQuestionIndex >= questionIndex) throw new ShotzException('QuestionId must be higher than the current question index', 400);
+
+            result.rounds[curRound].questions.splice(questionIndex, 1);
+            result.save();
+
+            return result.rounds[curRound].questions.toObject();
+        })
     }
 }

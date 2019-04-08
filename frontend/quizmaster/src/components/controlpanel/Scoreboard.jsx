@@ -18,7 +18,6 @@ export default function Scoreboard(props) {
         <h1>Scoreboard</h1>
       </header>
       <main>{scoreboard}</main>
-      <p>Trucje toegepast. Wanneer er 2 teams over zijn kun je deze niet verwijderen. Moet eigenlijk dan quiz beëindigen</p>
     </div>
   );
 }
