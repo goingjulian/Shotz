@@ -46,7 +46,7 @@ function handleMessage(message) {
     return dispatch => {
         switch (message.type) {
             case "team_accepted":
-                dispatch(viewMessageScreenAction(messageTypes.MSG_APPROVAL));
+                dispatch(viewMessageScreenAction(messageTypes.MSG_ACCEPTED));
                 dispatch(teamAcceptedAction());
                 break;
             case "team_rejected":
@@ -65,6 +65,12 @@ function handleMessage(message) {
                 break;
             case "team_nextQuestion":
                 dispatch(getCurrentQuestion(store.getState().game.roomKey));
+                break;
+            case "team_answerCorrect":
+                dispatch(viewMessageScreenAction(messageTypes.MSG_ANSWERCORRECT));
+                break;
+            case "team_answerIncorrect":
+                dispatch(viewMessageScreenAction(messageTypes.MSG_ANSWERINCORRECT));
                 break;
             default:
                 console.log("Unknown message: ", message);

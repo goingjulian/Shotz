@@ -201,7 +201,7 @@ export function endRoundScore(roomKey) {
                 if (!response.ok) {
                     throw new Error(body.error);
                 } else {
-                    dispatch(viewMessageScreenAction(`End round ${body.round}. You're position is ${body.position}.`));
+                    dispatch(viewMessageScreenAction(`End round ${body.round}. Your position is ${body.position}.`));
                 }
             })
             .catch(err => {

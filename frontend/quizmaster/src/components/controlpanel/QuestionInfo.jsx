@@ -10,7 +10,6 @@ class QuestionInfo extends React.Component {
     this.props.setAnswerStatus(this.props.roomKey, questionId, teamSessionId, correct)
   }
 
-
   render() {
     const currentQuestionObj = this.props.currentRound.questions[this.props.activeQuestionIndex];
     const totalQuestionsAmount = this.props.currentRound.questions.length;
@@ -20,18 +19,14 @@ class QuestionInfo extends React.Component {
     const answers = [];
 
     this.props.teamList.forEach(team => {
-      console.log(team)
       const answer = team.answers.find(answer => answer.questionId === currentQuestionObj._id);
 
-      
       if (answer) {
-        console.log("Answer!", answer.answer)
-        console.log(answer.correct)
 
         let answerClass
         if (answer.correct) answerClass = "correct"
+        else if (answer.correct === null) answerClass = ""
         else if (answer.correct === false) answerClass = "incorrect"
-        
 
         answers.push(<Item
           key={team.teamName}

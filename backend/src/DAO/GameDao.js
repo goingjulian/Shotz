@@ -173,6 +173,8 @@ export default class GameDAO {
                 const answer = result.teams[team].answers.findIndex(answer => answer.questionId === questionId);
 
                 result.teams[team].answers[answer].correct = correct;
+
+                if(correct) result.teams[team].score += 10;
                 result.save();
                 return result.teams.toObject();
             })

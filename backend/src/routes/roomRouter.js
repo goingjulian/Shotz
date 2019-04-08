@@ -60,6 +60,9 @@ router.route("/:roomKey/team/:teamSessionId").put((req, res, next) => {
         });
 });
 
+/**
+ * Leave room as team
+ */
 router.route("/:roomKey/leave").delete((req, res, next) => {
     const roomKey = req.params.roomKey;
     const sessionId = req.session.id;
@@ -143,6 +146,9 @@ router.route("/:roomKey/round").post((req, res, next) => {
         })
 });
 
+/**
+ * Close the current round
+ */
 router.route("/:roomKey/round/end").put((req, res, next) => {
     const roomKey = req.params.roomKey;
     const sessionId = req.session.id;
@@ -156,6 +162,9 @@ router.route("/:roomKey/round/end").put((req, res, next) => {
         })
 });
 
+/**
+ * Get score
+ */
 router.route("/:roomKey/score").get((req, res, next) => {
     const roomKey = req.params.roomKey;
     const sessionId = req.session.id;
@@ -170,10 +179,8 @@ router.route("/:roomKey/score").get((req, res, next) => {
     //     })
 });
 
-
-
 /**
- * next question in round
+ * proceed to next question in round
  */
 router.route('/:roomKey/round/question/next').put((req, res, next) => {
     const sessionId = req.session.id;
@@ -207,6 +214,9 @@ router.route('/:roomKey/round/question').get((req, res, next) => {
         })
 })
 
+/**
+ * Submit answer
+ */
 router.route('/:roomKey/round/question/answer').post((req, res, next) => {
     const roomKey = req.params.roomKey;
     const sessionId = req.session.id;
@@ -216,13 +226,13 @@ router.route('/:roomKey/round/question/answer').post((req, res, next) => {
     GameService.submitAnswer(roomKey, sessionId, questionId, answer)
         .then(response => {
             res.json(response);
+            console.log("ANS:", answer);
 
             sendMessageQuizmaster(roomKey, {
                 type: "quizmaster_answerSubmitted",
                 teamSessionId: sessionId,
                 questionId: questionId,
-                answer: answer,
-                correct: null
+                answer: answer
             })
         })
         .catch(err => {
@@ -230,6 +240,9 @@ router.route('/:roomKey/round/question/answer').post((req, res, next) => {
         })
 })
 
+/**
+ * Accept or reject a answer
+ */
 router.route('/:roomKey/round/questions/answer/:questionId').put((req, res, next) => {
     const roomKey = req.params.roomKey;
     const sessionId = req.session.id;
@@ -240,6 +253,12 @@ router.route('/:roomKey/round/questions/answer/:questionId').put((req, res, next
     GameService.setCorrectStatusStatusAnswer(roomKey, sessionId, teamSessionId, questionId, correct)
         .then(response => {
             res.json(response);
+            const responseType = correct ? "team_answerCorrect" : "team_answerIncorrect"
+            console.log(responseType, correct)
+            sendMessageTeam(roomKey, teamSessionId, {
+                type: responseType,
+                questionId: questionId
+            })
         })
         .catch(err => {
             console.log(err);

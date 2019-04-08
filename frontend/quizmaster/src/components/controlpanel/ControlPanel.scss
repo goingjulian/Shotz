@@ -97,9 +97,9 @@
           button[class^='itemButton'] {
               border: 1px solid darken($border-grey, 10%);
           }
-          .itemButton__accept {
+          .AnswerItem__correct {
               display: none;
-          }
+          } //Wout, fix dit even
         }
       }
     }

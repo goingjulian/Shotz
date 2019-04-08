@@ -44,8 +44,7 @@ export function addSubmittedAnswerAction(teamSessionId, questionId, answer) {
         type: teamActionTypes.ADD_ANSWER,
         teamSessionId: teamSessionId,
         questionId: questionId,
-        answer: answer,
-        correct: null
+        answer: answer
     }
 }
 

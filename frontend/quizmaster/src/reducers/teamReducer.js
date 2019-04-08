@@ -28,7 +28,7 @@ export default function teamReducer(state = initialTeamState, action) {
             teamListCopy[team].answers.push({
                 questionId: action.questionId,
                 answer: action.answer,
-                correct: false
+                correct: null
             })
             console.log(teamListCopy[team], teamListCopy);
             return {...state, teamList: teamListCopy}
