@@ -2,8 +2,15 @@ import React from "react";
 import * as ReactRedux from "react-redux";
 import Item from "../General/Item";
 import { nextQuestion } from '../../actions/roundsActions'
+import { setAnswerStatus } from '../../actions/teamActions'
 
 class QuestionInfo extends React.Component {
+
+  handleAnswerStatus(questionId, teamSessionId, correct) {
+    this.props.setAnswerStatus(this.props.roomKey, questionId, teamSessionId, correct)
+  }
+
+
   render() {
     const currentQuestionObj = this.props.currentRound.questions[this.props.activeQuestionIndex];
     const totalQuestionsAmount = this.props.currentRound.questions.length;
@@ -11,18 +18,28 @@ class QuestionInfo extends React.Component {
     const currentAnswer = this.props.currentRound.questions[this.props.activeQuestionIndex].answer;
 
     const answers = [];
+
     this.props.teamList.forEach(team => {
       console.log(team)
       const answer = team.answers.find(answer => answer.questionId === currentQuestionObj._id);
-      console.log(answer)
+
+      
       if (answer) {
+        console.log("Answer!", answer.answer)
+        console.log(answer.correct)
+
+        let answerClass
+        if (answer.correct) answerClass = "correct"
+        else if (answer.correct === false) answerClass = "incorrect"
+        
+
         answers.push(<Item
           key={team.teamName}
           text={answer.answer}
           team={team.teamName}
-          itemClass="AnswerItem"
-          closeHandler={() => { }}
-          acceptHandler={() => { }}
+          itemClass={`${answerClass} AnswerItem`}
+          closeHandler={() => { this.props.setAnswerStatus(this.props.roomKey, answer.questionId, team.sessionId, false) }}
+          acceptHandler={() => { this.props.setAnswerStatus(this.props.roomKey, answer.questionId, team.sessionId, true) }}
         />)
       }
     })
@@ -67,7 +84,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    nextQuestion: (roomKey) => dispatch(nextQuestion(roomKey))
+    nextQuestion: (roomKey) => dispatch(nextQuestion(roomKey)),
+    setAnswerStatus: (roomKey, questionId, teamSessionId, correct) => dispatch(setAnswerStatus(roomKey, questionId, teamSessionId, correct))
   };
 }
 

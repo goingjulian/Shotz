@@ -192,10 +192,28 @@ router.route('/:roomKey/round/question/answer').post((req, res, next) => {
                 type: "quizmaster_answerSubmitted",
                 teamSessionId: sessionId,
                 questionId: questionId,
-                answer: answer
+                answer: answer,
+                correct: null
             })
         })
         .catch(err => {
+            next(err);
+        })
+})
+
+router.route('/:roomKey/round/questions/answer/:questionId').put((req, res, next) => {
+    const roomKey = req.params.roomKey;
+    const sessionId = req.session.id;
+    const teamSessionId = req.body.teamSessionId;
+    const questionId = req.params.questionId;
+    const correct = req.body.correct;
+
+    GameService.setCorrectStatusStatusAnswer(roomKey, sessionId, teamSessionId, questionId, correct)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(err => {
+            console.log(err);
             next(err);
         })
 })
