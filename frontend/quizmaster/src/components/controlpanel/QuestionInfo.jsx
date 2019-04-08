@@ -1,8 +1,8 @@
 import React from "react";
 import * as ReactRedux from "react-redux";
 import Item from "../General/Item";
-import { nextQuestion } from '../../actions/roundsActions'
 import { setAnswerStatus } from '../../actions/teamActions'
+import { nextQuestion, endRound } from '../../actions/roundsActions'
 
 class QuestionInfo extends React.Component {
 
@@ -50,7 +50,7 @@ class QuestionInfo extends React.Component {
           <button>Show answer to teams</button>
           <h2>Round {this.props.rounds.length}</h2>
           {totalQuestionsAmount === this.props.activeQuestionIndex + 1
-            ? <button>End round</button>
+            ? <button onClick={() => this.props.endRound(this.props.roomKey)}>End round</button>
             : <button onClick={() => this.props.nextQuestion(this.props.roomKey)}>Next question</button>}
         </div>
         <div className="infoQuestion">
@@ -85,7 +85,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     nextQuestion: (roomKey) => dispatch(nextQuestion(roomKey)),
-    setAnswerStatus: (roomKey, questionId, teamSessionId, correct) => dispatch(setAnswerStatus(roomKey, questionId, teamSessionId, correct))
+    setAnswerStatus: (roomKey, questionId, teamSessionId, correct) => dispatch(setAnswerStatus(roomKey, questionId, teamSessionId, correct)),
+    endRound: (roomKey) => dispatch(endRound(roomKey))
   };
 }
 

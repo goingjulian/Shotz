@@ -29,10 +29,10 @@ export default function gameReducer(state = initialState, action) {
             };
         case "team_rejected":
             return {
-                ...state,
+                ...initialState,
                 rejected: true
             };
-        case "team_leaveGame":
+        case "team_leaveRoom":
             return {
                 ...initialState
             };

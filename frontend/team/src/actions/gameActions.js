@@ -1,6 +1,12 @@
 import environment from "../environments/environment";
-import { viewWaitingscreenAction, restoreActiveScreenFromGameState, viewLobbyAction, viewQuestionScreenAction } from "./viewActions";
+import {
+    viewLoginScreenAction,
+    viewMessageScreenAction,
+    restoreActiveScreenFromGameState,
+    viewQuestionScreenAction
+} from "./viewActions";
 import { initSocket } from "./wsActions";
+import { messageTypes } from "./Enums";
 
 export function joinRoomAction(roomKey, teamName) {
     return {
@@ -32,9 +38,9 @@ export function teamRejectedAction() {
     };
 }
 
-export function leaveGameAction() {
+export function leaveRoomAction() {
     return {
-        type: "team_leaveGame"
+        type: "team_leaveRoom"
     };
 }
 
@@ -42,7 +48,7 @@ export function setQuestionAction(question) {
     return {
         type: "team_setQuestion",
         question: question
-    }
+    };
 }
 
 export function getCurrentQuestion(roomKey) {
@@ -50,34 +56,33 @@ export function getCurrentQuestion(roomKey) {
         const options = {
             method: "GET",
             credentials: "include"
-        }
+        };
 
         const response = await fetch(`${environment.API_URL}/room/${roomKey}/round/question`, options);
-        
-        if(!response.ok) throw new Error(`Error while getting question`);
+
+        if (!response.ok) throw new Error(`Error while getting question`);
 
         const body = await response.json();
 
         dispatch(setQuestionAction(body));
         dispatch(viewQuestionScreenAction());
-    }
+    };
 }
 
-export function leaveGame(roomKey) {
-    const method = {
-        method: "DELETE",
-        credentials: "include"
-    };
+export function leaveRoom(roomKey) {
     return dispatch => {
+        const method = {
+            method: "DELETE",
+            credentials: "include"
+        };
         fetch(`${environment.API_URL}/room/${roomKey}/leave`, method)
             .then(async response => {
                 const body = await response.json();
-                console.log("LEAVE ROOM");
+                console.log("LEAVING ROOM");
                 console.log(body);
                 console.log("----------");
-                dispatch(viewLobbyAction());
-                dispatch(leaveGameAction());
-                // throw new Error(body.error);
+                dispatch(viewLoginScreenAction());
+                dispatch(leaveRoomAction());
             })
             .catch(err => {
                 console.log(err.message);
@@ -105,7 +110,7 @@ export function joinRoom(roomKey, teamName) {
                     throw new Error(body.error);
                 } else {
                     dispatch(joinRoomAction(body.roomKey, body.teamName));
-                    dispatch(viewWaitingscreenAction());
+                    dispatch(viewMessageScreenAction(messageTypes.MSG_APPROVAL));
                     dispatch(initSocket());
                 }
             })
@@ -135,7 +140,7 @@ export function restoreSession() {
                     throw new Error(body.error);
                 } else {
                     dispatch(restoreSessionAction(body.roomKey, body.teamName, body.accepted, body.question));
-                    dispatch(restoreActiveScreenFromGameState(body.gameState));
+                    dispatch(restoreActiveScreenFromGameState(body.gameState, body.accepted));
                     dispatch(initSocket());
                 }
             })
@@ -146,7 +151,7 @@ export function restoreSession() {
 }
 
 export function submitAnswer(roomKey, questionId, answer) {
-    return async dispatch => {
+    return dispatch => {
         const options = {
             method: "POST",
             credentials: "include",
@@ -157,13 +162,50 @@ export function submitAnswer(roomKey, questionId, answer) {
                 questionId: questionId,
                 answer: answer
             })
-        }
-        const response = await fetch(`${environment.API_URL}/room/${roomKey}/round/question/answer`, options)
+        };
 
-        if(!response.ok) throw new Error(`Error while submitting answer`);
+        fetch(`${environment.API_URL}/room/${roomKey}/round/question/answer`, options)
+            .then(async response => {
+                const body = await response.json();
+                console.log("RESTORE");
+                console.log(body);
+                console.log("----------");
+                if (!response.ok) {
+                    throw new Error(body.error);
+                } else {
+                    dispatch(viewMessageScreenAction(messageTypes.MSG_QUESTIONANSWERED));
+                    dispatch(initSocket());
+                }
+            })
+            .catch(err => {
+                console.log(err.message);
+            });
+    };
+}
 
-        const body = await response.json();
-
-        console.log(body);
-    }
+export function endRoundScore(roomKey) {
+    return dispatch => {
+        const method = {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        };
+        fetch(`${environment.API_URL}/room/${roomKey}/score`, method)
+            .then(async response => {
+                const body = await response.json();
+                console.log("GET SCORE END ROUND");
+                console.log(body);
+                console.log("----------");
+                if (!response.ok) {
+                    throw new Error(body.error);
+                } else {
+                    dispatch(viewMessageScreenAction(`End round ${body.round}. You're position is ${body.position}.`));
+                }
+            })
+            .catch(err => {
+                console.log(err.message);
+            });
+    };
 }

@@ -79,7 +79,12 @@ export default class GameDAO {
         return Game.updateOne(
             { roomKey: roomKey, quizmaster: quizmasterSessionId },
             { gameState: newState }
-        )
+        ).then(doc => {
+            console.log(doc)
+            if (doc.n < 1) {
+                throw new Error('Team not found or registration is closed')
+            }
+        })
     }
 
     static joinGameAsTeam(roomKey, teamName, sessionId) {

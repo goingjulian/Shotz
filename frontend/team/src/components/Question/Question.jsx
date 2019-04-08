@@ -2,23 +2,21 @@ import React from "react";
 import * as ReactRedux from "react-redux";
 
 import "./Question.scss";
-import { leaveGame, submitAnswer } from "../../actions/gameActions";
+import { submitAnswer } from "../../actions/gameActions";
+import Navigation from "../Navigation/Navigation";
 
 class Question extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = {
             answer: null
-        }
+        };
     }
 
     handleInput(e) {
         this.setState({
             answer: e.target.value
-        })
-
-        console.log(this.state);
+        });
     }
 
     submitAnswer(e) {
@@ -33,19 +31,7 @@ class Question extends React.Component {
     render() {
         return (
             <div className="Component Question">
-                <nav>
-                    <div className="navInner">
-                        <div className="navCloseGame">
-                            <button onClick={() => this.props.leaveGame(this.props.roomKey)}>Leave</button>
-                        </div>
-                        <div className="navTeamName">
-                            <span>Team: {this.props.teamName}</span>
-                        </div>
-                        <div className="navRoomKey">
-                            <span>Room: {this.props.roomKey}</span>
-                        </div>
-                    </div>
-                </nav>
+                <Navigation />
                 <main>
                     <h1 className="question">{this.props.question.question}</h1>
                     <h2 className="category">{this.props.question.category}</h2>
@@ -60,26 +46,23 @@ class Question extends React.Component {
                         />
                     </div>
                     <div className="inputField">
-                        <button onClick={(e) => this.submitAnswer(e)}>Submit</button>
+                        <button onClick={e => this.submitAnswer(e)}>Submit</button>
                     </div>
                 </main>
             </div>
         );
     }
-
 }
 
 function mapStateToProps(state) {
     return {
         roomKey: state.game.roomKey,
-        teamName: state.game.teamName,
         question: state.game.question
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        leaveGame: roomKey => dispatch(leaveGame(roomKey)),
         submitAnswer: (roomKey, questionId, answer) => dispatch(submitAnswer(roomKey, questionId, answer))
     };
 }

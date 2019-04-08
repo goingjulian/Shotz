@@ -4,29 +4,21 @@ import * as ReactRedux from "react-redux";
 import QuestionInfo from "./QuestionInfo";
 import QuestionQueue from "./QuestionQueue";
 import Scoreboard from "./Scoreboard";
-import { alterTeamAcceptedStatus } from '../../actions/teamActions';
+import { alterTeamAcceptedStatus } from "../../actions/teamActions";
 
-import './ControlPanel.scss';
+import "./ControlPanel.scss";
+import Navigation from "../Navigation/Navigation";
 
 class ControlPanel extends React.Component {
   render() {
     console.log("ROUNDS CONTROL");
     return (
       <div className="Component">
-        <nav>
-          <div className="navInner">
-            <div className="navLeft">
-              <button>End quiz</button>
-            </div>
-            <div className="navMiddle">
-              <h2>Room: {this.props.roomKey}</h2>
-            </div>
-          </div>
-        </nav>
+        <Navigation />
         <div className="ControlPanel">
           <Scoreboard
             teams={this.props.teams}
-            removeTeam={(teamSessionId) => this.props.removeTeam(this.props.roomKey, teamSessionId)}
+            removeTeam={teamSessionId => this.props.removeTeam(this.props.roomKey, teamSessionId)}
           />
           <QuestionInfo />
           <QuestionQueue
@@ -34,7 +26,6 @@ class ControlPanel extends React.Component {
             currentQuestionIndex={this.props.rounds[this.props.rounds.length - 1].activeQuestionIndex}
           />
         </div>
-
       </div>
     );
   }
@@ -54,6 +45,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default ReactRedux.connect(mapStateToProps, mapDispatchToProps)(
-  ControlPanel
-);
+export default ReactRedux.connect(mapStateToProps, mapDispatchToProps)(ControlPanel);

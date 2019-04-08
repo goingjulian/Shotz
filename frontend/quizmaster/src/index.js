@@ -9,7 +9,6 @@ import thunkMiddleware from 'redux-thunk'
 import { mainReducer } from './reducers/mainReducer';
 import { restoreSession } from './actions/roomActions';
 
-
 export const store = Redux.createStore(
     mainReducer,
     Redux.applyMiddleware(thunkMiddleware)

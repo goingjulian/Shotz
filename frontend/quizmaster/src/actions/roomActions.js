@@ -1,17 +1,17 @@
-import environment from '../environments/environment'
-import { initSocket } from '../helpers/websocketHelper'
-import { setViewByGameState, loginViewAction } from './viewActions';
-import { removeTeamsAction, setTeamsAction } from './teamActions';
-import { setRoundsAction } from './roundsActions'
+import environment from "../environments/environment";
+import { initSocket } from "../helpers/websocketHelper";
+import { setViewByGameState, loginViewAction } from "./viewActions";
+import { removeTeamsAction, setTeamsAction } from "./teamActions";
+import { setRoundsAction } from "./roundsActions";
 
 export const roomActionTypes = {
-    createRoom: " createRoom",
+    CREATE_ROOM: "CREATE_ROOM",
     LEAVE_ROOM: "LEAVE_ROOM"
 };
 
 export function createRoomAction(roomKey) {
     return {
-        type: roomActionTypes.createRoom,
+        type: roomActionTypes.CREATE_ROOM,
         roomKey: roomKey
     };
 }
@@ -35,7 +35,7 @@ export function createRoom() {
                 throw new Error(body.error);
             } else {
                 dispatch(createRoomAction(body.roomKey));
-            dispatch(setViewByGameState(body.gameState))
+                dispatch(setViewByGameState(body.gameState));
                 dispatch(initSocket());
             }
         } catch (err) {
@@ -87,7 +87,7 @@ export function restoreSession() {
             if (!response.ok) {
                 throw new Error(body.error);
             } else {
-                console.log(body)
+                console.log(body);
                 dispatch(setTeamsAction(body.teams));
                 dispatch(createRoomAction(body.roomKey));
                 dispatch(setRoundsAction(body.rounds, body.currentQuestionIndex));
