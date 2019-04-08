@@ -143,6 +143,35 @@ router.route("/:roomKey/round").post((req, res, next) => {
         })
 });
 
+router.route("/:roomKey/round/end").put((req, res, next) => {
+    const roomKey = req.params.roomKey;
+    const sessionId = req.session.id;
+    GameService.endRound(roomKey, sessionId)
+        .then(response => {
+            res.status(200).json(response);
+        })
+        .catch(err => {
+            console.log(err);
+            next(err)
+        })
+});
+
+router.route("/:roomKey/score").get((req, res, next) => {
+    const roomKey = req.params.roomKey;
+    const sessionId = req.session.id;
+    res.status(200).json({})
+    // GameService.getTeamScore(roomKey, sessionId)
+    //     .then(response => {
+    //         res.status(200).json(response);
+    //     })
+    //     .catch(err => {
+    //         console.log(err);
+    //         next(err)
+    //     })
+});
+
+
+
 /**
  * next question in round
  */

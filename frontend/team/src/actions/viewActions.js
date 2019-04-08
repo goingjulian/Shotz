@@ -1,18 +1,15 @@
-export const viewActionTypes = {
-    VIEW_LOBBY: 1,
-    VIEW_WAITINGSCREEN: 2,
-    VIEW_QUESTIONSCREEN: 3
-};
+import { viewActionTypes, messageTypes } from "./Enums";
 
-export function viewLobbyAction() {
+export function viewLoginScreenAction() {
     return {
-        type: viewActionTypes.VIEW_LOBBY
+        type: viewActionTypes.VIEW_LOGINSCREEN
     };
 }
 
-export function viewWaitingscreenAction() {
+export function viewMessageScreenAction(message) {
     return {
-        type: viewActionTypes.VIEW_WAITINGSCREEN
+        type: viewActionTypes.VIEW_MESSAGESCREEN,
+        message: message
     };
 }
 
@@ -22,18 +19,24 @@ export function viewQuestionScreenAction() {
     };
 }
 
-export function restoreActiveScreenFromGameState(gameState) {
+export function restoreActiveScreenFromGameState(gameState, teamAccepted) {
     return dispatch => {
         switch (gameState) {
             case "REGISTER":
+                teamAccepted ? dispatch(viewMessageScreenAction(messageTypes.MSG_ACCEPTED)) : dispatch(viewMessageScreenAction(messageTypes.MSG_APPROVAL));
+                break;
             case "CATEGORY_SELECT":
-                dispatch(viewWaitingscreenAction());
+                dispatch(viewMessageScreenAction(messageTypes.MSG_SELECTINGCATEGORIES));
                 break;
             case "IN_ROUND":
                 dispatch(viewQuestionScreenAction());
                 break;
+            case "END_ROUND":
+                // TODO add message from state restore
+                dispatch(viewMessageScreenAction("END ROUND!"));
+                break;
             default:
-                dispatch(viewLobbyAction());
+                dispatch(viewLoginScreenAction());
                 break;
         }
     };

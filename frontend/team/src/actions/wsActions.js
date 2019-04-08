@@ -1,8 +1,10 @@
 import environment from "../environments/environment";
-import { teamAcceptedAction, teamRejectedAction, leaveGameAction, getCurrentQuestion } from "./gameActions";
-import { viewLobbyAction } from "./viewActions";
-import store from '../store'
-import Lobby from "../components/Lobby/Lobby.jsx";
+import { endRoundScore, teamAcceptedAction, teamRejectedAction, getCurrentQuestion, leaveRoomAction } from "./gameActions";
+import { viewMessageScreenAction } from "./viewActions";
+import store from "../store";
+
+import Login from "../components/Login/Login.jsx";
+import { messageTypes } from "./Enums";
 
 let reconnects = 0;
 
@@ -24,7 +26,7 @@ export function initSocket() {
         socket.onclose = () => {
             console.log("Socket disconnected");
 
-            if (reconnects < 3 && store.getState().views.activeView !== Lobby) {
+            if (reconnects < 3 && store.getState().views.activeView !== Login) {
                 console.log("Trying to reconnect");
                 reconnects++;
                 setTimeout(() => {
@@ -44,15 +46,22 @@ function handleMessage(message) {
     return dispatch => {
         switch (message.type) {
             case "team_accepted":
+                dispatch(viewMessageScreenAction(messageTypes.MSG_APPROVAL));
                 dispatch(teamAcceptedAction());
                 break;
             case "team_rejected":
+                dispatch(viewMessageScreenAction(messageTypes.MSG_KICKED));
                 dispatch(teamRejectedAction());
-                dispatch(viewLobbyAction());
+                break;
+            case "team_selectingCategories":
+                dispatch(viewMessageScreenAction(messageTypes.MSG_SELECTINGCATEGORIES));
+                break;
+            case "team_endRound":
+                dispatch(endRoundScore(store.getState().game.roomKey));
                 break;
             case "team_quizmasterLeft":
-                dispatch(viewLobbyAction());
-                dispatch(leaveGameAction());
+                dispatch(viewMessageScreenAction(messageTypes.MSG_QUIZMASTERLEFT));
+                dispatch(leaveRoomAction(store.getState().game.roomKey));
                 break;
             case "team_nextQuestion":
                 dispatch(getCurrentQuestion(store.getState().game.roomKey));

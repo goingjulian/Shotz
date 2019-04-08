@@ -1,5 +1,5 @@
 import environment from "../environments/environment";
-import { categorySelectViewAction } from "./viewActions";
+import { viewCategorySelectionScreen } from "./viewActions";
 
 export const teamActionTypes = {
     SET_TEAMS: "SET_TEAMS",
@@ -43,11 +43,11 @@ export function addSubmittedAnswerAction(teamSessionId, questionId, answer) {
         teamSessionId: teamSessionId,
         questionId: questionId,
         answer: answer
-    }
+    };
 }
 
 export function alterTeamAcceptedStatus(roomKey, sessionId, accepted) {
-    console.log('alter stat: ', sessionId, roomKey, accepted);
+    console.log("alter stat: ", sessionId, roomKey, accepted);
     return async dispatch => {
         try {
             const method = {
@@ -112,7 +112,7 @@ export function clearRejectedTeams(roomKey) {
                 throw new Error("Server error");
             } else {
                 dispatch(setTeamsAction(body));
-                dispatch(categorySelectViewAction());
+                dispatch(viewCategorySelectionScreen());
             }
         } catch (err) {
             console.log(err.message);

@@ -1,6 +1,6 @@
 import Game from "../models/Game";
 import GameDAO from "../DAO/GameDao";
-import QuestionDAO from '../DAO/QuestionDao'
+import QuestionDAO from "../DAO/QuestionDao";
 import ShotzException from "../exceptions/ShotzException";
 import gameStates from "../definitions/gameStates";
 import { sendMessageTeam, closeConnection, sendMessageQuizmaster, sendMessageTeams } from "./websocketService";
@@ -60,12 +60,7 @@ export default class GameService {
                     rounds: game.rounds,
                     currentQuestionIndex: game.rounds.length > 0 ? game.rounds[game.rounds.length - 1].activeQuestionIndex : 0
                 };
-            } else if (
-                game &&
-                game.teams.length > 0 &&
-                game.teams.find(team => team.sessionId === sessionId) &&
-                loginRole === "Team"
-            ) {
+            } else if (game && game.teams.length > 0 && game.teams.find(team => team.sessionId === sessionId) && loginRole === "Team") {
                 const team = game.teams.find(team => team.sessionId === sessionId);
                 const currentQuestion = await this.getCurrentQuestion(roomKey);
                 return {
@@ -206,7 +201,7 @@ export default class GameService {
                 sendMessageTeam(roomKey, team.sessionId, {
                     type: "team_rejected"
                 });
-            })
+            });
 
             return await acceptedTeams;
         } catch (err) {
@@ -219,10 +214,10 @@ export default class GameService {
     static async startNewRound(roomKey, sessionId, categories) {
         try {
             if (!Array.isArray(categories)) {
-                throw new ShotzException('Invalid format: the chosen categories have to be in an array', 400);
+                throw new ShotzException("Invalid format: the chosen categories have to be in an array", 400);
             }
             if (categories.length < 1 || categories.length > 3) {
-                throw new ShotzException('Invalid length: you need at leat 1 and max 3 categories to start a round', 400);
+                throw new ShotzException("Invalid length: you need at leat 1 and max 3 categories to start a round", 400);
             }
 
             const allQuestions = await QuestionDAO.getAllQuestionsByCategories(categories);
@@ -247,8 +242,8 @@ export default class GameService {
     }
 
     static pickRandomquestionsFromList(questions, amount) {
-        const chosenQuestions = []
-        const questionAmount = questions.length > amount ? amount : questions.length
+        const chosenQuestions = [];
+        const questionAmount = questions.length > amount ? amount : questions.length;
 
         for (let i = 0; i < questionAmount; i++) {
             const randomNumber = Math.floor(Math.random() * questions.length);
@@ -257,7 +252,7 @@ export default class GameService {
             if (!questionAlreadyPicked) {
                 chosenQuestions.push(questions[randomNumber]);
             } else {
-                console.log("Duplicate number!")
+                console.log("Duplicate number!");
                 i--;
             }
         }
@@ -272,12 +267,12 @@ export default class GameService {
 
             const currentRound = rounds.rounds[rounds.rounds.length - 1];
 
-            if (currentRound.questions.length <= currentRound.activeQuestionIndex + 1) throw new ShotzException('Last question reached', 400);
+            if (currentRound.questions.length <= currentRound.activeQuestionIndex + 1) throw new ShotzException("Last question reached", 400);
 
             await GameDAO.goTonextQuestionInRound(roomKey, sessionId, currentRound._id);
             return { activeQuestionIndex: currentRound.activeQuestionIndex + 1 };
         } catch (err) {
-            console.log(err)
+            console.log(err);
             if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
             else throw err;
         }
@@ -292,9 +287,9 @@ export default class GameService {
                 return {
                     question: null,
                     category: null
-                }
+                };
             }
-            
+
             const currentRound = result[0].round[0];
             const currentQuestion = currentRound.questions[currentRound.activeQuestionIndex];
             return {
@@ -303,7 +298,7 @@ export default class GameService {
                 category: currentQuestion.category
             };
         } catch (err) {
-            console.log(err)
+            console.log(err);
             if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
             else throw err;
         }
@@ -314,9 +309,24 @@ export default class GameService {
             await GameDAO.submitAnswer(roomKey, sessionId, questionId, answer);
             return {
                 success: "answer submitted"
-            }
-        } catch(err) {
-            console.log(err)
+            };
+        } catch (err) {
+            console.log(err);
+            if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
+            else throw err;
+        }
+    }
+
+    static async endRound(roomKey, sessionId) {
+        try {
+            // TODO implement roles in session
+            await GameDAO.alterGameState(roomKey, sessionId, gameStates.END_ROUND);
+            sendMessageTeams(roomKey, {
+                type: 'team_endRound'
+            });
+            return await this.getTeams(roomKey);
+        } catch (err) {
+            console.log(err);
             if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
             else throw err;
         }
