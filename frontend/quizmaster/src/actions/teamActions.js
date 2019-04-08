@@ -7,7 +7,9 @@ export const teamActionTypes = {
     REJECT_TEAM: "REJECT_TEAM",
     CLEAR_REJECTED: "CLEAR_REJECTED",
     REMOVE_TEAMS: "REMOVE_TEAMS",
-    ADD_ANSWER: "ADD_ANSWER"
+    ADD_ANSWER: "ADD_ANSWER",
+    ANSWER_CORRECT: "ANSWER_CORRECT",
+    ANSWER_INCORRECT: "ANSWER_INCORRECT"
 };
 
 export function removeTeamsAction() {
@@ -42,8 +44,34 @@ export function addSubmittedAnswerAction(teamSessionId, questionId, answer) {
         type: teamActionTypes.ADD_ANSWER,
         teamSessionId: teamSessionId,
         questionId: questionId,
-        answer: answer
-    };
+        answer: answer,
+        correct: null
+    }
+}
+
+export function setAnswerStatus(roomKey, questionId, teamSessionId, correct) {
+    console.log(roomKey, questionId, teamSessionId, correct)
+    return async dispatch => {
+        const options = {
+            method: "PUT",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({correct: correct, teamSessionId: teamSessionId})
+        }
+
+        const response = await fetch(`${environment.API_URL}/room/${roomKey}/round/questions/answer/${questionId}`, options);
+        if(!response.ok) throw new Error('Error while setting answer status');
+
+        const body = await response.json();
+
+        console.log(typeof body);
+
+        dispatch(setTeamsAction(body));
+
+        // console.log(response);
+    }
 }
 
 export function alterTeamAcceptedStatus(roomKey, sessionId, accepted) {

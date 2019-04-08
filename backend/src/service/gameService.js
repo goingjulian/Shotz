@@ -305,11 +305,13 @@ export default class GameService {
     }
 
     static async submitAnswer(roomKey, sessionId, questionId, answer) {
+        if(typeof answer !== "string") throw new ShotzException('Answer must be a string', 400);
+
         try {
             await GameDAO.submitAnswer(roomKey, sessionId, questionId, answer);
             return {
-                success: "answer submitted"
-            };
+                success: "Answer submitted"
+            }
         } catch (err) {
             console.log(err);
             if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
@@ -327,6 +329,23 @@ export default class GameService {
             return await this.getTeams(roomKey);
         } catch (err) {
             console.log(err);
+            if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
+            else throw err;
+        }
+    }
+
+    static async setCorrectStatusStatusAnswer(roomKey, sessionId, teamSessionId, questionId, correct) {
+        console.log(correct, typeof correct)
+        if(typeof questionId !== "string") throw new ShotzException('questionId must be a string', 400);
+        if(typeof correct !== "boolean") throw new ShotzException('correct must be a boolean', 400);
+
+        try {
+            const teams = await GameDAO.setCorrectStatusStatusAnswer(roomKey, sessionId, teamSessionId, questionId, correct);
+            console.log(teams)
+            return teams;
+            
+        } catch(err) {
+            console.log(err)
             if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
             else throw err;
         }

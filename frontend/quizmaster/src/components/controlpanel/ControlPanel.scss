@@ -82,6 +82,25 @@
         max-width: 300px;
         margin: 0 20px 20px 0;
         border: 1px solid $border-grey;
+
+        &.correct {
+          background-color: lighten($green, 40%);
+        }
+
+        &.incorrect {
+          background-color: lighten($red, 40%);
+        }
+
+        &.correct &.incorrect {
+          
+          border: 1px solid darken($border-grey, 10%);
+          button[class^='itemButton'] {
+              border: 1px solid darken($border-grey, 10%);
+          }
+          .itemButton__accept {
+              display: none;
+          }
+        }
       }
     }
   }

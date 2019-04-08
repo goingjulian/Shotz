@@ -6,5 +6,5 @@ export const teamSchema = new mongoose.Schema({
     sessionId: {type: String, required: true},
     accepted: { type: Boolean, required: true },
     answers: { type: [answerSchema], reguired: true },
-    score: {type: Number, required: true}
+    score: {type: Number, required: true, default: 0}
 })

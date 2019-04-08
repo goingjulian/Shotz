@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Game from "../models/Game";
 import gameStates from "../definitions/gameStates";
 import ShotzException from "../exceptions/ShotzException";
@@ -143,7 +144,7 @@ export default class GameDAO {
 
     static submitAnswer(roomKey, sessionId, questionId, answer) {
         return Game.updateOne(
-            { roomKey: roomKey, teams: {$elemMatch: {"answers.questionId": {$ne: questionId}, sessionId: sessionId}} },
+            { roomKey: roomKey, teams: { $elemMatch: { "answers.questionId": { $ne: questionId }, sessionId: sessionId } } },
             {
                 $push: {
                     "teams.$.answers": {
@@ -154,8 +155,26 @@ export default class GameDAO {
             }
         ).then(doc => {
             if (doc.n < 1) {
-                throw new ShotzException('User not found or answer already given', 400);
+                throw new ShotzException('Team not found or answer already given', 400);
             }
         })
+    }
+
+    static setCorrectStatusStatusAnswer(roomKey, sessionId, teamSessionId, questionId, correct) {
+        console.log(teamSessionId)
+        return Game.findOne(
+            { roomKey: roomKey, quizmaster: sessionId, teams: { $elemMatch: { "answers.questionId": questionId } } }
+        )
+            .then(result => {
+                const team = result.teams.findIndex(team => team.sessionId === teamSessionId);
+
+                if (team === undefined) throw new ShotzException('Team not found with provided sessionId', 401);
+
+                const answer = result.teams[team].answers.findIndex(answer => answer.questionId === questionId);
+
+                result.teams[team].answers[answer].correct = correct;
+                result.save();
+                return result.teams.toObject();
+            })
     }
 }
