@@ -254,14 +254,26 @@ router.route('/:roomKey/round/questions/answer/:questionId').put((req, res, next
         .then(response => {
             res.json(response);
             const responseType = correct ? "team_answerCorrect" : "team_answerIncorrect"
-            console.log(responseType, correct)
             sendMessageTeam(roomKey, teamSessionId, {
                 type: responseType,
                 questionId: questionId
             })
         })
         .catch(err => {
-            console.log(err);
+            next(err);
+        })
+})
+
+router.route("/:roomKey/round/questions/:questionId").delete((req, res, next) => {
+    const roomKey = req.params.roomKey;
+    const questionId = req.params.questionId;
+    const sessionId = req.session.id;
+
+    GameService.deleteQuestionFromCurrentRound(roomKey, sessionId, questionId)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(err => {
             next(err);
         })
 })

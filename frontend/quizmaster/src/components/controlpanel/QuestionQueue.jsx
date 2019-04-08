@@ -7,7 +7,13 @@ export default function QuestionQueue(props) {
     if (index === props.currentQuestionIndex) cssClass = "current"
     else if (index < props.currentQuestionIndex) cssClass = "greyedOut"
 
-    return <Item key={index} index={index + 1} text={question.question} itemClass={cssClass}/>
+    if (index > props.currentQuestionIndex) {
+      return <Item key={index} index={index + 1} text={question.question} itemClass={cssClass} closeHandler={() => props.removeQuestionFromQueue(question._id)} />
+    } else {
+      return <Item key={index} index={index + 1} text={question.question} itemClass={cssClass} />
+    }
+
+
   }
 
   );
