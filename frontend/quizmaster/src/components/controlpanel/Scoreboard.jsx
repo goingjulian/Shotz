@@ -4,7 +4,12 @@ import Item from "../General/Item";
 export default function Scoreboard(props) {
   console.log(props.teams)
 
-  const sortedTeam = sortTeamsByScore(props.teams);
+  const sortedTeam = [...props.teams].sort((a, b) => {
+    if(a.score > b.score) return -1
+    if(a.score < b.score) return 1
+    return 0
+  });
+
   console.log(sortedTeam)
   const scoreboard = sortedTeam.map((team, index) => {
     console.log(team.score)
@@ -20,13 +25,5 @@ export default function Scoreboard(props) {
       <main>{scoreboard}</main>
     </div>
   );
-}
-
-function sortTeamsByScore(teams) {
-  return teams.sort((a, b) => {
-    if(a.score > b.score) return -1
-    if(a.score < b.score) return 1
-    return 0
-  })
 }
 
