@@ -1,5 +1,5 @@
 import environment from "../environments/environment";
-import { store } from "..";
+import { store } from "../index";
 import { getTeamList, rejectTeamAction, addSubmittedAnswerAction } from "./teamActions";
 
 let reconnects = 0;
@@ -22,7 +22,7 @@ export function initSocket() {
     socket.onclose = () => {
       console.log("WS: Websocket disconnected");
 
-      if (reconnects < 3) {
+      if (reconnects < 3 && store.getState().views.wsAllowed) {
         console.log("WS: Trying to reconnect websocket");
         reconnects++;
         setTimeout(() => {

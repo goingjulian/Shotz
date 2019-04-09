@@ -2,8 +2,6 @@ import environment from "../environments/environment";
 import { endRoundScore, teamAcceptedAction, teamRejectedAction, getCurrentQuestion, leaveRoomAction } from "./gameActions";
 import { viewMessageScreenAction } from "./viewActions";
 import store from "../store";
-
-import Login from "../components/Login/Login.jsx";
 import { messageTypes } from "./Enums";
 
 let reconnects = 0;
@@ -24,9 +22,7 @@ export function initSocket() {
         };
 
         socket.onclose = () => {
-            console.log("Socket disconnected");
-
-            if (reconnects < 3 && store.getState().views.activeView !== Login) {
+            if (reconnects < 3 && store.getState().views.wsAllowed) {
                 console.log("Trying to reconnect");
                 reconnects++;
                 setTimeout(() => {
