@@ -167,14 +167,15 @@ export default class GameDAO {
         )
             .then(result => {
                 const team = result.teams.findIndex(team => team.sessionId === teamSessionId);
-
                 if (team === undefined) throw new ShotzException('Team not found with provided sessionId', 401);
 
                 const answer = result.teams[team].answers.findIndex(answer => answer.questionId === questionId);
+                if(result.teams[team].answers[answer].correct !== null) throw new ShotzException('You have already graded this answer', 400);
 
                 result.teams[team].answers[answer].correct = correct;
 
                 if (correct) result.teams[team].score += 10;
+
                 result.save();
                 return result.teams.toObject();
             })
@@ -182,7 +183,7 @@ export default class GameDAO {
 
     static deleteQuestionFromCurrentRound(roomKey, sessionId, questionId) {
         return Game.findOne(
-            { roomKey: roomKey } //, "teams.sessionId": sessionId
+            { roomKey: roomKey, quizmaster: sessionId }
         ).then(result => {
             if (result === undefined) throw new ShotzException('Game not found', 400);
 
