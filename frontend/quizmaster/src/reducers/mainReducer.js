@@ -5,10 +5,12 @@ import questionReducer from './questionReducer'
 import roomReducer from './roomReducer'
 import teamReducer from './teamReducer';
 
-export const mainReducer = Redux.combineReducers({
-    views: viewReducer,
-    teams: teamReducer,
-    rounds: roundsReducer,
-    questions: questionReducer,
-    room: roomReducer
-  })
+const mainReducer = Redux.combineReducers({
+  views: viewReducer,
+  teams: teamReducer,
+  rounds: roundsReducer,
+  questions: questionReducer,
+  room: roomReducer
+})
+
+export default mainReducer;

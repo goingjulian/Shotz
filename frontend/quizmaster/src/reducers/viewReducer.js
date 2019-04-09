@@ -6,21 +6,22 @@ import { viewActionTypes } from "../actions/viewActions";
 import EndRound from "../components/EndRound/EndRound.jsx";
 
 const initalViewState = {
-    activeView: Login
+    activeView: Login,
+    wsAllowed: false
 };
 
 export default function viewReducer(state = initalViewState, action) {
     switch (action.type) {
         case viewActionTypes.VIEW_LOGIN_SCREEN:
-            return { ...state, activeView: Login };
+            return { ...state, activeView: Login, wsAllowed: false };
         case viewActionTypes.VIEW_LOBBY_SCREEN:
-            return { ...state, activeView: Lobby };
+            return { ...state, activeView: Lobby, wsAllowed: true };
         case viewActionTypes.VIEW_CATEGORYSELECTION_SCREEN:
-            return { ...state, activeView: CategorySelect };
+            return { ...state, activeView: CategorySelect, wsAllowed: true };
         case viewActionTypes.VIEW_CPANEL_SCREEN:
-            return { ...state, activeView: ControlPanel };
+            return { ...state, activeView: ControlPanel, wsAllowed: true };
         case viewActionTypes.VIEW_END_ROUND_SCREEN:
-            return { ...state, activeView: EndRound };
+            return { ...state, activeView: EndRound, wsAllowed: true };
         default:
             return state;
     }
