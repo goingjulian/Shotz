@@ -160,23 +160,22 @@ router.route("/:roomKey/round/end").put((req, res, next) => {
             console.log(err);
             next(err)
         })
-});
+}); 
 
 /**
  * Get score
  */
-router.route("/:roomKey/score").get((req, res, next) => {
+router.route("/:roomKey/scores").get((req, res, next) => {
     const roomKey = req.params.roomKey;
     const sessionId = req.session.id;
-    res.status(200).json({})
-    // GameService.getTeamScore(roomKey, sessionId)
-    //     .then(response => {
-    //         res.status(200).json(response);
-    //     })
-    //     .catch(err => {
-    //         console.log(err);
-    //         next(err)
-    //     })
+    GameService.getScores(roomKey)
+        .then(scores => {
+            res.status(200).json(scores.teams);
+        })
+        .catch(err => {
+            console.log(err);
+            next(err)
+        })
 });
 
 /**

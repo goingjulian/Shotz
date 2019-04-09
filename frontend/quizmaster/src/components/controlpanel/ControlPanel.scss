@@ -78,7 +78,7 @@
     }
     .infoAnswersList {
       padding: 20px 0;
-      .AnswerItem {
+      .itemAnswer {
         max-width: 300px;
         margin: 0 20px 20px 0;
         border: 1px solid $border-grey;
@@ -91,15 +91,14 @@
           background-color: lighten($red, 40%);
         }
 
-        &.correct &.incorrect {
-          
+        &.correct, &.incorrect {
           border: 1px solid darken($border-grey, 10%);
           button[class^='itemButton'] {
               border: 1px solid darken($border-grey, 10%);
           }
-          .AnswerItem__correct {
-              display: none;
-          } //Wout, fix dit even
+          *[class^='itemButton'] {
+            display: none;
+        }
         }
       }
     }
