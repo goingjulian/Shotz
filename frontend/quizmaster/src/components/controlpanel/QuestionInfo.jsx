@@ -17,6 +17,8 @@ class QuestionInfo extends React.Component {
 
     const answers = [];
 
+    
+
     this.props.teamList.forEach(team => {
       const answer = team.answers.find(answer => answer.questionId === currentQuestionObj._id);
 

@@ -1,6 +1,5 @@
 import environment from "../environments/environment";
 import { setViewByGameState, viewEndRoundScreenAction } from "./viewActions";
-import { setTeamsAction } from "./teamActions";
 
 export const roundsActionTypes = {
     startRound: "startRound",
@@ -70,7 +69,6 @@ export function endRound(roomKey) {
             .then(async response => {
                 const body = await response.json();
                 if (response.ok) {
-                    dispatch(setTeamsAction(body));
                     dispatch(viewEndRoundScreenAction());
                 } else {
                     throw new Error(body.error);

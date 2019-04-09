@@ -139,38 +139,44 @@ export default class GameDAO {
   static getCurrentQuestion(roomKey) {
     return Game.aggregate([{ $match: { roomKey: roomKey } }, { $project: { _id: 0, round: { $slice: ["$rounds", -1] } } }]);
   }
+  static submitAnswer(roomKey, sessionId, questionId, answer) {
+    return Game.updateOne(
+      { roomKey: roomKey, teams: { $elemMatch: { "answers.questionId": { $ne: questionId }, sessionId: sessionId } } },
+      {
+        $push: {
+          "teams.$.answers": {
+            questionId: questionId,
+            answer: answer
+          }
+        }
+      }
+    ).then(doc => {
+      if (doc.n < 1) {
+        throw new ShotzException("Team not found or answer already given", 400);
+      }
+    });
+  }
 
-    static setCorrectStatusStatusAnswer(roomKey, sessionId, teamSessionId, questionId, correct) {
-        console.log(teamSessionId)
-        return Game.findOne(
-            { roomKey: roomKey, quizmaster: sessionId, teams: { $elemMatch: { "answers.questionId": questionId } } }
-        )
-            .then(result => {
-                const team = result.teams.findIndex(team => team.sessionId === teamSessionId);
-                if (team === undefined) throw new ShotzException('Team not found with provided sessionId', 401);
-
-                const answer = result.teams[team].answers.findIndex(answer => answer.questionId === questionId);
-                if(result.teams[team].answers[answer].correct !== null) throw new ShotzException('You have already graded this answer', 400);
+  static setCorrectStatusStatusAnswer(roomKey, sessionId, teamSessionId, questionId, correct) {
+    console.log(teamSessionId);
+    return Game.findOne({ roomKey: roomKey, quizmaster: sessionId, teams: { $elemMatch: { "answers.questionId": questionId } } }).then(result => {
+      const team = result.teams.findIndex(team => team.sessionId === teamSessionId);
+      if (team === undefined) throw new ShotzException("Team not found with provided sessionId", 401);
 
       const answer = result.teams[team].answers.findIndex(answer => answer.questionId === questionId);
+      if (result.teams[team].answers[answer].correct !== null) throw new ShotzException("You have already graded this answer", 400);
 
-                if (correct) result.teams[team].score += 10;
+      result.teams[team].answers[answer].correct = correct;
 
-                result.save();
-                return result.teams.toObject();
-            })
-    }
+      if (correct) result.teams[team].score += 10;
 
-    static deleteQuestionFromCurrentRound(roomKey, sessionId, questionId) {
-        return Game.findOne(
-            { roomKey: roomKey, quizmaster: sessionId }
-        ).then(result => {
-            if (result === undefined) throw new ShotzException('Game not found', 400);
+      result.save();
+      return result.teams.toObject();
+    });
+  }
 
   static deleteQuestionFromCurrentRound(roomKey, sessionId, questionId) {
-    return Game.findOne(
-      { roomKey: roomKey } //, "teams.sessionId": sessionId
-    ).then(result => {
+    return Game.findOne({ roomKey: roomKey, quizmaster: sessionId }).then(result => {
       if (result === undefined) throw new ShotzException("Game not found", 400);
 
       const curRound = result.rounds.length - 1;

@@ -57,7 +57,7 @@ function handleMessage(message) {
                 dispatch(viewMessageScreenAction(messageTypes.MSG_SELECTINGCATEGORIES));
                 break;
             case "team_endRound":
-                dispatch(endRoundScore(store.getState().game.roomKey));
+                dispatch(endRoundScore(store.getState().game.roomKey, store.getState().game.teamName));
                 break;
             case "team_quizmasterLeft":
                 dispatch(viewMessageScreenAction(messageTypes.MSG_QUIZMASTERLEFT));
