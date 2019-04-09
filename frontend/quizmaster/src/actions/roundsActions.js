@@ -65,7 +65,7 @@ export function endRound(roomKey) {
             method: "PUT",
             credentials: "include"
         };
-        fetch(`${environment.API_URL}/room/${roomKey}/round/end`, options)
+        fetch(`${environment.API_URL}/room/${roomKey}/round/state/end`, options)
             .then(async response => {
                 const body = await response.json();
                 if (response.ok) {

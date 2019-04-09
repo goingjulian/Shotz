@@ -45,6 +45,14 @@ export default class GameService {
     }
   }
 
+  static async selectCategory(roomKey, sessionId) {
+    await GameDAO.alterGameState(roomKey, sessionId, gameStates.CATEGORY_SELECT);
+    sendMessageTeams(roomKey, {
+      type: "team_selectingCategories"
+    });
+    return gameStates.CATEGORY_SELECT;
+  }
+
   static async restoreSession(roomKey, loginRole, sessionId) {
     try {
       if (typeof loginRole !== "string") throw new ShotzException("Invalid format: role must be a string", 400);
@@ -195,14 +203,11 @@ export default class GameService {
       const rejectedTeams = teams.filter(team => team.accepted === false);
       const acceptedTeams = teams.filter(team => team.accepted === true);
       await GameDAO.removeUnacceptedTeams(roomKey, quizmasterSessionId);
-      await GameDAO.alterGameState(roomKey, quizmasterSessionId, gameStates.CATEGORY_SELECT);
-
       rejectedTeams.forEach(team => {
         sendMessageTeam(roomKey, team.sessionId, {
           type: "team_rejected"
         });
       });
-
       return await acceptedTeams;
     } catch (err) {
       console.log(err);

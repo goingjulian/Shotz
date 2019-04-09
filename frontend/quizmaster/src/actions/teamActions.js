@@ -1,5 +1,4 @@
 import environment from "../environments/environment";
-import { viewCategorySelectionScreen } from "./viewActions";
 
 export const teamActionTypes = {
     SET_TEAMS: "SET_TEAMS",
@@ -139,7 +138,6 @@ export function clearRejectedTeams(roomKey) {
                 throw new Error("Server error");
             } else {
                 dispatch(setTeamsAction(body));
-                dispatch(viewCategorySelectionScreen());
             }
         } catch (err) {
             console.log(err.message);

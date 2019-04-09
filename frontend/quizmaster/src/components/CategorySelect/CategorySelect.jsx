@@ -28,8 +28,8 @@ class CategorySelect extends React.Component {
   }
 
   startRound() {
-    this.props.emptySelectedCategoriesAction();
     this.props.startRound(this.props.roomKey, this.props.selectedCategories);
+    this.props.emptySelectedCategoriesAction();
   }
 
   render() {
