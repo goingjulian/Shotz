@@ -1,3 +1,5 @@
+import environment from "../environments/environment";
+
 export const viewActionTypes = {
     VIEW_LOBBY_SCREEN: "VIEW_LOBBY_SCREEN",
     VIEW_LOGIN_SCREEN: "VIEW_LOGIN_SCREEN",
@@ -33,6 +35,27 @@ export function controlPanelViewAction() {
 export function viewEndRoundScreenAction() {
     return {
         type: viewActionTypes.VIEW_END_ROUND_SCREEN
+    };
+}
+
+export function setCategorySelectState(roomKey) {
+    return dispatch => {
+        const options = {
+            method: "PUT",
+            credentials: "include"
+        };
+        fetch(`${environment.API_URL}/room/${roomKey}/round/state/category`, options)
+            .then(async response => {
+                const body = await response.json();
+                if (response.ok) {
+                    dispatch(viewCategorySelectionScreen());
+                } else {
+                    throw new Error(body.error);
+                }
+            })
+            .catch(err => {
+                console.log(err.message);
+            });
     };
 }
 

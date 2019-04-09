@@ -1,13 +1,12 @@
 import React from "react";
 import * as ReactRedux from "react-redux";
 import Item from "../General/Item";
-import { setAnswerStatus } from '../../actions/teamActions'
-import { nextQuestion, endRound } from '../../actions/roundsActions'
+import { setAnswerStatus } from "../../actions/teamActions";
+import { nextQuestion, endRound } from "../../actions/roundsActions";
 
 class QuestionInfo extends React.Component {
-
   handleAnswerStatus(questionId, teamSessionId, correct) {
-    this.props.setAnswerStatus(this.props.roomKey, questionId, teamSessionId, correct)
+    this.props.setAnswerStatus(this.props.roomKey, questionId, teamSessionId, correct);
   }
 
   render() {
@@ -18,47 +17,57 @@ class QuestionInfo extends React.Component {
 
     const answers = [];
 
+    
+
     this.props.teamList.forEach(team => {
       const answer = team.answers.find(answer => answer.questionId === currentQuestionObj._id);
 
       if (answer) {
 
-        let answerClass
-        if (answer.correct) answerClass = "correct"
-        else if (answer.correct === null) answerClass = ""
-        else if (answer.correct === false) answerClass = "incorrect"
+        let answerClass;
+        if (answer.correct) answerClass = "correct";
+        else if (answer.correct === false) answerClass = "incorrect";
 
-        answers.push(<Item
-          key={team.teamName}
-          text={answer.answer}
-          team={team.teamName}
-          itemClass={`${answerClass} AnswerItem`}
-          closeHandler={() => { this.props.setAnswerStatus(this.props.roomKey, answer.questionId, team.sessionId, false) }}
-          acceptHandler={() => { this.props.setAnswerStatus(this.props.roomKey, answer.questionId, team.sessionId, true) }}
-        />)
+        answers.push(
+          <Item
+            key={team.teamName}
+            text={answer.answer}
+            team={team.teamName}
+            itemClass={`itemAnswer ${answerClass}`}
+            closeHandler={() => {
+              this.props.setAnswerStatus(this.props.roomKey, answer.questionId, team.sessionId, false);
+            }}
+            acceptHandler={() => {
+              this.props.setAnswerStatus(this.props.roomKey, answer.questionId, team.sessionId, true);
+            }}
+          />
+        );
       }
-    })
+    });
 
     return (
       <div className="QuestionInfo">
         <div className="infoActions">
           <button>Show answer to teams</button>
           <h2>Round {this.props.rounds.length}</h2>
-          {totalQuestionsAmount === this.props.activeQuestionIndex + 1
-            ? <button onClick={() => this.props.endRound(this.props.roomKey)}>End round</button>
-            : <button onClick={() => this.props.nextQuestion(this.props.roomKey)}>Next question</button>}
+          {totalQuestionsAmount === this.props.activeQuestionIndex + 1 ? (
+            <button onClick={() => this.props.endRound(this.props.roomKey)}>End round</button>
+          ) : (
+            <button onClick={() => this.props.nextQuestion(this.props.roomKey)}>Next question</button>
+          )}
         </div>
         <div className="infoQuestion">
           <h2>
-            Question {this.props.activeQuestionIndex + 1}/{totalQuestionsAmount}:
-            <span> {currentQuestion}</span>
+            Question {this.props.activeQuestionIndex + 1}/{totalQuestionsAmount}:<span> {currentQuestion}</span>
           </h2>
           <h2>
             Answer: <span>{currentAnswer}</span>
           </h2>
         </div>
         <div className="infoAnswers">
-          <h2>Answers ({answers.length}/{this.props.teamList.length}):</h2>
+          <h2>
+            Answers ({answers.length}/{this.props.teamList.length}):
+          </h2>
           <div className="infoAnswersList">{answers}</div>
         </div>
       </div>
@@ -67,7 +76,7 @@ class QuestionInfo extends React.Component {
 }
 
 function mapStateToProps(state) {
-  console.log(state)
+  console.log(state);
   return {
     roomKey: state.room.roomKey,
     rounds: state.rounds.rounds,
@@ -79,12 +88,10 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    nextQuestion: (roomKey) => dispatch(nextQuestion(roomKey)),
+    nextQuestion: roomKey => dispatch(nextQuestion(roomKey)),
     setAnswerStatus: (roomKey, questionId, teamSessionId, correct) => dispatch(setAnswerStatus(roomKey, questionId, teamSessionId, correct)),
-    endRound: (roomKey) => dispatch(endRound(roomKey))
+    endRound: roomKey => dispatch(endRound(roomKey))
   };
 }
 
-export default ReactRedux.connect(mapStateToProps, mapDispatchToProps)(
-  QuestionInfo
-);
+export default ReactRedux.connect(mapStateToProps, mapDispatchToProps)(QuestionInfo);

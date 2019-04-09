@@ -24,13 +24,11 @@ export default function teamReducer(state = initialTeamState, action) {
         case teamActionTypes.ADD_ANSWER:
             const teamListCopy = [...state.teamList];
             const team = teamListCopy.findIndex(team => team.sessionId === action.teamSessionId);
-            console.log(teamListCopy[team], team);
             teamListCopy[team].answers.push({
                 questionId: action.questionId,
                 answer: action.answer,
                 correct: null
             })
-            console.log(teamListCopy[team], teamListCopy);
             return {...state, teamList: teamListCopy}
 
         default:

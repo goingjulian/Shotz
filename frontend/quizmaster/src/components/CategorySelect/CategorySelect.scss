@@ -25,20 +25,13 @@
                 width: 100%;
                 margin: 10px 0;
                 padding: 15px 30px;
-
                 border: 1px solid $border-grey;
                 cursor: pointer;
+                &.disabled { 
+                    cursor: not-allowed;
+                    background-color: $border-grey;
+                }
             }
         }
-    }
-}
-.categorySelect {
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: center;
-
-    .key {
-        font-weight: bold;
     }
 }

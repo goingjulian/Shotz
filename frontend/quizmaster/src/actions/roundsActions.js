@@ -1,6 +1,5 @@
 import environment from "../environments/environment";
 import { setViewByGameState, viewEndRoundScreenAction } from "./viewActions";
-import { setTeamsAction } from "./teamActions";
 
 export const roundsActionTypes = {
     startRound: "startRound",
@@ -66,11 +65,10 @@ export function endRound(roomKey) {
             method: "PUT",
             credentials: "include"
         };
-        fetch(`${environment.API_URL}/room/${roomKey}/round/end`, options)
+        fetch(`${environment.API_URL}/room/${roomKey}/round/state/end`, options)
             .then(async response => {
                 const body = await response.json();
                 if (response.ok) {
-                    dispatch(setTeamsAction(body));
                     dispatch(viewEndRoundScreenAction());
                 } else {
                     throw new Error(body.error);
