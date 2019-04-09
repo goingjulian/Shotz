@@ -1,16 +1,16 @@
 import environment from "../environments/environment";
 import { store } from "..";
-import { getTeamList, rejectTeamAction, addSubmittedAnswerAction } from "../actions/teamActions";
+import { getTeamList, rejectTeamAction, addSubmittedAnswerAction } from "./teamActions";
 
 let reconnects = 0;
 
 export function initSocket() {
-  console.log("Connecting to websocket");
+  console.log("WS: Connecting to websocket");
   return async dispatch => {
     const socket = await new WebSocket(`${environment.WS_URL}/ws`);
 
     socket.onopen = () => {
-      console.log("Websocket connected");
+      console.log("WS: Websocket connected");
       reconnects = 0;
     };
 
@@ -20,16 +20,16 @@ export function initSocket() {
     };
 
     socket.onclose = () => {
-      console.log("Socket disconnected");
+      console.log("WS: Websocket disconnected");
 
       if (reconnects < 3) {
-        console.log("Trying to reconnect");
+        console.log("WS: Trying to reconnect websocket");
         reconnects++;
         setTimeout(() => {
           dispatch(initSocket());
         }, 5000);
       } else {
-        console.log("Websocket connection could not be restored");
+        console.log("WS: Websocket connection could not be restored");
       }
     };
   };

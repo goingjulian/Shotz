@@ -1,5 +1,5 @@
 import environment from "../environments/environment";
-import { initSocket } from "../helpers/websocketHelper";
+import { initSocket } from "./wsActions";
 import { setViewByGameState, loginViewAction } from "./viewActions";
 import { removeTeamsAction, setTeamsAction } from "./teamActions";
 import { setRoundsAction } from "./roundsActions";
@@ -83,11 +83,12 @@ export function restoreSession() {
                 }
             });
             const body = await response.json();
-
+            console.log("RESTORE SESSION");
+            console.log(body);
+            console.log("----------");
             if (!response.ok) {
                 throw new Error(body.error);
             } else {
-                console.log(body);
                 dispatch(setTeamsAction(body.teams));
                 dispatch(createRoomAction(body.roomKey));
                 dispatch(setRoundsAction(body.rounds, body.currentQuestionIndex));

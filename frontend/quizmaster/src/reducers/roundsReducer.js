@@ -8,8 +8,6 @@ export default function roundsReducer(state = initialRoundsState, action) {
     let roundsCopy;
     switch (action.type) {
         case roundsActionTypes.setRounds:
-            console.log("ROUNDS REDUCER", action.rounds)
-            console.log(action.currentRound)
             return { ...state, rounds: action.rounds }
         case roundsActionTypes.nextQuestion:
             roundsCopy = [...state.rounds];

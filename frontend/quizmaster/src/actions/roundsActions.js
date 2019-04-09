@@ -11,7 +11,6 @@ export const roundsActionTypes = {
 
 // TODO combine actions
 export function setRoundsAction(rounds, currentQuestionIndex) {
-    console.log("ROUNDS", rounds, currentQuestionIndex);
     return {
         type: roundsActionTypes.setRounds,
         rounds: rounds,
@@ -91,7 +90,6 @@ export function nextQuestion(roomKey) {
         };
 
         const response = await fetch(`${environment.API_URL}/room/${roomKey}/round/question/next`, options);
-        console.log(response.ok);
         if (!response.ok) throw new Error(`Error proceeding to next question`);
 
         const body = await response.json();
