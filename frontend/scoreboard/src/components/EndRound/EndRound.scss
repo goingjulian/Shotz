@@ -1,0 +1,38 @@
+@import "../../assets/scss/variables";
+
+.EndRound {
+    main {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+
+        .endRoundMsg {
+            font-size: 5vw;
+            text-align: center;
+        }
+    }
+    ul {
+        width: 100%;
+        padding-bottom: 40px;
+        li {
+            width: 100%;
+            margin: 10px 0;
+            padding: 15px 30px;
+            border: 1px solid $border-grey;
+            display: flex;
+            &.disabled { 
+                cursor: not-allowed;
+                background-color: $border-grey;
+            }
+            .position {
+                padding-right: 20px;
+            }
+            .score {
+                margin-left: auto;
+            }
+        }
+    }
+    h1 {
+        padding-bottom: 20px;
+    }
+}

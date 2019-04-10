@@ -33,6 +33,10 @@ export default class GameDAO {
     return Game.findOne({ roomKey: roomKey }, { _id: 0, "teams._id": 0 });
   }
 
+  static getScoreBoards(roomKey) {
+    return Game.findOne({roomKey: roomKey}, {scoreboards: 1, _id: 0})
+  }
+
   static getScores(roomKey) {
     return Game.findOne({ roomKey: roomKey }, { teams: 1, "teams.score": 1, "teams.teamName": 1 });
   }
@@ -101,6 +105,17 @@ export default class GameDAO {
         }
       }
     );
+  }
+
+  static joinGameAsScoreBoard(roomKey, sessionId) {
+    return Game.updateOne(
+      {roomKey: roomKey},
+      {
+        $push: {
+          scoreboards: sessionId
+        }
+      }
+    )
   }
 
   static addRound(roomKey, sessionId, randomQuestions, categories) {

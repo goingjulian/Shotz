@@ -47,8 +47,26 @@ roomRouter.route("/:roomKey").post((req, res, next) => {
       setSession(req.session, roomKey, roles.ROLE_TEAM);
       res.status(200).json(message);
     })
+
     .catch(err => next(err));
 });
+
+/**
+ * Join room as a scoreboard
+ */
+router.route("/scoreboard/:roomKey").post((req, res, next) => {
+  const roomKey = req.params.roomKey;
+  const sessionId = req.session.id;
+
+  GameService.joinRoomScoreBoard(roomKey, sessionId)
+    .then(message => {
+      // sendMessageScoreBoards(roomKey, message);
+      res.json(message);
+    })
+    .catch(err => {
+      next(err);
+    });
+})
 
 /**
  * Leave room

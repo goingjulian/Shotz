@@ -11,5 +11,6 @@ export const messageTypes = {
 
 export const viewActionTypes = {
     VIEW_LOGINSCREEN: 1,
-    VIEW_GAMESCREEN: 2
+    VIEW_GAMESCREEN: 2,
+    VIEW_SCORESCREEN: 3
 };

@@ -49,6 +49,42 @@ export default class GameService {
     }
   }
 
+  static async joinRoomScoreBoard(roomKey, sessionId) {
+    try {
+      const game = await GameDAO.getGame(roomKey).lean();
+
+      if (!game) throw new ShotzException(`Game with roomKey ${roomKey} not found`, 404);
+      if (game.scoreboards.find(scoreboard => scoreboard === sessionId)) throw new ShotzException(`You have already joined this room`, 403);
+
+      await GameDAO.joinGameAsScoreBoard(roomKey, sessionId);
+      //body.currentRound, body.currentQuestion, body.teamsConnected
+      return {
+        type: "scoreB_joinRound",
+        roomKey: roomKey,
+        gameState: game.gameState,
+        currentRound: game.rounds.length,
+        currentQuestionIndex: game.rounds[game.rounds.length - 1].activeQuestionIndex,
+        teams: game.teams
+      }
+
+    } catch (err) {
+      console.log(`joinRoom error: ${err.message}`);
+      if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
+      else throw err;
+    }
+  }
+
+  static getScoreBoards(roomKey) {
+    try {
+      const scoreBoards = GameDAO.getScoreBoards(roomKey);
+      return scoreBoards;
+    } catch (err) {
+      console.log(`joinRoom error: ${err.message}`);
+      if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
+      else throw err;
+    }
+  }
+
   static async selectCategory(roomKey, sessionId) {
     await GameDAO.alterGameState(roomKey, sessionId, gameStates.CATEGORY_SELECT);
     sendMessageTeams(roomKey, {
@@ -83,6 +119,15 @@ export default class GameService {
           accepted: team.accepted,
           question: currentQuestion
         };
+      } else if (game && game.scoreboards.length > 0 && game.scoreboards.find(scoreboard => scoreboard === sessionId) && loginRole === "Scoreboard") {
+        return {
+          type: "scoreB_restoreSession",
+          roomKey: roomKey,
+          gameState: game.gameState,
+          currentRound: game.rounds.length,
+          currentQuestionIndex: game.rounds[game.rounds.length - 1].activeQuestionIndex,
+          teams: game.teams
+        }
       } else {
         throw new ShotzException("No active sessions found for your role!", 404);
       }
@@ -263,7 +308,11 @@ export default class GameService {
       const questionAlreadyPicked = chosenQuestions.find(question => question._id === questions[randomNumber]._id);
 
       if (!questionAlreadyPicked) {
-        chosenQuestions.push(questions[randomNumber]);
+        chosenQuestions.push({
+          question: questions[randomNumber].question,
+          answer: questions[randomNumber].answer,
+          category: questions[randomNumber].category
+        });
       } else {
         console.log("Duplicate number!");
         i--;
@@ -286,6 +335,14 @@ export default class GameService {
       sendMessageTeams(roomKey, {
         type: "team_nextQuestion"
       });
+      //message.currentQuestionIndex, message.currentQuestion, message.currentAnswer
+      sendMessageScoreBoards(roomKey, {
+        type: "scoreB_nextQuestion",
+        currentQuestionIndex: currentRound.activeQuestionIndex + 1,
+        currentQuestion: currentRound.questions[currentRound.activeQuestionIndex + 1].question,
+        currentAnswer: currentRound.questions[currentRound.activeQuestionIndex + 1].answer
+      });
+
       return { activeQuestionIndex: currentRound.activeQuestionIndex + 1 };
     } catch (err) {
       console.log(err);
@@ -354,6 +411,9 @@ export default class GameService {
   static async endRound(roomKey, sessionId) {
     try {
       await GameDAO.alterGameState(roomKey, sessionId, gameStates.END_ROUND);
+      sendMessageQuizmaster(roomKey, {
+        type: "scoreB_endRound"
+      });
       sendMessageTeams(roomKey, {
         type: "team_endRound"
       });

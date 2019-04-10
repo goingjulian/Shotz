@@ -40,7 +40,7 @@ export async function sendMessageTeams(roomKey, message) {
         throw new ShotzException(`No teams found for roomKey ${roomKey}`);
     } else {
         for (let client of websocketServer.clients) {
-            for(let team of teams) {
+            for (let team of teams) {
                 if (team.sessionId === client.sessionId) _sendMessage(client, message);
             }
         }
@@ -62,6 +62,21 @@ export async function sendMessageTeam(roomKey, sessionId, message) {
         if (client.sessionId === sessionId) _sendMessage(client, message);
     }
 }
+
+export async function sendMessageScoreBoards(roomKey, message) {
+    const result = await GameService.getScoreBoards(roomKey);
+    console.log(result);
+    if (!result) {
+        throw new ShotzException(`No scoreboards found for roomKey ${roomKey}`);
+    } else {
+        for (let client of websocketServer.clients) {
+            result.scoreboards.forEach(scoreboard => {
+                if (scoreboard === client.sessionId) _sendMessage(client, message);
+            })
+        }
+    }
+}
+
 
 export function closeConnection(sessionId) {
     for (let client of websocketServer.clients) {

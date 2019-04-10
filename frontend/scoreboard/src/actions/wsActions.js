@@ -1,7 +1,6 @@
 import environment from "../environments/environment";
-import { shotzTime } from "./gameActions";
-import store from "../store";
-import { messageTypes } from "./Enums";
+import { store } from '../index';
+import { shotzTime, nextQuestionAction, endRoundScore } from "./gameActions";
 
 let reconnects = 0;
 
@@ -53,6 +52,7 @@ function handleMessage(message) {
                 // dispatch(viewMessageScreenAction(messageTypes.MSG_SELECTINGCATEGORIES));
                 break;
             case "scoreB_endRound":
+                dispatch(endRoundScore(store.getState().game.roomKey));
                 // dispatch(endRoundScore(store.getState().game.roomKey));
                 break;
             case "scoreB_quizmasterLeft":
@@ -60,7 +60,7 @@ function handleMessage(message) {
                 // dispatch(leaveRoomAction(store.getState().game.roomKey));
                 break;
             case "scoreB_nextQuestion":
-                // dispatch(getCurrentQuestion(store.getState().game.roomKey));
+                dispatch(nextQuestionAction(message.currentQuestionIndex, message.currentQuestion, message.currentAnswer));
                 break;
             default:
                 console.log("Unknown message: ", message);

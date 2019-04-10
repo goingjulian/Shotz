@@ -1,4 +1,5 @@
 import { viewActionTypes, messageTypes } from "./Enums";
+import gameStates from "../definitions/gameStates";
 
 export function viewLoginScreenAction() {
     return {
@@ -12,25 +13,28 @@ export function viewGameScreenAction() {
     };
 }
 
+export function viewScoreScreenAction() {
+    return {
+        type: viewActionTypes.VIEW_SCORESCREEN
+    }
+}
+
 export function restoreActiveScreenFromGameState(gameState) {
+    console.log(gameState)
     return dispatch => {
-        // switch (gameState) {
-        //     case "REGISTER":
-        //         teamAccepted ? dispatch(viewMessageScreenAction(messageTypes.MSG_ACCEPTED)) : dispatch(viewMessageScreenAction(messageTypes.MSG_APPROVAL));
-        //         break;
-        //     case "CATEGORY_SELECT":
-        //         dispatch(viewMessageScreenAction(messageTypes.MSG_SELECTINGCATEGORIES));
-        //         break;
-        //     case "IN_ROUND":
-        //         dispatch(viewQuestionScreenAction());
-        //         break;
-        //     case "END_ROUND":
-        //         // TODO add message from state restore
-        //         dispatch(viewMessageScreenAction("END ROUND!"));
-        //         break;
-        //     default:
-        //         dispatch(viewLoginScreenAction());
-        //         break;
-        // }
+        switch (gameState) {
+            case gameStates.REGISTER:
+                dispatch(viewLoginScreenAction());
+                break;
+            case gameStates.CATEGORY_SELECT:
+            case gameStates.IN_ROUND:
+            case gameStates.END_ROUND:
+                console.log("DISPATCHING");
+                dispatch(viewGameScreenAction());
+                break;
+            default:
+                dispatch(viewLoginScreenAction());
+                break;
+        }
     };
 }

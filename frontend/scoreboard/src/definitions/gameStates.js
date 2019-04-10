@@ -1,0 +1,6 @@
+export default {
+    REGISTER: "REGISTER",
+    CATEGORY_SELECT: "CATEGORY_SELECT",
+    IN_ROUND: "IN_ROUND",
+    END_ROUND: "END_ROUND"
+};

@@ -8,6 +8,7 @@ const gameSchema = new mongoose.Schema(
         roomKey: { type: String, required: true },
         quizmaster: { type: String, required: true },
         teams: { type: [teamSchema], required: true, default: [] },
+        scoreboards: { type: [String], required: true, defaulf: [] },
         gameState: {
             type: String,
             enum: Object.values(gameStates),
