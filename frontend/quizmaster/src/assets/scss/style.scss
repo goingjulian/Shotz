@@ -1,42 +1,43 @@
-@import "variables";
+@import 'variables';
 
 body,
 html,
 .App,
 #root {
-    width: 100%;
-    min-height: 100%;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
 }
 
-@import url("https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700");
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700');
 
 * {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 
-    box-sizing: border-box;
+  box-sizing: border-box;
 
-    font-family: "Montserrat", verdana, sans-serif;
-    font-size: 1em;
-    line-height: 1em;
-    font-weight: normal;
-    text-decoration: none;
+  font-family: 'Montserrat', verdana, sans-serif;
+  font-size: 1em;
+  line-height: 1em;
+  font-weight: normal;
+  text-decoration: none;
 
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 ul,
 ol {
-    list-style: none;
+  list-style: none;
 }
 button,
 input {
-    background: transparent;
-    border: none;
-    outline: none;
-    box-shadow: none;
-    cursor: pointer;
-} 
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  cursor: pointer;
+}
 
 .bttn {
   padding: 15px 30px;
@@ -46,27 +47,29 @@ input {
   border: 1px solid $border-grey;
   cursor: pointer;
   &:hover {
-      background-color: $border-grey;
+    background-color: $border-grey;
   }
 }
 
 h1 {
-    font-size: 1.6em;
-    font-weight: 700;
-    letter-spacing: 2px;
-    color: $text-color-dark;
+  font-size: 1.6em;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: $text-color-dark;
 }
 h2 {
-    font-size: 1.2em;
-    font-weight: 500;
-    letter-spacing: 1px;
-    color: $text-color-dark;
+  font-size: 1.2em;
+  font-weight: 500;
+  letter-spacing: 1px;
+  color: $text-color-dark;
 }
 
 .Component {
-    width: 100%;
-    height: 100%;
-    main {
-        padding: 40px;
-    }
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  > main {
+    padding: 40px;
+  }
 }

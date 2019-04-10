@@ -14,8 +14,10 @@ export default function Scoreboard(props) {
       : <Item key={index} index={index + 1} text={`${team.teamName} (${team.score} pts)`} />
   });
   
+  const toggledClass = props.toggled ? 'disabled' : '';
+
   return (
-    <div className="Scoreboard">
+    <div className={'Scoreboard ' + toggledClass}>
       <header>
         <h1>Scoreboard</h1>
       </header>

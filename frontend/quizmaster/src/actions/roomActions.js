@@ -92,14 +92,14 @@ export function restoreSession() {
     fetch(`${environment.API_URL}/room/restore/ROLE_QUIZMASTER`, options)
       .then(async response => {
         const body = await response.json();
-        if (!response.ok) {
-          throw new Error(body.error);
-        } else {
+        if (response.ok) {
           dispatch(setTeamsAction(body.teams));
           dispatch(createRoomAction(body.roomKey));
           dispatch(setRoundsAction(body.rounds, body.currentQuestionIndex));
           dispatch(setViewByGameState(body.gameState));
           dispatch(initSocket());
+        } else {
+          throw new Error(body.error);
         }
       })
       .catch(err => console.log(err.message));

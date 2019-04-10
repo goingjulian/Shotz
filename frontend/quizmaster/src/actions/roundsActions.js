@@ -3,11 +3,11 @@ import { viewEndRoundScreenAction, viewControlPanelScreenAction } from './viewAc
 import { addErrorAction } from './roomActions';
 
 export const roundsActionTypes = {
-  startRound: "startRound",
-  setRounds: "setRounds",
-  nextQuestion: "nextQuestion",
-  setQuestions: "setQuestions",
-  revealAnswer: "revealAnswer"
+  startRound: 'startRound',
+  setRounds: 'setRounds',
+  nextQuestion: 'nextQuestion',
+  setQuestions: 'setQuestions',
+  revealAnswer: 'revealAnswer'
 };
 
 export function setRoundsAction(rounds, currentQuestionIndex) {
@@ -35,7 +35,7 @@ export function setQuestionsAction(questions) {
 export function revealAnswerAction() {
   return {
     type: roundsActionTypes.revealAnswer
-  }
+  };
 }
 
 export function newRound(roomKey, categories) {
@@ -71,15 +71,12 @@ export function endRound(roomKey) {
       method: 'PUT',
       credentials: 'include'
     };
-    
+
     fetch(`${environment.API_URL}/room/${roomKey}/round/end`, options)
       .then(async response => {
         const body = await response.json();
-        if (response.ok) {
-          dispatch(viewEndRoundScreenAction());
-        } else {
-          throw new Error(body.error);
-        }
+        if (response.ok) dispatch(viewEndRoundScreenAction());
+        else throw new Error(body.error);
       })
       .catch(err => dispatch(addErrorAction(err.message)));
   };
@@ -88,16 +85,18 @@ export function endRound(roomKey) {
 export function revealAnswer(roomKey) {
   return async dispatch => {
     const options = {
-      method: "PUT",
-      credentials: "include"
-    }
+      method: 'PUT',
+      credentials: 'include'
+    };
 
-    const response = await fetch(`${environment.API_URL}/room/${roomKey}/round/question/reveal`, options);
-
-    if(!response.ok) throw new Error('Error while revealing answer');
-
-    dispatch(revealAnswerAction());
-  }
+    fetch(`${environment.API_URL}/room/${roomKey}/round/question/reveal`, options)
+      .then(async response => {
+        const body = await response.json();
+        if (response.ok) dispatch(revealAnswerAction());
+        else throw new Error(body.error);
+      })
+      .catch(err => dispatch(addErrorAction(err.message)));
+  };
 }
 
 export function nextQuestion(roomKey) {
@@ -110,8 +109,7 @@ export function nextQuestion(roomKey) {
     fetch(`${environment.API_URL}/room/${roomKey}/round/question/next`, options)
       .then(async response => {
         const body = await response.json();
-        if (!response.ok)
-          dispatch(nextQuestionAction(body.activeQuestionIndex));
+        if (response.ok) dispatch(nextQuestionAction(body.activeQuestionIndex));
         else throw new Error(body.error);
       })
       .catch(err => dispatch(addErrorAction(err.message)));
@@ -125,13 +123,10 @@ export function removeQuestionFromQueue(roomKey, questionId) {
       credentials: 'include'
     };
 
-    fetch(
-      `${environment.API_URL}/room/${roomKey}/round/question/${questionId}`,
-      options
-    )
+    fetch(`${environment.API_URL}/room/${roomKey}/round/question/${questionId}`, options)
       .then(async response => {
         const body = await response.json();
-        if (!response.ok) dispatch(setQuestionsAction(body));
+        if (response.ok) dispatch(setQuestionsAction(body));
         else throw new Error(body.error);
       })
       .catch(err => dispatch(addErrorAction(err.message)));

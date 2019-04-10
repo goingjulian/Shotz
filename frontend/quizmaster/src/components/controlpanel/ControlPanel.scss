@@ -1,10 +1,30 @@
-@import "../../assets/scss/variables";
+@import '../../assets/scss/variables';
+
+.navigationMobile {
+  width: 100%;
+  height: 50px;
+  padding: 5px 20px;
+  display: none;
+  position: relative;
+  background-color: transparent;
+  border-bottom: 1px solid $border-grey;
+  .toggleScoreboard {
+    display: flex;
+  }
+  .toggleQueue {
+    display: flex;
+    margin-left: auto;
+  }
+  div > span {
+    margin: auto 0;
+  }
+}
 
 .ControlPanel {
   width: 100%;
   height: 100%;
-
   display: flex;
+  position: relative;
 }
 
 .Scoreboard {
@@ -32,7 +52,6 @@
 
 .QuestionInfo {
   overflow: auto;
-  padding: 40px;
   flex: 1;
 
   .infoActions {
@@ -46,18 +65,6 @@
       font-size: 1.2em;
       font-weight: 700;
     }
-
-    button {
-      padding: 15px 30px;
-      font-size: 1.2em;
-      font-weight: 700;
-      color: $text-color-dark;
-      border: 1px solid $border-grey;
-      cursor: pointer;
-      &:hover {
-          background-color: $border-grey;
-      }
-  }
   }
   .infoQuestion {
     padding: 20px;
@@ -69,16 +76,12 @@
         font-weight: 400;
       }
     }
-  }
-  .infoAnswers {
-    padding: 20px;
-    h2 {
-      font-size: 1.4em;
-      font-weight: 700;
-    }
     .infoAnswersList {
       padding: 20px 0;
+      display: flex;
+      justify-content: space-between;
       .itemAnswer {
+        width: 100%;
         max-width: 300px;
         margin: 0 20px 20px 0;
         border: 1px solid $border-grey;
@@ -91,14 +94,90 @@
           background-color: lighten($red, 40%);
         }
 
-        &.correct, &.incorrect {
+        &.correct,
+        &.incorrect {
           border: 1px solid darken($border-grey, 10%);
           button[class^='itemButton'] {
-              border: 1px solid darken($border-grey, 10%);
+            border: 1px solid darken($border-grey, 10%);
           }
           *[class^='itemButton'] {
             display: none;
+          }
         }
+      }
+    }
+  }
+}
+
+@media all and (max-width: 1200px) {
+  .navigationMobile {
+    display: flex;
+  }
+  .Scoreboard {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+
+    background-color: #fff;
+    box-shadow: 1px 1px 10px 0px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+    &.disabled {
+      display: none;
+    }
+  }
+
+  .QuestionQueue {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+
+    background-color: #fff;
+    box-shadow: 1px 1px 10px 0px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+    &.disabled {
+      display: none;
+    }
+  }
+
+  .QuestionInfo {
+    overflow: auto;
+    flex: 1;
+
+    .infoActions {
+      padding: 20px;
+      h2 {
+        margin: auto 0;
+      }
+      button {
+        font-size: 1em;
+        margin-left: 20px;
+        padding: 10px 20px;
+        order: 1;
+        &:first-of-type {
+          margin-left: auto;
+        }
+      }
+    }
+
+    .infoQuestion {
+      padding: 20px;
+      h2 {
+        font-size: 1.2em;
+        font-weight: 700;
+        margin: 0 0 20px 0;
+        span {
+          font-weight: 400;
+        }
+      }
+      .infoAnswersList {
+        padding: 20px 0;
+        .itemAnswer {
+          width: 100%;
+          max-width: initial;
+          margin: 0 20px 20px 0;
+          border: 1px solid $border-grey;
         }
       }
     }

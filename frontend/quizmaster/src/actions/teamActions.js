@@ -66,7 +66,7 @@ export function setAnswerStatus(roomKey, questionId, teamSessionId, correct) {
       .then(async response => {
         const body = await response.json();
         if (response.ok) dispatch(setTeamsAction(body));
-        else throw new Error('Error while setting answer status');
+        else throw new Error(body.error);
       })
       .catch(err => dispatch(addErrorAction(err.message)));
   };

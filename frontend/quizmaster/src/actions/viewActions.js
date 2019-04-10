@@ -66,7 +66,7 @@ export function setViewByGameState(gameState) {
                 dispatch(viewLobbyAction());
                 break;
             case "CATEGORY_SELECT":
-                dispatch(viewCategorySelectionScreen());
+                dispatch(viewCategorySelectionScreenAction());
                 break;
             case "IN_ROUND":
             case "SUBMIT_CLOSED":
