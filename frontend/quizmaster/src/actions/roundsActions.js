@@ -1,14 +1,14 @@
-import environment from "../environments/environment";
-import { setViewByGameState, viewEndRoundScreenAction } from "./viewActions";
+import environment from '../environments/environment';
+import { viewEndRoundScreenAction, viewControlPanelScreenAction } from './viewActions';
+import { addErrorAction } from './roomActions';
 
 export const roundsActionTypes = {
-  startRound: "startRound",
-  setRounds: "setRounds",
-  nextQuestion: "nextQuestion",
-  setQuestions: "setQuestions"
+  startRound: 'startRound',
+  setRounds: 'setRounds',
+  nextQuestion: 'nextQuestion',
+  setQuestions: 'setQuestions'
 };
 
-// TODO combine actions
 export function setRoundsAction(rounds, currentQuestionIndex) {
   return {
     type: roundsActionTypes.setRounds,
@@ -34,37 +34,37 @@ export function setQuestionsAction(questions) {
 export function newRound(roomKey, categories) {
   return dispatch => {
     const options = {
-      method: "POST",
+      method: 'POST',
+      credentials: 'include',
       headers: {
-        "Content-Type": "application/json"
+        'Content-Type': 'application/json'
       },
-      credentials: "include",
       body: JSON.stringify({
         categories: categories
       })
     };
+
     fetch(`${environment.API_URL}/room/${roomKey}/round/start`, options)
       .then(async response => {
         const body = await response.json();
         if (response.ok) {
           dispatch(setRoundsAction(body.rounds, body.currentQuestionIndex));
-          dispatch(setViewByGameState(body.gameState));
+          dispatch(viewControlPanelScreenAction());
         } else {
           throw new Error(body.error);
         }
       })
-      .catch(err => {
-        console.log(err.message);
-      });
+      .catch(err => dispatch(addErrorAction(err.message)));
   };
 }
 
 export function endRound(roomKey) {
   return dispatch => {
     const options = {
-      method: "PUT",
-      credentials: "include"
+      method: 'PUT',
+      credentials: 'include'
     };
+    
     fetch(`${environment.API_URL}/room/${roomKey}/round/end`, options)
       .then(async response => {
         const body = await response.json();
@@ -74,46 +74,44 @@ export function endRound(roomKey) {
           throw new Error(body.error);
         }
       })
-      .catch(err => {
-        console.log(err.message);
-      });
+      .catch(err => dispatch(addErrorAction(err.message)));
   };
 }
 
 export function nextQuestion(roomKey) {
-  return async dispatch => {
+  return dispatch => {
     const options = {
-      method: "PUT",
-      credentials: "include"
+      method: 'PUT',
+      credentials: 'include'
     };
 
-    const response = await fetch(`${environment.API_URL}/room/${roomKey}/round/question/next`, options);
-    if (!response.ok) throw new Error(`Error proceeding to next question`);
-
-    const body = await response.json();
-    console.log(body);
-
-    dispatch(nextQuestionAction(body.activeQuestionIndex));
+    fetch(`${environment.API_URL}/room/${roomKey}/round/question/next`, options)
+      .then(async response => {
+        const body = await response.json();
+        if (!response.ok)
+          dispatch(nextQuestionAction(body.activeQuestionIndex));
+        else throw new Error(body.error);
+      })
+      .catch(err => dispatch(addErrorAction(err.message)));
   };
 }
 
 export function removeQuestionFromQueue(roomKey, questionId) {
-  return async dispatch => {
-    try {
-      const options = {
-        method: "DELETE",
-        credentials: "include"
-      };
+  return dispatch => {
+    const options = {
+      method: 'DELETE',
+      credentials: 'include'
+    };
 
-      const response = await fetch(`${environment.API_URL}/room/${roomKey}/round/question/${questionId}`, options);
-
-      if (!response.ok) throw new Error("Error while removing question from queue");
-
-      const body = await response.json();
-
-      dispatch(setQuestionsAction(body));
-    } catch (err) {
-      console.log(err);
-    }
+    fetch(
+      `${environment.API_URL}/room/${roomKey}/round/question/${questionId}`,
+      options
+    )
+      .then(async response => {
+        const body = await response.json();
+        if (!response.ok) dispatch(setQuestionsAction(body));
+        else throw new Error(body.error);
+      })
+      .catch(err => dispatch(addErrorAction(err.message)));
   };
 }

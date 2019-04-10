@@ -2,7 +2,7 @@ import React from "react";
 import * as ReactRedux from "react-redux";
 
 import "./Navigation.scss";
-import { loginViewAction } from "../../actions/viewActions";
+import { viewLoginScreenAction } from "../../actions/viewActions";
 import { leaveRoom } from "./../../actions/roomActions";
 
 class Navigation extends React.Component {
@@ -37,7 +37,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     leaveRoom: roomKey => dispatch(leaveRoom(roomKey)),
-    viewLoginScreenAction: () => dispatch(loginViewAction())
+    viewLoginScreenAction: () => dispatch(viewLoginScreenAction())
   };
 }
 

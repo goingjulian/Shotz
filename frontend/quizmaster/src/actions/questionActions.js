@@ -1,11 +1,11 @@
-import environment from "../environments/environment";
-import { addErrorAction } from "./roomActions";
+import environment from '../environments/environment';
+import { addErrorAction } from './roomActions';
 
 export const questionActionTypes = {
-  SET_CATEGORY: "SET_CATEGORY",
-  ADD_CATEGORY: "ADD_CATEGORY",
-  REMOVE_CATEGORY: "REMOVE_CATEGORY",
-  EMPTY_SELECTED_CATEGORIES: "EMPTY_SELECTED_CATEGORIES"
+  SET_CATEGORY: 'SET_CATEGORY',
+  ADD_CATEGORY: 'ADD_CATEGORY',
+  REMOVE_CATEGORY: 'REMOVE_CATEGORY',
+  EMPTY_SELECTED_CATEGORIES: 'EMPTY_SELECTED_CATEGORIES'
 };
 
 export function setCategoriesAction(categories) {
@@ -37,14 +37,17 @@ export function removeCategory(category) {
 
 export function getAllCategories() {
   return dispatch => {
-    fetch(`${environment.API_URL}/room/categories`)
+    const options = {
+      method: 'GET',
+      credentials: 'include'
+    };
+
+    fetch(`${environment.API_URL}/room/categories`, options)
       .then(async response => {
         const body = await response.json();
         if (response.ok) dispatch(setCategoriesAction(body));
         else throw new Error(body.error);
       })
-      .catch(err => {
-        dispatch(addErrorAction(err.message));
-      });
+      .catch(err => dispatch(addErrorAction(err.message)));
   };
 }
