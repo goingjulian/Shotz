@@ -1,0 +1,129 @@
+@import "../../assets/scss/variables";
+
+.Game {
+    nav {
+        width: 100%;
+        height: 50px;
+        padding: 5px 20px;
+        display: flex;
+        position: relative;
+    
+        background-color: $text-color-dark;
+
+        font-size: 20px;
+    
+        .navInner {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            line-height: 50px;
+            position: relative;
+    
+            .navLeft {
+                position: absolute;
+                top: 0;
+                left: 0;
+                button {
+                  color: $white;
+                  &:hover {
+                    color: $theme;
+                  }
+                }
+            }
+            .navMiddle {
+                display: flex;
+                flex-flow: column nowrap;
+                align-items: center;
+                margin: auto;
+                h2 {
+                    color: $white;
+                }
+            }
+            .navRight {
+                position: absolute;
+                top: 0;
+                right: 0;
+            }
+    
+            > div {
+                height: 100%;
+                display: flex;
+                h1,
+                h2,
+                span {
+                    margin: auto 0;
+                    color: $white;
+                }
+            }
+        }
+    } 
+    .message {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: center;
+        align-items: center;
+
+        .mainMsg {
+            font-size: 120px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+
+            img {
+                width: 120px;
+                height: auto;
+            }
+        }
+
+        .subMsg {
+            font-size: 40px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+    }
+
+    .divider {
+        border-top: 1px solid grey;
+        width: 100vw;
+        padding-bottom: 10px;
+    }
+
+      .teams {
+          display: flex;
+          flex-flow: row wrap;
+          justify-content: center;
+          align-items: center;
+
+          .team {
+            max-width: 350px;
+            max-height: 200px;
+            margin: 0 20px 20px 0;
+            border: 1px solid $border-grey;
+            font-size: 25px;
+    
+            &.correct {
+              background-color: lighten($green, 40%);
+            }
+    
+            &.incorrect {
+              background-color: lighten($red, 40%);
+            }
+    
+            &.correct &.incorrect {
+              
+              border: 1px solid darken($border-grey, 10%);
+              button[class^='itemButton'] {
+                  border: 1px solid darken($border-grey, 10%);
+              }
+              .AnswerItem__correct {
+                  display: none;
+              }
+            }
+          }
+      }
+}
