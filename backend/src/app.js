@@ -21,7 +21,8 @@ import connectMongo from 'connect-mongo';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config();
-import cors from 'cors'; 9
+import cors from 'cors';
+import addQuestionsToDB from './questionSeed'
 
 import room from './routes/roomRouter';
 import category from './routes/questionsRouter'
@@ -44,10 +45,18 @@ mongoose.connection.on('connecting', () => {
   console.log(`INFO: Trying to connect to the database on ${dbUrl} with port ${dbPort}`);
 });
 
-mongoose.connection.on('connected', () => {
+mongoose.connection.on('connected', async () => {
   console.log(`SUCCESS: Database connected succesfully on ${dbUrl} with port ${dbPort}`);
+
   runAPIServer();
   initWSServer(sessionParser, httpServer);
+
+  try {
+    await addQuestionsToDB();
+  } catch (err) {
+    console.log(`ERROR: ${err.message}`);
+    shutdownAPIServer();
+  }
 });
 
 mongoose.connection.on('error', error => {

@@ -1,6 +1,5 @@
 import environment from "../environments/environment";
-import { endRoundScore, teamAcceptedAction, teamRejectedAction, getCurrentQuestion, leaveRoomAction } from "./gameActions";
-// import { viewMessageScreenAction } from "./viewActions";
+import { shotzTime } from "./gameActions";
 import store from "../store";
 import { messageTypes } from "./Enums";
 
@@ -46,6 +45,7 @@ function handleMessage(message) {
                 // dispatch(teamAcceptedAction());
                 break;
             case "scoreB_rejected":
+                dispatch(shotzTime());
                 // dispatch(viewMessageScreenAction(messageTypes.MSG_KICKED));
                 // dispatch(teamRejectedAction());
                 break;

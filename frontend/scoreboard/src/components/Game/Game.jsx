@@ -3,7 +3,6 @@ import * as ReactRedux from "react-redux";
 import "./Game.scss";
 import shot from './shot.png'
 import { joinRoom } from './../../actions/gameActions';
-import Navigation from "../Navigation/Navigation.jsx";
 import Item from '../General/Item.jsx'
 
 function Game(props) {

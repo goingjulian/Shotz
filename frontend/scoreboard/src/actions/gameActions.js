@@ -6,6 +6,14 @@ import {
 import { initSocket } from "./wsActions";
 import { messageTypes } from "./Enums";
 
+export function shotzTime() {
+    return async dispatch => {
+        const options = {
+            method: "GET"
+        }
+    }
+}
+
 export function joinRoomAction(roomKey, teamName) {
     return {
         type: "team_joinRoom",
