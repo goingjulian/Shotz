@@ -6,8 +6,24 @@ import { setRoundsAction } from "./roundsActions";
 
 export const roomActionTypes = {
   CREATE_ROOM: "CREATE_ROOM",
-  LEAVE_ROOM: "LEAVE_ROOM"
+  LEAVE_ROOM: "LEAVE_ROOM",
+  ADD_ERROR: "ADD_ERROR",
+  REMOVE_ERROR: "REMOVE_ERROR"
 };
+
+export function addErrorAction(error) {
+  return {
+    type: roomActionTypes.ADD_ERROR,
+    error: error
+  };
+}
+
+export function removeErrorAction(error) {
+  return {
+    type: roomActionTypes.REMOVE_ERROR,
+    error: error
+  };
+}
 
 export function createRoomAction(roomKey) {
   return {
@@ -38,7 +54,7 @@ export function createRoom() {
         dispatch(initSocket());
       }
     } catch (err) {
-      console.log(err.message);
+      dispatch(addErrorAction(err.message));
     }
   };
 }
@@ -52,9 +68,6 @@ export function leaveRoom(roomKey) {
     fetch(`${environment.API_URL}/room/${roomKey}`, method)
       .then(async response => {
         const body = await response.json();
-        console.log("LEAVE ROOM");
-        console.log(body);
-        console.log("----------");
         if (!response.ok) {
           throw new Error(body.error);
         } else {
@@ -64,7 +77,7 @@ export function leaveRoom(roomKey) {
         }
       })
       .catch(err => {
-        console.log(err);
+        dispatch(addErrorAction(err.message));
       });
   };
 }
@@ -77,9 +90,6 @@ export function restoreSession() {
         credentials: "include"
       });
       const body = await response.json();
-      console.log("RESTORE SESSION");
-      console.log(body);
-      console.log("----------");
       if (!response.ok) {
         throw new Error(body.error);
       } else {

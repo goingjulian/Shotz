@@ -54,7 +54,7 @@ roomRouter.route("/:roomKey").post((req, res, next) => {
 /**
  * Join room as a scoreboard
  */
-router.route("/scoreboard/:roomKey").post((req, res, next) => {
+roomRouter.route("/scoreboard/:roomKey").post((req, res, next) => {
   const roomKey = req.params.roomKey;
   const sessionId = req.session.id;
 
