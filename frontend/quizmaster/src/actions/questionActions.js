@@ -1,4 +1,5 @@
 import environment from "../environments/environment";
+import { addErrorAction } from "./roomActions";
 
 export const questionActionTypes = {
   SET_CATEGORY: "SET_CATEGORY",
@@ -16,7 +17,7 @@ export function setCategoriesAction(categories) {
 
 export function emptySelectedCategoriesAction() {
   return {
-      type: questionActionTypes.EMPTY_SELECTED_CATEGORIES
+    type: questionActionTypes.EMPTY_SELECTED_CATEGORIES
   };
 }
 
@@ -43,7 +44,7 @@ export function getAllCategories() {
         else throw new Error(body.error);
       })
       .catch(err => {
-        console.log(err.message);
+        dispatch(addErrorAction(err.message));
       });
   };
 }
