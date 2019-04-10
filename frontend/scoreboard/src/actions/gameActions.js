@@ -32,7 +32,6 @@ export function shotzTime() {
 }
 
 export function setRoomAction(roomKey, gameState, currentRound, currentQuestionIndex, teams) {
-    console.log("x", teams)
     return {
         type: gameActionTypes.scoreB_setRoom,
         roomKey: roomKey,
@@ -75,18 +74,16 @@ export function joinRoom(roomKey) {
 }
 
 export function restoreSession() {
-    const method = {
-        method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ role: "Scoreboard" })
-    };
+    console.log("RESTORING SESSION")
     return async dispatch => {
         try {
-            const response = await fetch(`${environment.API_URL}/room/restore`, method)
+            const options = {
+                method: "GET",
+                credentials: "include"
+            };
 
+            const response = await fetch(`${environment.API_URL}/room/restore/ROLE_SCOREBOARD`, options);
+            console.log("RESPONSE RECEIVED")
             const body = await response.json();
             console.log("RESTORE");
             console.log(body);
@@ -109,7 +106,7 @@ export function endRoundScore(roomKey) {
             method: "GET",
             credentials: "include"
         };
-        fetch(`${environment.API_URL}/room/${roomKey}/scores`, method)
+        fetch(`${environment.API_URL}/room/${roomKey}/teams/scores`, method)
             .then(async response => {
                 const body = await response.json();
                 console.log("GET SCORE END ROUND");

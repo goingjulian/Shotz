@@ -13,7 +13,7 @@ export default class GameDAO {
 
   static getGameWithSessionId(sessionId) {
     return Game.findOne({
-      $or: [{ quizmaster: sessionId }, { teams: { $elemMatch: { sessionId: sessionId } } }]
+      $or: [{ quizmaster: sessionId }, { teams: { $elemMatch: { sessionId: sessionId } } }, {scoreboards: sessionId}]
     });
   }
 

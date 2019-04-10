@@ -1,6 +1,7 @@
 import environment from "../environments/environment";
 import { store } from '../index';
 import { shotzTime, nextQuestionAction, endRoundScore } from "./gameActions";
+import { viewGameScreenAction } from './viewActions';
 
 let reconnects = 0;
 
@@ -61,6 +62,7 @@ function handleMessage(message) {
                 break;
             case "scoreB_nextQuestion":
                 dispatch(nextQuestionAction(message.currentQuestionIndex, message.currentQuestion, message.currentAnswer));
+                dispatch(viewGameScreenAction());
                 break;
             default:
                 console.log("Unknown message: ", message);
