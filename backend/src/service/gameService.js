@@ -4,6 +4,7 @@ import QuestionDAO from "../DAO/QuestionDao";
 import ShotzException from "../exceptions/ShotzException";
 import gameStates from "../definitions/gameStates";
 import { sendMessageTeam, closeConnection, sendMessageQuizmaster, sendMessageTeams } from "./websocketService";
+import roles from "../definitions/roles";
 
 export default class GameService {
   static async createRoom(quizmasterId) {
@@ -32,6 +33,9 @@ export default class GameService {
         throw new ShotzException(`There is a already a team with the name ${teamName}!`, 403);
       } else {
         await GameDAO.joinGameAsTeam(roomKey, teamName, sessionId);
+        sendMessageQuizmaster(roomKey, {
+          type: "quizmaster_newTeam"
+        });
         return {
           type: "team_joinRoom",
           roomKey: roomKey,
@@ -59,7 +63,7 @@ export default class GameService {
 
       const game = await GameDAO.getGame(roomKey).lean();
       if (game) game.teams = [...game.teams];
-      if (game && game.quizmaster === sessionId && loginRole === "Quizmaster") {
+      if (game && game.quizmaster === sessionId && loginRole === roles.ROLE_QUIZMASTER) {
         return {
           type: "quizmaster_restoreSession",
           roomKey: roomKey,
@@ -68,7 +72,7 @@ export default class GameService {
           rounds: game.rounds,
           currentQuestionIndex: game.rounds.length > 0 ? game.rounds[game.rounds.length - 1].activeQuestionIndex : 0
         };
-      } else if (game && game.teams.length > 0 && game.teams.find(team => team.sessionId === sessionId) && loginRole === "Team") {
+      } else if (game && game.teams.length > 0 && game.teams.find(team => team.sessionId === sessionId) && loginRole === roles.ROLE_TEAM) {
         const team = game.teams.find(team => team.sessionId === sessionId);
         const currentQuestion = await this.getCurrentQuestion(roomKey);
         return {
@@ -235,6 +239,10 @@ export default class GameService {
 
       const rounds = await GameDAO.getRounds(roomKey, sessionId).lean();
 
+      sendMessageTeams(roomKey, {
+        type: "team_nextQuestion"
+      });
+
       return {
         gameState: gameStates.IN_ROUND,
         rounds: rounds.rounds,
@@ -275,6 +283,9 @@ export default class GameService {
       if (currentRound.questions.length <= currentRound.activeQuestionIndex + 1) throw new ShotzException("Last question reached", 400);
 
       await GameDAO.goTonextQuestionInRound(roomKey, sessionId, currentRound._id);
+      sendMessageTeams(roomKey, {
+        type: "team_nextQuestion"
+      });
       return { activeQuestionIndex: currentRound.activeQuestionIndex + 1 };
     } catch (err) {
       console.log(err);
@@ -314,6 +325,12 @@ export default class GameService {
 
     try {
       await GameDAO.submitAnswer(roomKey, sessionId, questionId, answer);
+      sendMessageQuizmaster(roomKey, {
+        type: "quizmaster_answerSubmitted",
+        teamSessionId: sessionId,
+        questionId: questionId,
+        answer: answer
+      });
       return {
         success: "Answer submitted"
       };
@@ -354,6 +371,11 @@ export default class GameService {
 
     try {
       const teams = await GameDAO.setCorrectStatusStatusAnswer(roomKey, sessionId, teamSessionId, questionId, correct);
+      const responseType = correct ? "team_answerCorrect" : "team_answerIncorrect";
+      sendMessageTeam(roomKey, teamSessionId, {
+        type: responseType,
+        questionId: questionId
+      });
       return teams;
     } catch (err) {
       if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);

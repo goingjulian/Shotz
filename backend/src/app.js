@@ -24,7 +24,6 @@ dotenv.config();
 import cors from 'cors'; 9
 
 import room from './routes/roomRouter';
-import category from './routes/questionsRouter'
 import { initWSServer } from './service/websocketService'
 
 const app = express();
@@ -96,9 +95,9 @@ function runAPIServer() {
   app.use(sessionParser);
 
   app.use('/room', room);
-  app.use('/question', category);
 
   app.use((err, req, res, next) => {
+    console.log(err.message);
     const errMsg = err.message || "Destination URL not found";
     const errCode = err.htmlErrorCode || 404;
     res.status(errCode).json({ error: `${errMsg}` });

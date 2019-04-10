@@ -70,7 +70,7 @@ export function leaveRoom(roomKey) {
       method: "DELETE",
       credentials: "include"
     };
-    fetch(`${environment.API_URL}/room/${roomKey}/leave`, method)
+    fetch(`${environment.API_URL}/room/${roomKey}`, method)
       .then(async response => {
         const body = await response.json();
         console.log("LEAVING ROOM");
@@ -117,15 +117,11 @@ export function joinRoom(roomKey, teamName) {
 
 export function restoreSession() {
   const method = {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ role: "Team" })
+    method: "GET",
+    credentials: "include"
   };
   return dispatch => {
-    fetch(`${environment.API_URL}/room/restore`, method)
+    fetch(`${environment.API_URL}/room/restore/ROLE_TEAM`, method)
       .then(async response => {
         const body = await response.json();
         console.log("RESTORE");
@@ -154,12 +150,11 @@ export function submitAnswer(roomKey, questionId, answer) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        questionId: questionId,
         answer: answer
       })
     };
 
-    fetch(`${environment.API_URL}/room/${roomKey}/round/question/answer`, options)
+    fetch(`${environment.API_URL}/room/${roomKey}/round/question/${questionId}/answer`, options)
       .then(async response => {
         const body = await response.json();
         console.log("RESTORE");
@@ -187,7 +182,7 @@ export function endRoundScore(roomKey, teamName) {
         "Content-Type": "application/json"
       }
     };
-    fetch(`${environment.API_URL}/room/${roomKey}/scores`, method)
+    fetch(`${environment.API_URL}/room/${roomKey}/teams/scores`, method)
       .then(async response => {
         const body = await response.json();
         console.log("GET SCORE END ROUND");

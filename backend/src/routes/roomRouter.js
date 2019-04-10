@@ -1,126 +1,97 @@
 import express from "express";
+import roundRouter from "./roundRouter";
 import GameService from "../service/gameService";
-import { sendMessageQuizmaster, sendMessageTeam, sendMessageTeams } from "../service/websocketService";
-import ShotzException from "./../exceptions/ShotzException";
-import { closeConnection } from "./../service/websocketService";
+import QuestionService from "./../service/questionService";
+
 import gameStates from "../definitions/gameStates";
-const router = express.Router();
+import roles from "../definitions/roles";
+
+import { checkAuthentication, setSession, checkRoleAuthentication } from "./../service/authService";
+
+const roomRouter = express.Router();
 
 /**
- * Create a room as a quizmaster
- * 
- * TODO -> /create
+ * Routers
  */
-router.route("/").post((req, res, next) => {
-  const quizmasterId = req.session.id;
-  GameService.createRoom(quizmasterId)
+roomRouter.use("/:roomKey/round", roundRouter);
+
+/**
+ * Create a room
+ * ALLOWED: *
+ */
+roomRouter.route("/").post((req, res, next) => {
+  const sessionId = req.session.id;
+
+  GameService.createRoom(sessionId)
     .then(roomKey => {
-      req.session.roomKey = roomKey;
+      setSession(req.session, roomKey, roles.ROLE_QUIZMASTER);
       res.status(201).json({
         roomKey: roomKey,
         gameState: gameStates.REGISTER
       });
     })
-    .catch(err => {
-      next(err);
-    });
-});
-
-/**
- * Restore a session
- */
-router.route("/restore").post((req, res, next) => {
-  const roomKey = req.session.roomKey;
-  const sessionId = req.session.id;
-  const loginRole = req.body.role;
-
-  GameService.restoreSession(roomKey, loginRole, sessionId)
-    .then(gameState => {
-      console.log(`Session for ${loginRole}: ${sessionId} restored in room ${roomKey}`);
-      req.session.roomKey = roomKey;
-      res.status(200).json(gameState);
-    })
-    .catch(err => {
-      next(err);
-    });
-});
-
-/**
- * Accept or reject teams
- */
-router.route("/:roomKey/team/:teamSessionId").put((req, res, next) => {
-  console.log("acceptReject teamId: ", req.params.teamSessionId);
-  const roomKey = req.params.roomKey;
-  const teamSessionId = req.params.teamSessionId;
-  const accepted = req.body.accepted;
-  GameService.alterTeamStatus(roomKey, teamSessionId, accepted)
-    .then(teamStatus => {
-      res.status(200).json(teamStatus);
-    })
-    .catch(err => {
-      next(err);
-    });
-});
-
-/**
- * Leave room as team
- */
-router.route("/:roomKey/leave").delete((req, res, next) => {
-  const roomKey = req.params.roomKey;
-  const sessionId = req.session.id;
-
-  GameService.leaveGame(roomKey, sessionId)
-    .then(teams => {
-      res.json(teams);
-    })
-    .catch(err => {
-      next(err);
-    });
-});
-
-/**
- * delete all not-accepted teams
- */
-router.route("/:roomKey/teams").delete((req, res, next) => {
-  const roomKey = req.params.roomKey;
-  const sessionId = req.session.id;
-
-  GameService.removeUnacceptedTeams(roomKey, sessionId)
-    .then(teams => {
-      res.json(teams);
-    })
-    .catch(err => {
-      next(err);
-    });
+    .catch(err => next(err));
 });
 
 /**
  * Join a room as a team
+ * ALLOWED: *
  */
-router.route("/:roomKey").post((req, res, next) => {
-  const roomKey = req.params.roomKey;
+roomRouter.route("/:roomKey").post((req, res, next) => {
   const sessionId = req.session.id;
+  const roomKey = req.params.roomKey;
   const teamName = req.body.teamName;
 
   GameService.joinRoom(roomKey, teamName, sessionId)
     .then(message => {
-      sendMessageQuizmaster(roomKey, {
-        type: "quizmaster_newTeam"
-      });
-      req.session.roomKey = roomKey;
+      setSession(req.session, roomKey, roles.ROLE_TEAM);
       res.status(200).json(message);
     })
-    .catch(err => {
-      next(err);
-    });
+    .catch(err => next(err));
+});
+
+/**
+ * Leave room
+ * ALLOWED: Team, Quizmaster, Scoreboard
+ */
+roomRouter.route("/:roomKey").delete((req, res, next) => {
+  const { roomKey, role, id } = req.session;
+  const roomKeyParam = req.params.roomKey;
+
+  checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER, roles.ROLE_TEAM, roles.ROLE_SCOREBOARD])
+    .then(() => GameService.leaveGame(roomKey, id))
+    .then(response => {
+      res.status(200).json(response);
+    })
+    .catch(err => next(err));
+});
+
+/**
+ * Restore a room
+ * ALLLOWED: Team, Quizmaster, Scoreboard
+ */
+roomRouter.route("/restore/:role").get((req, res, next) => {
+  const { roomKey, role, id } = req.session;
+  const roleParam = req.params.role;
+
+  checkRoleAuthentication(role, roleParam)
+    .then(() => GameService.restoreSession(roomKey, roleParam, id))
+    .then(gameState => {
+      res.status(200).json(gameState);
+    })
+    .catch(err => next(err));
 });
 
 /**
  * Get all teams in a room as quizmaster
+ * ALLOWED: Quizmaster
  */
-router.route("/:roomKey/teams").get((req, res, next) => {
-  const roomKey = req.params.roomKey;
-  GameService.getTeams(roomKey)
+roomRouter.route("/:roomKey/teams").get((req, res, next) => {
+  const { roomKey, role, id } = req.session;
+  const roomKeyParam = req.params.roomKey;
+
+  checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER])
+    .then(() => GameService.getTeams(roomKey))
     .then(teams => {
       res.status(200).json(teams);
     })
@@ -128,181 +99,66 @@ router.route("/:roomKey/teams").get((req, res, next) => {
 });
 
 /**
- * start new round
+ * delete all not-accepted teams
+ * ALLOWED: Quizmaster
  */
-router.route("/:roomKey/round").post((req, res, next) => {
-  const roomKey = req.params.roomKey;
-  const categories = req.body.categories;
-  const sessionId = req.session.id;
-  console.log(roomKey, sessionId, categories);
-  GameService.startNewRound(roomKey, sessionId, categories)
-    .then(response => {
-      res.json(response);
-      sendMessageTeams(roomKey, {
-        type: "team_nextQuestion"
-      });
+roomRouter.route("/:roomKey/teams").delete((req, res, next) => {
+  const { roomKey, role, id } = req.session;
+  const roomKeyParam = req.params.roomKey;
+
+  checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER])
+    .then(() => GameService.removeUnacceptedTeams(roomKey, id))
+    .then(teams => {
+      res.status(200).json(teams);
     })
-    .catch(err => {
-      console.log(err);
-      next(err);
-    });
+    .catch(err => next(err));
 });
 
 /**
- * Close the current round
+ * Get scores of all teams in a room
+ * ALLOWED: Team, Quizmaster, Scoreboard
  */
-router.route("/:roomKey/round/end").put((req, res, next) => {
-  const roomKey = req.params.roomKey;
-  const sessionId = req.session.id;
-  GameService.endRound(roomKey, sessionId)
-    .then(response => {
-      res.status(200).json(response);
-    })
-    .catch(err => {
-      console.log(err);
-      next(err);
-    });
-});
+roomRouter.route("/:roomKey/teams/scores").get((req, res, next) => {
+  const { roomKey, role, id } = req.session;
+  const roomKeyParam = req.params.roomKey;
 
-router.route("/:roomKey/round/state/end").put((req, res, next) => {
-  const roomKey = req.params.roomKey;
-  const sessionId = req.session.id;
-  GameService.endRound(roomKey, sessionId)
-    .then(response => {
-      res.status(200).json(response);
-    })
-    .catch(err => {
-      console.log(err);
-      next(err);
-    });
-});
-
-router.route("/:roomKey/round/state/category").put((req, res, next) => {
-  const roomKey = req.params.roomKey;
-  const sessionId = req.session.id;
-  GameService.selectCategory(roomKey, sessionId)
-    .then(gameState => {
-      res.status(200).json({ gameState: gameState });
-    })
-    .catch(err => {
-      console.log(err);
-      next(err);
-    });
-});
-
-/**
- * Get score
- */
-router.route("/:roomKey/scores").get((req, res, next) => {
-  const roomKey = req.params.roomKey;
-  const sessionId = req.session.id;
-  GameService.getScores(roomKey)
+  checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER, roles.ROLE_TEAM, roles.ROLE_SCOREBOARD])
+    .then(() => GameService.getScores(roomKey))
     .then(scores => {
       res.status(200).json(scores.teams);
     })
-    .catch(err => {
-      console.log(err);
-      next(err);
-    });
+    .catch(err => next(err));
 });
 
 /**
- * proceed to next question in round
+ * Accept or reject teams
+ * ALLOWED: Quizmaster
  */
-router.route("/:roomKey/round/question/next").put((req, res, next) => {
-  const sessionId = req.session.id;
-  const roomKey = req.params.roomKey;
+roomRouter.route("/:roomKey/team/:teamId/status").put((req, res, next) => {
+  const { roomKey, role, id } = req.session;
+  const roomKeyParam = req.params.roomKey;
 
-  GameService.goTonextQuestionInRound(roomKey, sessionId)
-    .then(response => {
-      res.json(response);
-      sendMessageTeams(roomKey, {
-        type: "team_nextQuestion"
-      });
+  const teamId = req.params.teamId;
+  const teamStatus = req.body.accepted;
+
+  checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER])
+    .then(() => GameService.alterTeamStatus(roomKey, teamId, teamStatus))
+    .then(team => {
+      res.status(200).json(team);
     })
-    .catch(err => {
-      throw err;
-      next(err);
-    });
+    .catch(err => next(err));
 });
 
 /**
- * get current question
+ * Get a list of categories for a room
+ * ALLOWED: *
  */
-router.route("/:roomKey/round/question").get((req, res, next) => {
-  const roomKey = req.params.roomKey;
-
-  GameService.getCurrentQuestion(roomKey)
-    .then(response => {
-      res.json(response);
+roomRouter.route("/categories").get((req, res, next) => {
+  QuestionService.getAllCategories()
+    .then(categories => {
+      res.json(categories);
     })
-    .catch(err => {
-      next(err);
-    });
+    .catch(err => next(err));
 });
 
-/**
- * Submit answer
- */
-router.route("/:roomKey/round/question/answer").post((req, res, next) => {
-  const roomKey = req.params.roomKey;
-  const sessionId = req.session.id;
-  const questionId = req.body.questionId;
-  const answer = req.body.answer;
-
-  GameService.submitAnswer(roomKey, sessionId, questionId, answer)
-    .then(response => {
-      res.json(response);
-      console.log("ANS:", answer);
-
-      sendMessageQuizmaster(roomKey, {
-        type: "quizmaster_answerSubmitted",
-        teamSessionId: sessionId,
-        questionId: questionId,
-        answer: answer
-      });
-    })
-    .catch(err => {
-      next(err);
-    });
-});
-
-/**
- * Accept or reject a answer
- */
-router.route("/:roomKey/round/questions/answer/:questionId").put((req, res, next) => {
-  const roomKey = req.params.roomKey;
-  const sessionId = req.session.id;
-  const teamSessionId = req.body.teamSessionId;
-  const questionId = req.params.questionId;
-  const correct = req.body.correct;
-
-  GameService.setCorrectStatusStatusAnswer(roomKey, sessionId, teamSessionId, questionId, correct)
-    .then(response => {
-      res.json(response);
-      const responseType = correct ? "team_answerCorrect" : "team_answerIncorrect";
-      sendMessageTeam(roomKey, teamSessionId, {
-        type: responseType,
-        questionId: questionId
-      });
-    })
-    .catch(err => {
-      next(err);
-    });
-});
-
-router.route("/:roomKey/round/questions/:questionId").delete((req, res, next) => {
-  const roomKey = req.params.roomKey;
-  const questionId = req.params.questionId;
-  const sessionId = req.session.id;
-
-  GameService.deleteQuestionFromCurrentRound(roomKey, sessionId, questionId)
-    .then(response => {
-      res.json(response);
-    })
-    .catch(err => {
-      next(err);
-    });
-});
-
-export default router;
+export default roomRouter;

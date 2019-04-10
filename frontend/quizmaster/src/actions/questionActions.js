@@ -36,7 +36,7 @@ export function removeCategory(category) {
 
 export function getAllCategories() {
   return dispatch => {
-    fetch(`${environment.API_URL}/question/categories`)
+    fetch(`${environment.API_URL}/room/categories`)
       .then(async response => {
         const body = await response.json();
         if (response.ok) dispatch(setCategoriesAction(body));

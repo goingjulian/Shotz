@@ -44,7 +44,7 @@ export function setCategorySelectState(roomKey) {
             method: "PUT",
             credentials: "include"
         };
-        fetch(`${environment.API_URL}/room/${roomKey}/round/state/category`, options)
+        fetch(`${environment.API_URL}/room/${roomKey}/round/select-category`, options)
             .then(async response => {
                 const body = await response.json();
                 if (response.ok) {
