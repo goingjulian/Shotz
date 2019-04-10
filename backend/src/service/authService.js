@@ -5,7 +5,8 @@ export async function checkAuthentication(sessionRoomKey, sessionRole, roomKey, 
   const roomKeyStatus = sessionRoomKey == roomKey;
   const roleStatus = allowedRoles.includes(sessionRole);
   console.log("CHECK");
-  console.log(sessionRole, roleStatus)
+  console.log("rkey", roomKey, sessionRoomKey)
+  console.log(roomKeyStatus && roleStatus)
 
   if (roomKeyStatus && roleStatus) return true;
   else throw new ShotzException(`You're not authorized to do this action!`, 401);

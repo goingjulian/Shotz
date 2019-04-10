@@ -85,6 +85,7 @@ roomRouter.route("/:roomKey").delete((req, res, next) => {
   checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER, roles.ROLE_TEAM, roles.ROLE_SCOREBOARD])
     .then(() => GameService.leaveGame(roomKey, id))
     .then(response => {
+      req.session.destroy();
       res.status(200).json(response);
     })
     .catch(err => next(err));
@@ -107,14 +108,14 @@ roomRouter.route("/restore/:role").get((req, res, next) => {
 });
 
 /**
- * Get all teams in a room as quizmaster
- * ALLOWED: Quizmaster
+ * Get all teams in a room as quizmaster or scoreboard
+ * ALLOWED: Quizmaster, Scoreboard
  */
 roomRouter.route("/:roomKey/teams").get((req, res, next) => {
   const { roomKey, role, id } = req.session;
   const roomKeyParam = req.params.roomKey;
 
-  checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER])
+  checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER, roles.ROLE_SCOREBOARD])
     .then(() => GameService.getTeams(roomKey))
     .then(teams => {
       res.status(200).json(teams);
@@ -126,6 +127,7 @@ roomRouter.route("/:roomKey/teams").get((req, res, next) => {
  * delete all not-accepted teams
  * ALLOWED: Quizmaster
  */
+//BUG: destroy sessions also
 roomRouter.route("/:roomKey/teams").delete((req, res, next) => {
   const { roomKey, role, id } = req.session;
   const roomKeyParam = req.params.roomKey;

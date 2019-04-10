@@ -1,7 +1,8 @@
 import { roundsActionTypes } from '../actions/roundsActions'
 
 const initialRoundsState = {
-    rounds: []
+    rounds: [],
+    answerRevealed: false
 }
 
 export default function roundsReducer(state = initialRoundsState, action) {
@@ -12,11 +13,13 @@ export default function roundsReducer(state = initialRoundsState, action) {
         case roundsActionTypes.nextQuestion:
             roundsCopy = [...state.rounds];
             roundsCopy[roundsCopy.length - 1].activeQuestionIndex = action.activeQuestionIndex;
-            return {...state, rounds: roundsCopy}
+            return { ...state, rounds: roundsCopy, answerRevealed: false }
         case roundsActionTypes.setQuestions:
             roundsCopy = [...state.rounds];
             roundsCopy[roundsCopy.length - 1].questions = action.questions;
-            return {...state, rounds: roundsCopy}
+            return { ...state, rounds: roundsCopy }
+        case roundsActionTypes.revealAnswer:
+            return { ...state, answerRevealed: true }
         default:
             return state;
 

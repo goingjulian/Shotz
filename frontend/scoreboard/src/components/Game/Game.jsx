@@ -17,7 +17,7 @@ function Game(props) {
                     gameState={props.gameState}
                     roomKey={props.roomKey}
                     currentQuestion={props.currentQuestion}
-                    currentAnswer={props.currentAnswer} />
+                    revealAnswer={props.revealAnswer} />
 
                 <div className="divider" />
 
@@ -25,7 +25,7 @@ function Game(props) {
                     {props.teams.map(team => {
                         return <Item
                             key={team._id}
-                            text={`${team.teamName} (${team.score} pts)`}
+                            text={`${team.teamName}`}
                             itemClass={`team`}
                         />
                     })}
@@ -42,8 +42,8 @@ function mapStateToProps(state) {
         currentRound: state.game.currentRound,
         currentQuestionIndex: state.game.currentQuestionIndex,
         currentQuestion: state.game.currentQuestion,
-        currentAnswer: state.game.currentAnswer,
-        teams: state.game.teams
+        teams: state.game.teams,
+        revealAnswer: state.game.revealAnswer
     };
 }
 

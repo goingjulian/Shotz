@@ -62,6 +62,22 @@ questionRouter.route("/:questionId/answer/:teamId").put((req, res, next) => {
 });
 
 /**
+ * Show the answer of the current question on all scoreboards
+ * ALLOWED: Quizmaster
+ */
+questionRouter.route("/reveal").put((req, res, next) => {
+  const { roomKey, role, id } = req.session;
+  const roomKeyParam = req.params.roomKey;
+
+  checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER])
+    .then(() => GameService.revealAnswer(roomKey, id))
+    .then(() => {
+      res.status(200).send();
+    })
+    .catch(err => next(err));
+})
+
+/**
  * Proceed to next question in round
  * ALLOWED: Quizmaster
  */
@@ -82,17 +98,18 @@ questionRouter.route("/next").put((req, res, next) => {
  * ALLOWED: Quizmaster
  */
 questionRouter.route("/:questionId").delete((req, res, next) => {
+  console.log("TEST")
   const { roomKey, role, id } = req.session;
   const roomKeyParam = req.params.roomKey;
 
   const questionId = req.params.questionId;
 
   checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER])
-    .thne(() => GameService.deleteQuestionFromCurrentRound(roomKey, id, questionId))
+    .then(() => GameService.deleteQuestionFromCurrentRound(roomKey, id, questionId))
     .then(response => {
       res.status(200).json(response);
     })
-    .catch(err => next(err));
+    .catch(err => console.log(err));
 });
 
 export default questionRouter;

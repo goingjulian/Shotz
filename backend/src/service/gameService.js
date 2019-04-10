@@ -57,7 +57,6 @@ export default class GameService {
       if (game.scoreboards.find(scoreboard => scoreboard === sessionId)) throw new ShotzException(`You have already joined this room`, 403);
       if (game.quizmaster === sessionId || game.teams.find(team => team.sessionId === sessionId)) throw new ShotzException(`You are a quizmaster or a team`);
       await GameDAO.joinGameAsScoreBoard(roomKey, sessionId);
-      //body.currentRound, body.currentQuestion, body.teamsConnected
       return {
         type: "scoreB_joinRound",
         roomKey: roomKey,
@@ -66,9 +65,7 @@ export default class GameService {
         currentQuestionIndex: game.rounds.length > 0 ? game.rounds[game.rounds.length - 1].activeQuestionIndex : 0,
         teams: game.teams
       }
-
     } catch (err) {
-      console.log(`joinRoom error: ${err.message}`);
       if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
       else throw err;
     }
@@ -79,7 +76,6 @@ export default class GameService {
       const scoreBoards = GameDAO.getScoreBoards(roomKey);
       return scoreBoards;
     } catch (err) {
-      console.log(`joinRoom error: ${err.message}`);
       if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
       else throw err;
     }
@@ -90,11 +86,15 @@ export default class GameService {
     sendMessageTeams(roomKey, {
       type: "team_selectingCategories"
     });
+
+    sendMessageScoreBoards(roomKey, {
+      type: "scoreB_selectingCategories"
+    });
+
     return gameStates.CATEGORY_SELECT;
   }
 
   static async restoreSession(roomKey, loginRole, sessionId) {
-    console.log("DEBUG:", roomKey, loginRole, sessionId);
     try {
       if (typeof loginRole !== "string") throw new ShotzException("Invalid format: role must be a string", 400);
 
@@ -130,11 +130,9 @@ export default class GameService {
           teams: game.teams
         }
       } else {
-        console.log("ERROR");
         throw new ShotzException("No active sessions found for your role!", 404);
       }
     } catch (err) {
-      console.log(`restoreSession error: ${err.message}`);
       if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
       else throw err;
     }
@@ -189,6 +187,13 @@ export default class GameService {
         await sendMessageTeams(roomKey, {
           type: "team_quizmasterLeft"
         });
+
+        const scores = await GameDAO.getScores(roomKey);
+
+        await sendMessageScoreBoards(roomKey, {
+          type: "scoreB_quizmasterLeft",
+          scores: scores
+        });
         game.teams.forEach(team => {
           closeConnection(team.sessionId);
         });
@@ -226,6 +231,9 @@ export default class GameService {
         sendMessageTeam(roomKey, sessionId, {
           type: "team_accepted"
         });
+        sendMessageScoreBoards(roomKey, {
+          type: "scoreB_team_accepted"
+        });
         return {
           type: "quizmaster_teamAccepted",
           sessionId: sessionId
@@ -234,6 +242,9 @@ export default class GameService {
         await GameDAO.removeTeam(roomKey, sessionId);
         sendMessageTeam(roomKey, sessionId, {
           type: "team_rejected"
+        });
+        sendMessageScoreBoards(roomKey, {
+          type: "scoreB_team_rejected"
         });
         closeConnection(sessionId);
         return {
@@ -285,7 +296,7 @@ export default class GameService {
       await GameDAO.alterGameState(roomKey, sessionId, gameStates.IN_ROUND);
 
       const rounds = await GameDAO.getRounds(roomKey, sessionId).lean();
-      
+
       const currentRound = rounds.rounds[rounds.rounds.length - 1];
       // console.log("DEB", rounds, currentRound)
 
@@ -296,8 +307,7 @@ export default class GameService {
       sendMessageScoreBoards(roomKey, {
         type: "scoreB_nextQuestion",
         currentQuestionIndex: currentRound.activeQuestionIndex,
-        currentQuestion: currentRound.questions[currentRound.activeQuestionIndex].question,
-        currentAnswer: currentRound.questions[currentRound.activeQuestionIndex].answer
+        currentQuestion: currentRound.questions[currentRound.activeQuestionIndex]
       });
 
       return {
@@ -351,13 +361,11 @@ export default class GameService {
       sendMessageScoreBoards(roomKey, {
         type: "scoreB_nextQuestion",
         currentQuestionIndex: currentRound.activeQuestionIndex + 1,
-        currentQuestion: currentRound.questions[currentRound.activeQuestionIndex + 1].question,
-        currentAnswer: currentRound.questions[currentRound.activeQuestionIndex + 1].answer
+        currentQuestion: currentRound.questions[currentRound.activeQuestionIndex + 1]
       });
 
       return { activeQuestionIndex: currentRound.activeQuestionIndex + 1 };
     } catch (err) {
-      console.log(err);
       if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
       else throw err;
     }
@@ -404,7 +412,6 @@ export default class GameService {
         success: "Answer submitted"
       };
     } catch (err) {
-      console.log(err);
       if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
       else throw err;
     }
@@ -414,7 +421,6 @@ export default class GameService {
     try {
       return await GameDAO.getScores(roomKey);
     } catch (err) {
-      console.log(err);
       if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
       else throw err;
     }
@@ -435,7 +441,6 @@ export default class GameService {
       })
       return await GameDAO.getScores(roomKey);
     } catch (err) {
-      console.log(err);
       if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
       else throw err;
     }
@@ -467,5 +472,15 @@ export default class GameService {
       if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
       else throw err;
     }
+  }
+
+  static async revealAnswer(roomKey, sessionId) {
+    await GameDAO.alterGameState(roomKey, sessionId, gameStates.SUBMIT_CLOSED);
+    await sendMessageScoreBoards(roomKey, {
+      type: "scoreB_revealAnswer"
+    });
+    await sendMessageTeams(roomKey, {
+      type: "team_submitClosed"
+    });
   }
 }
