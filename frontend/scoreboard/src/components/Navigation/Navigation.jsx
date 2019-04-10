@@ -14,7 +14,7 @@ function Navigation(props) {
             {props.gameState === gameStates.REGISTER
                 ? <div className="navMiddle"><h2>RoomKey: {props.roomKey}</h2></div>
                 : <div className="navMiddle">
-                    <h2>Question {props.currentQuestionIndex + 1}/12</h2>
+                    <h2>Question {props.currentQuestionIndex + 1}</h2>
                     <h2>Round {props.currentRound}</h2>
                 </div>
             }

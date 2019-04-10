@@ -24,12 +24,15 @@ export function restoreActiveScreenFromGameState(gameState) {
     return dispatch => {
         switch (gameState) {
             case gameStates.REGISTER:
-                dispatch(viewLoginScreenAction());
-                break;
             case gameStates.CATEGORY_SELECT:
             case gameStates.IN_ROUND:
+                dispatch(viewGameScreenAction());
+                break;
             case gameStates.END_ROUND:
-                console.log("DISPATCHING");
+                dispatch(viewScoreScreenAction())
+                break;
+            case gameStates.SUBMIT_CLOSED:
+                console.log("bingo")
                 dispatch(viewGameScreenAction());
                 break;
             default:

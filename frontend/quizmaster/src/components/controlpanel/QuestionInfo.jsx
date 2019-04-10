@@ -2,7 +2,7 @@ import React from "react";
 import * as ReactRedux from "react-redux";
 import Item from "../General/Item";
 import { setAnswerStatus } from "../../actions/teamActions";
-import { nextQuestion, endRound } from "../../actions/roundsActions";
+import { nextQuestion, endRound, revealAnswer } from "../../actions/roundsActions";
 
 class QuestionInfo extends React.Component {
   handleAnswerStatus(questionId, teamSessionId, correct) {
@@ -17,7 +17,6 @@ class QuestionInfo extends React.Component {
 
     const answers = [];
 
-    
 
     this.props.teamList.forEach(team => {
       const answer = team.answers.find(answer => answer.questionId === currentQuestionObj._id);
@@ -48,13 +47,15 @@ class QuestionInfo extends React.Component {
     return (
       <div className="QuestionInfo">
         <div className="infoActions">
-          <button>Show answer to teams</button>
+          {!this.props.answerRevealed
+            ? <button onClick={() => this.props.revealAnswer(this.props.roomKey)}>Show answer to teams</button>
+            : null}
           <h2>Round {this.props.rounds.length}</h2>
           {totalQuestionsAmount === this.props.activeQuestionIndex + 1 ? (
             <button onClick={() => this.props.endRound(this.props.roomKey)}>End round</button>
           ) : (
-            <button onClick={() => this.props.nextQuestion(this.props.roomKey)}>Next question</button>
-          )}
+              <button onClick={() => this.props.nextQuestion(this.props.roomKey)}>Next question</button>
+            )}
         </div>
         <div className="infoQuestion">
           <h2>
@@ -82,7 +83,8 @@ function mapStateToProps(state) {
     rounds: state.rounds.rounds,
     activeQuestionIndex: state.rounds.rounds[state.rounds.rounds.length - 1].activeQuestionIndex,
     currentRound: state.rounds.rounds[state.rounds.rounds.length - 1],
-    teamList: state.teams.teamList
+    teamList: state.teams.teamList,
+    answerRevealed: state.rounds.answerRevealed
   };
 }
 
@@ -90,7 +92,8 @@ function mapDispatchToProps(dispatch) {
   return {
     nextQuestion: roomKey => dispatch(nextQuestion(roomKey)),
     setAnswerStatus: (roomKey, questionId, teamSessionId, correct) => dispatch(setAnswerStatus(roomKey, questionId, teamSessionId, correct)),
-    endRound: roomKey => dispatch(endRound(roomKey))
+    endRound: roomKey => dispatch(endRound(roomKey)),
+    revealAnswer: roomKey => dispatch(revealAnswer(roomKey))
   };
 }
 

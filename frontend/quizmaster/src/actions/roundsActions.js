@@ -3,10 +3,11 @@ import { viewEndRoundScreenAction, viewControlPanelScreenAction } from './viewAc
 import { addErrorAction } from './roomActions';
 
 export const roundsActionTypes = {
-  startRound: 'startRound',
-  setRounds: 'setRounds',
-  nextQuestion: 'nextQuestion',
-  setQuestions: 'setQuestions'
+  startRound: "startRound",
+  setRounds: "setRounds",
+  nextQuestion: "nextQuestion",
+  setQuestions: "setQuestions",
+  revealAnswer: "revealAnswer"
 };
 
 export function setRoundsAction(rounds, currentQuestionIndex) {
@@ -29,6 +30,12 @@ export function setQuestionsAction(questions) {
     type: roundsActionTypes.setQuestions,
     questions: questions
   };
+}
+
+export function revealAnswerAction() {
+  return {
+    type: roundsActionTypes.revealAnswer
+  }
 }
 
 export function newRound(roomKey, categories) {
@@ -76,6 +83,21 @@ export function endRound(roomKey) {
       })
       .catch(err => dispatch(addErrorAction(err.message)));
   };
+}
+
+export function revealAnswer(roomKey) {
+  return async dispatch => {
+    const options = {
+      method: "PUT",
+      credentials: "include"
+    }
+
+    const response = await fetch(`${environment.API_URL}/room/${roomKey}/round/question/reveal`, options);
+
+    if(!response.ok) throw new Error('Error while revealing answer');
+
+    dispatch(revealAnswerAction());
+  }
 }
 
 export function nextQuestion(roomKey) {

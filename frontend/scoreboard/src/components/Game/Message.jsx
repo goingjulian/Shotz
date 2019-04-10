@@ -6,6 +6,7 @@ import shot from './shot.png'
 export default class Message extends React.Component {
 
     render() {
+        console.log(this.props)
         console.log("y", this.props.gameState === gameStates.IN_ROUND)
         let mainMessage, subMessage;
         switch (this.props.gameState) {
@@ -18,12 +19,13 @@ export default class Message extends React.Component {
                 subMessage = `Selecting categories...`
                 break;
             case gameStates.IN_ROUND:
+            case gameStates.SUBMIT_CLOSED:
                 const messages = this.getInRoundMessages();
                 mainMessage = messages.mainMessage;
                 subMessage = messages.subMessage;
                 break;
             default:
-                mainMessage = `Unknown gamestate`;
+                mainMessage = `Oops, something went wrong`;
                 subMessage = 'Error occured';
         }
         return <div className="message">
@@ -37,6 +39,7 @@ export default class Message extends React.Component {
     }
 
     getInRoundMessages() {
+        console.log(this.props)
         let mainMessage, subMessage;
         if (this.props.shotzTime) {
             mainMessage = <div>
@@ -44,12 +47,12 @@ export default class Message extends React.Component {
             <img src={shot} alt="A Shot Glass" />
             </div>
             subMessage = `${this.props.shotzTime.shotzTeam} must all take a shot`;
-        } else if (this.props.showAnswer) {
-            mainMessage = `The correct answer is: ${this.props.currentAnswer}`;
+        } else if (this.props.revealAnswer) {
+            mainMessage = `The correct answer is: ${this.props.currentQuestion.answer}`;
             subMessage = `Did you guess the right answer?`
         } else if(this.props.currentQuestion) {
-            mainMessage = this.props.currentQuestion;
-            subMessage = `Do you know the answer?`
+            mainMessage = this.props.currentQuestion.question;
+            subMessage = this.props.currentQuestion.category;
         } else {
             mainMessage = `Waiting for the next question...`;
             subMessage = `Just be patient`;

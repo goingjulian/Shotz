@@ -6,7 +6,8 @@ export const messageTypes = {
     MSG_SELECTINGCATEGORIES: "The quizmaster is selecting categories for the next round!",
     MSG_QUESTIONANSWERED: "Waiting for next question...",
     MSG_ANSWERCORRECT: "Your answer is correct!",
-    MSG_ANSWERINCORRECT: "Your answer is incorrect!"
+    MSG_ANSWERINCORRECT: "Your answer is incorrect!",
+    MSG_SUBMITCLOSED: "Waiting for the next question"
 };
 
 export const viewActionTypes = {

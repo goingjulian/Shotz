@@ -68,6 +68,8 @@ function handleMessage(message) {
             case "team_answerIncorrect":
                 dispatch(viewMessageScreenAction(messageTypes.MSG_ANSWERINCORRECT));
                 break;
+            case "team_submitClosed":
+                dispatch(viewMessageScreenAction(messageTypes.MSG_SUBMITCLOSED));
             default:
                 console.log("Unknown message: ", message);
         }

@@ -13,7 +13,7 @@ export default class GameDAO {
 
   static getGameWithSessionId(sessionId) {
     return Game.findOne({
-      $or: [{ quizmaster: sessionId }, { teams: { $elemMatch: { sessionId: sessionId } } }]
+      $or: [{ quizmaster: sessionId }, { teams: { $elemMatch: { sessionId: sessionId } } }, {scoreboards: sessionId}]
     });
   }
 
@@ -84,6 +84,7 @@ export default class GameDAO {
   }
 
   static alterGameState(roomKey, quizmasterSessionId, newState) {
+    console.log("sess", quizmasterSessionId)
     return Game.updateOne({ roomKey: roomKey, quizmaster: quizmasterSessionId }, { gameState: newState }).then(doc => {
       console.log(doc);
       if (doc.n < 1) {
@@ -156,7 +157,7 @@ export default class GameDAO {
   }
   static submitAnswer(roomKey, sessionId, questionId, answer) {
     return Game.updateOne(
-      { roomKey: roomKey, teams: { $elemMatch: { "answers.questionId": { $ne: questionId }, sessionId: sessionId } } },
+      { roomKey: roomKey, teams: { $elemMatch: { "answers.questionId": { $ne: questionId }, sessionId: sessionId } }, gameState: {$ne: gameStates.SUBMIT_CLOSED} },
       {
         $push: {
           "teams.$.answers": {

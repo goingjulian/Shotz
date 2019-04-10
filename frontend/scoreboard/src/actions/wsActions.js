@@ -1,6 +1,7 @@
 import environment from "../environments/environment";
 import { store } from '../index';
-import { shotzTime, nextQuestionAction, endRoundScore } from "./gameActions";
+import { shotzTime, nextQuestionAction, endRoundScore, getTeams, endGameAction, selectingCategoriesAction, revealAnswerAction } from "./gameActions";
+import { viewGameScreenAction } from './viewActions';
 
 let reconnects = 0;
 
@@ -39,28 +40,28 @@ function handleMessage(message) {
     console.log("---------");
     return dispatch => {
         switch (message.type) {
-            case "scoreB_accepted":
-                // dispatch(viewMessageScreenAction(messageTypes.MSG_ACCEPTED));
-                // dispatch(teamAcceptedAction());
-                break;
-            case "scoreB_rejected":
-                dispatch(shotzTime());
-                // dispatch(viewMessageScreenAction(messageTypes.MSG_KICKED));
-                // dispatch(teamRejectedAction());
+            case "scoreB_team_accepted":
+            case "scoreB_team_rejected":
+                dispatch(getTeams(store.getState().game.roomKey));
                 break;
             case "scoreB_selectingCategories":
-                // dispatch(viewMessageScreenAction(messageTypes.MSG_SELECTINGCATEGORIES));
+                dispatch(selectingCategoriesAction());
+                dispatch(viewGameScreenAction());
                 break;
             case "scoreB_endRound":
                 dispatch(endRoundScore(store.getState().game.roomKey));
-                // dispatch(endRoundScore(store.getState().game.roomKey));
                 break;
             case "scoreB_quizmasterLeft":
-                // dispatch(viewMessageScreenAction(messageTypes.MSG_QUIZMASTERLEFT));
-                // dispatch(leaveRoomAction(store.getState().game.roomKey));
                 break;
             case "scoreB_nextQuestion":
-                dispatch(nextQuestionAction(message.currentQuestionIndex, message.currentQuestion, message.currentAnswer));
+                dispatch(nextQuestionAction(message.currentQuestionIndex, message.currentQuestion));
+                dispatch(viewGameScreenAction());
+                break;
+            case "scoreB_quizmasterLeft":
+                dispatch(endGameAction(message.teams));
+                break;
+            case "scoreB_revealAnswer":
+                dispatch(revealAnswerAction());
                 break;
             default:
                 console.log("Unknown message: ", message);

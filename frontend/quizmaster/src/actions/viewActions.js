@@ -60,23 +60,24 @@ export function setCategorySelectState(roomKey) {
 }
 
 export function setViewByGameState(gameState) {
-  return dispatch => {
-    switch (gameState) {
-      case 'REGISTER':
-        dispatch(viewLobbyAction());
-        break;
-      case 'CATEGORY_SELECT':
-        dispatch(viewCategorySelectionScreenAction());
-        break;
-      case 'IN_ROUND':
-        dispatch(viewControlPanelScreenAction());
-        break;
-      case 'END_ROUND':
-        dispatch(viewEndRoundScreenAction());
-        break;
-      default:
-        dispatch(viewLoginScreenAction());
-        break;
-    }
-  };
+    return dispatch => {
+        switch (gameState) {
+            case "REGISTER":
+                dispatch(lobbyViewAction());
+                break;
+            case "CATEGORY_SELECT":
+                dispatch(viewCategorySelectionScreen());
+                break;
+            case "IN_ROUND":
+            case "SUBMIT_CLOSED":
+                dispatch(controlPanelViewAction());
+                break;
+            case "END_ROUND":
+                dispatch(viewEndRoundScreenAction());
+                break;
+            default:
+                dispatch(loginViewAction());
+                break;
+        }
+    };
 }
