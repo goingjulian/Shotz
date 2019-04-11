@@ -51,6 +51,7 @@ export default function gameReducer(state = initialState, action) {
       currentRoundCopy++;
       return { ...state, currentRound: currentRoundCopy };
     case gameActionTypes.scoreB_revealAnswer:
+      if(state.currentQuestion === null) return state;
       return { ...state, revealAnswer: true };
     default:
       return state;
