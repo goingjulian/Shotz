@@ -118,9 +118,11 @@ roomRouter.route('/restore/:role').get((req, res, next) => {
 roomRouter.route('/:roomKey/teams').get((req, res, next) => {
   const { roomKey, role, id } = req.session;
   const roomKeyParam = req.params.roomKey;
+  const acceptedFilter = req.query.accepted;
+
 
   checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER, roles.ROLE_SCOREBOARD])
-    .then(() => RoomService.getTeams(roomKey))
+    .then(() => RoomService.getTeams(roomKey, acceptedFilter))
     .then(teams => {
       res.status(200).json(teams);
     })

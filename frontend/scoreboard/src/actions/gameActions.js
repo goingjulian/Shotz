@@ -27,14 +27,6 @@ export function nextQuestionAction(currentQuestionIndex, currentQuestion) {
   };
 }
 
-export function shotzTime() {
-  return async dispatch => {
-    const options = {
-      method: 'GET'
-    };
-  };
-}
-
 export function setRoomAction(roomKey, gameState, currentRound, currentQuestionIndex, teams) {
   return {
     type: gameActionTypes.scoreB_setRoom,
@@ -95,9 +87,6 @@ export function joinRoom(roomKey) {
       const response = await fetch(`${environment.API_URL}/room/scoreboard/${roomKey}`, options);
 
       const body = await response.json();
-      console.log('JOIN ROOM');
-      console.log(body);
-      console.log('----------');
       if (!response.ok) throw new Error(body.error);
 
       dispatch(
@@ -156,9 +145,6 @@ export function endRoundScore(roomKey) {
       const response = await fetch(`${environment.API_URL}/room/${roomKey}/teams/scores`, method);
 
       const body = await response.json();
-      console.log('GET SCORE END ROUND');
-      console.log(body);
-      console.log('----------');
       if (!response.ok) {
         throw new Error(body.error);
       } else {
@@ -173,19 +159,21 @@ export function endRoundScore(roomKey) {
 }
 
 export function getTeams(roomKey) {
+  console.log('getting teams');
   return async dispatch => {
     const options = {
       method: 'GET',
       credentials: 'include'
     };
 
-    const response = await fetch(`${environment.API_URL}/room/${roomKey}/teams`, options);
+    const response = await fetch(
+      `${environment.API_URL}/room/${roomKey}/teams?accepted=true`,
+      options
+    );
 
     if (!response.ok) throw new Error('Error while fetching teams');
 
     const body = await response.json();
-
-    console.log(body);
 
     dispatch(setTeamsAction(body));
   };
@@ -215,14 +203,15 @@ export function leaveRoom(roomKey) {
       method: 'DELETE',
       credentials: 'include'
     };
-    fetch(`${environment.API_URL}/room/${roomKey}/leave`, method)
+    fetch(`${environment.API_URL}/room/${roomKey}`, method)
       .then(async response => {
         const body = await response.json();
-        console.log('LEAVING ROOM');
-        console.log(body);
-        console.log('----------');
-        dispatch(viewLoginScreenAction());
-        dispatch(leaveRoomAction());
+        if (response.ok) {
+          dispatch(viewLoginScreenAction());
+          dispatch(leaveRoomAction());
+        } else {
+          throw new Error(body.error);
+        }
       })
       .catch(err => {
         console.log(err.message);

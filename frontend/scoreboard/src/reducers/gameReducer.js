@@ -37,7 +37,13 @@ export default function gameReducer(state = initialState, action) {
     case gameActionTypes.scoreB_setTeams:
       return { ...state, teams: action.teams };
     case gameActionTypes.scoreB_endGame:
-      return { ...state, teams: action.teams, gameState: gameStates.END_GAME, revealAnswer: false };
+      return {
+        ...state,
+        teams: [...action.scores],
+        gameState: gameStates.END_GAME,
+        revealAnswer: false,
+        roomKey: null
+      };
     case gameActionTypes.scoreB_selecting_categories:
       return { ...state, gameState: gameStates.CATEGORY_SELECT };
     case gameActionTypes.scoreB_incCurRound:

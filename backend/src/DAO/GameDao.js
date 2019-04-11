@@ -37,7 +37,7 @@ export default class GameDAO {
     return quizmaster.quizmaster;
   }
 
-  static getTeams(roomKey) {
+  static getTeams(roomKey) { 
     return Game.findOne({ roomKey: roomKey }, { _id: 0, 'teams._id': 0 });
   }
 
@@ -60,12 +60,23 @@ export default class GameDAO {
     );
   }
 
+  static removeScoreboard(roomKey, sessionId) {
+    return Game.updateOne(
+      {
+        roomKey: roomKey
+      },
+      {
+        $pull: {
+          scoreboards: { sessionId }
+        }
+      }
+    );
+  }
+
   static removeTeam(roomKey, teamSessionId) {
     return Game.updateOne(
       {
-        roomKey: roomKey,
-        'teams.sessionId': teamSessionId,
-        $or: [{ gameState: gameStates.REGISTER }, { gameState: gameStates.IN_ROUND }]
+        roomKey: roomKey
       },
       {
         $pull: {

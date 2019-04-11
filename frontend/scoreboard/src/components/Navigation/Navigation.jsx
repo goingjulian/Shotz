@@ -3,34 +3,42 @@ import * as reactRedux from 'react-redux';
 import gameStates from '../../definitions/gameStates';
 
 import './Navigation.scss';
+import { leaveRoom } from '../../actions/gameActions';
+import { viewLoginScreenAction } from '../../actions/viewActions';
 
-function Navigation(props) {
-  return (
-    <nav>
-      <div className='navInner'>
-        <div className='navLeft'>
-          <button>Leave</button>
-        </div>
+class Navigation extends React.Component {
+  leaveRoom(roomKey) {
+    !roomKey ? this.props.viewLoginScreenAction() : this.props.leaveRoom(roomKey);
+  }
 
-        {props.gameState === gameStates.REGISTER ? (
-          <div className='navMiddle'>
-            <h2>RoomKey: {props.roomKey}</h2>
+  render() {
+    return (
+      <nav>
+        <div className='navInner'>
+          <div className='navLeft'>
+            <button onClick={() => this.leaveRoom(this.props.roomKey)}>Leave</button>
           </div>
-        ) : (
-          <div className='navMiddle'>
-            <h2>Question {props.currentQuestionIndex + 1}</h2>
-            <h2>Round {props.currentRound}</h2>
-          </div>
-        )}
 
-        <div className='navRight'>
-          <span>
-            {props.teams.length} {props.teams.length === 1 ? 'team' : 'teams'} connected
-          </span>
+          {this.props.gameState === gameStates.REGISTER ? (
+            <div className='navMiddle'>
+              <h2>RoomKey: {this.props.roomKey}</h2>
+            </div>
+          ) : (
+            <div className='navMiddle'>
+              <h2>Question {this.props.currentQuestionIndex + 1}</h2>
+              <h2>Round {this.props.currentRound}</h2>
+            </div>
+          )}
+
+          <div className='navRight'>
+            <span>
+              {this.props.teams.length} {this.props.teams.length === 1 ? 'team' : 'teams'} connected
+            </span>
+          </div>
         </div>
-      </div>
-    </nav>
-  );
+      </nav>
+    );
+  }
 }
 
 function mapStateToProps(state) {
@@ -43,4 +51,11 @@ function mapStateToProps(state) {
   };
 }
 
-export default reactRedux.connect(mapStateToProps)(Navigation);
+function mapDispatchToProps(dispatch) {
+  return {
+    leaveRoom: roomKey => dispatch(leaveRoom(roomKey)),
+    viewLoginScreenAction: () => dispatch(viewLoginScreenAction())
+  };
+}
+
+export default reactRedux.connect(mapStateToProps, mapDispatchToProps)(Navigation);

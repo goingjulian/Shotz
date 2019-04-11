@@ -8,17 +8,17 @@ import {
   selectingCategoriesAction,
   revealAnswerAction
 } from './gameActions';
-import { viewGameScreenAction } from './viewActions';
+import { viewGameScreenAction, viewScoreScreenAction } from './viewActions';
 
 let reconnects = 0;
 
 export function initSocket() {
-  console.log('Connecting to socket');
+  console.log('WS: Connecting to websocket');
   return async dispatch => {
     const socket = await new WebSocket(`${environment.WS_URL}/ws`);
 
     socket.onopen = () => {
-      console.log('Websocket connected');
+      console.log('WS: Websocket connected');
       reconnects = 0;
     };
 
@@ -29,26 +29,25 @@ export function initSocket() {
 
     socket.onclose = () => {
       if (reconnects < 3 && store.getState().views.wsAllowed) {
-        console.log('Trying to reconnect');
+        console.log('WS: Trying to reconnect websocket');
         reconnects++;
         setTimeout(() => {
           dispatch(initSocket());
         }, 5000);
       } else {
-        console.log('Websocket connection could not be restored');
+        console.log('WS: Websocket connection could not be restored');
       }
     };
   };
 }
 
 function handleMessage(message) {
-  console.log('WEBSOCKET MESSAGE:');
   console.log(message);
-  console.log('---------');
   return dispatch => {
     switch (message.type) {
       case 'scoreB_team_accepted':
       case 'scoreB_team_rejected':
+      case 'scoreB_teamLeft':
         dispatch(getTeams(store.getState().game.roomKey));
         break;
       case 'scoreB_selectingCategories':
@@ -63,13 +62,15 @@ function handleMessage(message) {
         dispatch(viewGameScreenAction());
         break;
       case 'scoreB_quizmasterLeft':
-        dispatch(endGameAction(message.teams));
+        dispatch(viewScoreScreenAction());
+        dispatch(endGameAction(message.scores.teams));
         break;
       case 'scoreB_revealAnswer':
         dispatch(revealAnswerAction());
         break;
       default:
         console.log('Unknown message: ', message);
+        break;
     }
   };
 }

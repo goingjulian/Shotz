@@ -96,6 +96,8 @@ export default class RoomService {
         await this._quizmasterLeaveRoom(game, roomKey, sessionId);
       } else if (game.teams.find(team => team.sessionId === sessionId)) {
         await this._teamLeaveRoom(game, roomKey, sessionId);
+      } else if (game.scoreboards.find(scoreboard => scoreboard === sessionId)) {
+        await this._scoreboardLeaveRoom(game, roomKey, sessionId);
       }
       return;
     } catch (err) {
@@ -144,6 +146,7 @@ export default class RoomService {
         game.scoreboards.some(scoreboard => scoreboard === sessionId) &&
         role === roles.ROLE_SCOREBOARD
       ) {
+        const teams = game.teams.filter(team => team.accepted == true);
         return {
           type: 'scoreB_restoreSession',
           roomKey: roomKey,
@@ -151,7 +154,7 @@ export default class RoomService {
           currentRound: game.rounds.length,
           currentQuestionIndex:
             game.rounds.length > 0 ? game.rounds[game.rounds.length - 1].activeQuestionIndex : 0,
-          teams: game.teams
+          teams: teams
         };
       } else {
         throw new ShotzException('No active sessions found for your role!', 404);
@@ -165,10 +168,13 @@ export default class RoomService {
   /**
    * Get array of teams from a room
    */
-  static async getTeams(roomKey) {
+  static async getTeams(roomKey, acceptedFilter) {
     try {
       const teams = await GameDAO.getTeams(roomKey).lean();
-      return teams.teams;
+      return acceptedFilter
+        ? teams.teams.filter(team => team.accepted == true)
+        : teams.teams;
+
     } catch (err) {
       if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
       else throw err;
@@ -305,6 +311,16 @@ export default class RoomService {
 
     // Remove team
     await GameDAO.removeTeam(roomKey, sessionId);
+    closeConnection(sessionId);
+    SessionDAO.removeSession(sessionId);
+  }
+
+  /**
+   * PRIVATE - Handles all connections when a scoreboard leaves
+   */
+  static async _scoreboardLeaveRoom(game, roomKey, sessionId) {
+    // Remove team
+    await GameDAO.removeScoreboard(roomKey, sessionId);
     closeConnection(sessionId);
     SessionDAO.removeSession(sessionId);
   }

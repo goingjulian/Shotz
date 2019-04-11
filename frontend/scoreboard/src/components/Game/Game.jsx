@@ -20,7 +20,7 @@ function Game(props) {
 
         <div className='teams'>
           {props.teams.map(team => {
-            return <Item key={team._id} text={`${team.teamName}`} itemClass={`team`} />;
+            return <Item key={team.teamName} text={`${team.teamName}`} itemClass={`team`} />;
           })}
         </div>
       </main>
