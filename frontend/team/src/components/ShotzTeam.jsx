@@ -1,5 +1,5 @@
-import React from "react";
-import * as ReactRedux from "react-redux";
+import React from 'react';
+import * as ReactRedux from 'react-redux';
 
 function ShotzTeam(props) {
   return <props.activeView />;

@@ -87,10 +87,19 @@ export default class QuestionService {
           correct
         );
         const responseType = correct ? 'team_answerCorrect' : 'team_answerIncorrect';
+
+        sendMessageScoreBoards(roomKey, {
+          type: 'scoreB_answerQuestion',
+          correct: correct,
+          teamId: teamSessionId,
+          questionId: questionId
+        });
+
         sendMessageTeam(roomKey, teamSessionId, {
           type: responseType,
           questionId: questionId
         });
+
         return teams;
       }
     } catch (err) {

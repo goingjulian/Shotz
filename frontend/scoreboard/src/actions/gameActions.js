@@ -16,7 +16,8 @@ export const gameActionTypes = {
   scoreB_endGame: 'scoreB_endGame',
   scoreB_selecting_categories: 'scoreB_selecting_categories',
   scoreB_incCurRound: 'scoreB_incCurRound',
-  scoreB_revealAnswer: 'scoreB_revealAnswer'
+  scoreB_revealAnswer: 'scoreB_revealAnswer',
+  scoreB_setQuestionStatus: 'scoreB_setQuestionStatus'
 };
 
 export function nextQuestionAction(currentQuestionIndex, currentQuestion) {
@@ -35,6 +36,15 @@ export function setRoomAction(roomKey, gameState, currentRound, currentQuestionI
     currentRound: currentRound,
     currentQuestionIndex: currentQuestionIndex,
     teams: teams
+  };
+}
+
+export function setQuestionStatus(teamId, questionId, correct) {
+  return {
+    type: gameActionTypes.scoreB_setQuestionStatus,
+    teamId: teamId,
+    questionId: questionId,
+    correct: correct
   };
 }
 
@@ -159,7 +169,6 @@ export function endRoundScore(roomKey) {
 }
 
 export function getTeams(roomKey) {
-  console.log('getting teams');
   return async dispatch => {
     const options = {
       method: 'GET',

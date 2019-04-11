@@ -1,10 +1,10 @@
 import React from "react";
 import * as ReactRedux from "react-redux";
 
-import { removeErrorAction } from "../../actions/roomActions";
+import { removeErrorAction } from "../../actions/gameActions";
 import "./Error.scss";
 
-class Errorlist extends React.Component {
+class Error extends React.Component {
   getError() {
     if (this.props.error !== "") {
       return (
@@ -29,7 +29,7 @@ class Errorlist extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    error: state.room.error
+    error: state.game.error
   };
 }
 
@@ -39,4 +39,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default ReactRedux.connect(mapStateToProps, mapDispatchToProps)(Errorlist);
+export default ReactRedux.connect(mapStateToProps, mapDispatchToProps)(Error);

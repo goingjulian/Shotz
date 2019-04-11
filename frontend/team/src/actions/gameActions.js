@@ -126,7 +126,6 @@ export function joinRoom(roomKey, teamName) {
           dispatch(joinRoomAction(body.roomKey, body.teamName));
           dispatch(viewMessageScreenAction(messageTypes.MSG_APPROVAL));
           dispatch(initSocket());
-          throw new Error(body.error);
         } else {
           throw new Error(body.error);
         }
@@ -146,9 +145,6 @@ export function restoreSession() {
     fetch(`${environment.API_URL}/room/restore/ROLE_TEAM`, method)
       .then(async response => {
         const body = await response.json();
-        console.log('RESTORE');
-        console.log(body);
-        console.log('----------');
         if (!response.ok) {
           throw new Error(body.error);
         } else {

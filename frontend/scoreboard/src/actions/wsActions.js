@@ -6,7 +6,8 @@ import {
   getTeams,
   endGameAction,
   selectingCategoriesAction,
-  revealAnswerAction
+  revealAnswerAction,
+  setQuestionStatus
 } from './gameActions';
 import { viewGameScreenAction, viewScoreScreenAction } from './viewActions';
 
@@ -42,7 +43,6 @@ export function initSocket() {
 }
 
 function handleMessage(message) {
-  console.log(message);
   return dispatch => {
     switch (message.type) {
       case 'scoreB_team_accepted':
@@ -60,6 +60,9 @@ function handleMessage(message) {
       case 'scoreB_nextQuestion':
         dispatch(nextQuestionAction(message.currentQuestionIndex, message.currentQuestion));
         dispatch(viewGameScreenAction());
+        break;
+      case 'scoreB_answerQuestion':
+        dispatch(setQuestionStatus(message.teamId, message.questionId, message.correct));
         break;
       case 'scoreB_quizmasterLeft':
         dispatch(viewScoreScreenAction());
