@@ -73,7 +73,7 @@ questionRouter.route("/reveal").put((req, res, next) => {
   checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER])
     .then(() => QuestionService.revealAnswer(roomKey, id))
     .then(() => {
-      res.status(200).send();
+      res.status(200).json({});
     })
     .catch(err => next(err));
 })

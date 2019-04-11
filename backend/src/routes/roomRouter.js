@@ -190,7 +190,7 @@ roomRouter.route('/:roomKey/team/:teamId/status').put((req, res, next) => {
 roomRouter.route('/categories').get((req, res, next) => {
   QuestionService.getAllCategories()
     .then(categories => {
-      res.json(categories);
+      res.status(200).json(categories);
     })
     .catch(err => next(err));
 });

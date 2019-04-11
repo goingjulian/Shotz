@@ -15,8 +15,14 @@
     display: flex;
     margin-left: auto;
   }
-  div > span {
-    margin: auto 0;
+  div {
+    cursor: pointer;
+    span {
+      margin: auto 0;
+    }
+    &:hover span {
+      color: $theme;
+    }
   }
 }
 

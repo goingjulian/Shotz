@@ -32,7 +32,6 @@ export function restoreActiveScreenFromGameState(gameState, teamAccepted) {
                 dispatch(viewQuestionScreenAction());
                 break;
             case "END_ROUND":
-                // TODO add message from state restore
                 dispatch(viewMessageScreenAction("END ROUND!"));
                 break;
             case "SUBMIT_CLOSED":

@@ -1,8 +1,8 @@
-import { roomActionTypes } from "../actions/roomActions";
+import { roomActionTypes } from '../actions/roomActions';
 
 const initialRoomState = {
   roomKey: null,
-  error: ""
+  error: ''
 };
 
 export default function roomReducer(state = initialRoomState, action) {
@@ -14,7 +14,7 @@ export default function roomReducer(state = initialRoomState, action) {
     case roomActionTypes.ADD_ERROR:
       return { ...state, error: action.error };
     case roomActionTypes.REMOVE_ERROR:
-      return { ...state, error: "" };
+      return { ...state, error: '' };
     default:
       return state;
   }
