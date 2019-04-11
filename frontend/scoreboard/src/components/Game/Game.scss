@@ -1,75 +1,64 @@
-@import "../../assets/scss/variables";
+@import '../../assets/scss/variables';
 
 .Game {
-    .message {
-        padding-top: 10px;
-        padding-bottom: 10px;
-        display: flex;
-        flex-flow: column nowrap;
-        justify-content: center;
-        align-items: center;
+  .question {
+    padding-bottom: 40px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
 
-        text-align: center;
+    text-align: center;
 
-        .mainMsg {
-            font-size: 6vw;
-            padding-top: 10px;
-            padding-bottom: 10px;
+    border-bottom: 2px solid $border-grey;
 
-            display: flex;
-            flex-flow: row nowrap;
-            align-items: center;
-
-            img {
-                width: 8vw;
-                height: auto;
-            }
-        }
-
-        .subMsg {
-            font-size: 5vw;
-            padding-top: 10px;
-            padding-bottom: 10px;
-        }
-    }
-
-    .divider {
-        border-top: 1px solid grey;
-        width: 100vw;
-        padding-bottom: 10px;
-    }
-
-      .teams {
-          display: flex;
-          flex-flow: row wrap;
-          justify-content: center;
-          align-items: center;
-
-          .team {
-            max-width: 350px;
-            max-height: 200px;
-            margin: 0 20px 20px 0;
-            border: 1px solid $border-grey;
-            font-size: 25px;
-    
-            &.correct {
-              background-color: lighten($green, 40%);
-            }
-    
-            &.incorrect {
-              background-color: lighten($red, 40%);
-            }
-    
-            &.correct &.incorrect {
-              
-              border: 1px solid darken($border-grey, 10%);
-              button[class^='itemButton'] {
-                  border: 1px solid darken($border-grey, 10%);
-              }
-              .AnswerItem__correct {
-                  display: none;
-              }
-            }
-          }
+    h1 {
+      font-size: 3em;
+      font-weight: 500;
+      img {
+        width: 8vw;
+        height: auto;
       }
+    }
+    h2 {
+      padding-bottom: 20px;
+      font-size: 1.6em;
+      font-style: italic;
+    }
+
+  }
+
+  .teams {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+
+    padding-top: 40px;
+
+    .team {
+      max-width: 350px;
+      max-height: 200px;
+      margin: 0 20px 20px 0;
+      border: 1px solid $border-grey;
+      font-size: 25px;
+
+      &.correct {
+        background-color: lighten($green, 40%);
+      }
+
+      &.incorrect {
+        background-color: lighten($red, 40%);
+      }
+
+      &.correct &.incorrect {
+        border: 1px solid darken($border-grey, 10%);
+        button[class^='itemButton'] {
+          border: 1px solid darken($border-grey, 10%);
+        }
+        .AnswerItem__correct {
+          display: none;
+        }
+      }
+    }
+  }
 }
