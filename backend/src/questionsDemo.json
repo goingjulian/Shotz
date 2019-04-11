@@ -1,0 +1,87 @@
+[
+    {
+        "question": "Hoe heet de band waar Fritz in zit/zat?",
+        "answer": "Cheeses of Mexico",
+        "category": "Muziek"
+    },
+    {
+        "question": "Wat bakt Fritz graag?",
+        "answer": "Brood",
+        "category": "Eten en drinken"
+    },
+    {
+        "question": "Hoeveel jaar werkt Sander bij de HAN als docent?",
+        "answer": "20 jaar",
+        "category": "Algemene kennis"
+    },
+    {
+        "question": "Waar heeft Sander zijn ICT-opleiding genoten?",
+        "answer": "De HAN",
+        "category": "Educatie"
+    },
+    {
+        "question": "Hoeveel kinderen heeft Meron?",
+        "answer": "2",
+        "category": "Algemene kennis"
+    },
+    {
+        "question": "Welk instrument speelt Meron?",
+        "answer": "Gitaar",
+        "category": "Muziek"
+    },
+    {
+        "question": "Hoeveel jaar werkt Meron bij de HAN?",
+        "answer": "2 jaar",
+        "category": "Algemene kennis"
+    },
+    {
+        "question": "Van welk profiel komt Meron oorspronkelijk vandaan?",
+        "answer": "SD profiel",
+        "category": "Educatie"
+    },
+    {
+        "question": "Meron werkt aan een vervanger van de OOPG, hoe heet deze?",
+        "answer": "Yeager",
+        "category": "Games"
+    },
+    {
+        "question": "Welke minor geeft Lars?",
+        "answer": "De game-minor",
+        "category": "Games"
+    },
+    {
+        "question": "Op welke universiteit heeft Lars gestudeerd?",
+        "answer": "Rijksuniversiteit Groningen",
+        "category": "Educatie"
+    },
+    {
+        "question": "Hoeveel views heeft het YouTube kanaal van Lars ongeveer, 30, 300, 3000 of 30.000?",
+        "answer": "3000",
+        "category": "Internet"
+    },
+    {
+        "question": "Voor welke retro console programmeert Fritz wel eens?",
+        "answer": "De NES",
+        "category": "Games"
+    },
+    {
+        "question": "Hoeveel openbare GitHub repo's heeft Fritz ongeveer, 15, 150 of 300?",
+        "answer": "150",
+        "category": "Internet"
+    },
+    {
+        "question": "Moet je als HBO-docent al je vakantiedagen in de schoolvakanties opnemen?",
+        "answer": "Nee, maximaal 4 dagen kan de werkgever verplicht stellen",
+        "category": "Werk en inkomen"
+    },
+    {
+        "question": "In welke schaal valt een docent niveau 1 bij aanstelling op de ICA?",
+        "answer": "Schaal 11",
+        "category": "Werk en inkomen"
+    },
+    {
+        "question": "Hoeveel omzet draait de HAN in een jaar omgeveer, 30 miljoen, 50 miljoen, 100 miljoen of 300 miljoen?",
+        "answer": "300 miljoen",
+        "category": "Werk en inkomen"
+    }
+]

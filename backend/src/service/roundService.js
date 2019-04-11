@@ -100,7 +100,7 @@ export default class RoundService {
     for (let i = 0; i < questionAmount; i++) {
       const randomNumber = Math.floor(Math.random() * questions.length);
       const questionAlreadyPicked = chosenQuestions.find(
-        question => question._id === questions[randomNumber]._id
+        question => question.question === questions[randomNumber].question
       );
 
       if (!questionAlreadyPicked) {

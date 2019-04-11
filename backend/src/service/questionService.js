@@ -134,6 +134,7 @@ export default class QuestionService {
         throw new ShotzException('Last question reached', 400);
 
       await GameDAO.goTonextQuestionInRound(roomKey, currentRound._id);
+      await GameDAO.alterGameState(roomKey, gameStates.IN_ROUND);
       sendMessageTeams(roomKey, {
         type: 'team_nextQuestion'
       });

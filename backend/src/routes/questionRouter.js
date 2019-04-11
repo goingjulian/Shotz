@@ -105,7 +105,7 @@ questionRouter.route("/:questionId").delete((req, res, next) => {
   const questionId = req.params.questionId;
 
   checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER])
-    .then(() => QuestionService.deleteQuestionFromCurrentRound(roomKey, id, questionId))
+    .then(() => QuestionService.deleteQuestionFromCurrentRound(roomKey, questionId))
     .then(response => {
       res.status(200).json(response);
     })

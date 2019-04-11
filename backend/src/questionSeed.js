@@ -2,7 +2,7 @@ import fs from 'fs';
 import Question from './models/question';
 
 export default async function addQuestionsToDB() {
-    const path = './src/questionsEN.json';
+    const path = './src/questionsDemo.json';
 
     try {
         await Question.deleteMany();
