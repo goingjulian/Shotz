@@ -90,7 +90,6 @@ class QuestionInfo extends React.Component {
 }
 
 function mapStateToProps(state) {
-  console.log(state);
   return {
     roomKey: state.room.roomKey,
     rounds: state.rounds.rounds,

@@ -1,5 +1,6 @@
 import express from "express";
-import GameService from "../service/gameService";
+
+import QuestionService from '../service/questionService';
 
 import { checkAuthentication } from "./../service/authService";
 import roles from "../definitions/roles";
@@ -15,7 +16,7 @@ questionRouter.route("/").get((req, res, next) => {
   const roomKeyParam = req.params.roomKey;
 
   checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER, roles.ROLE_TEAM, roles.ROLE_SCOREBOARD])
-    .then(() => GameService.getCurrentQuestion(roomKey))
+    .then(() => QuestionService.getCurrentQuestion(roomKey))
     .then(response => {
       res.status(200).json(response);
     })
@@ -34,7 +35,7 @@ questionRouter.route("/:questionId/answer").post((req, res, next) => {
   const answer = req.body.answer;
 
   checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_TEAM])
-    .then(() => GameService.submitAnswer(roomKey, id, questionId, answer))
+    .then(() => QuestionService.submitAnswer(roomKey, id, questionId, answer))
     .then(response => {
       res.status(201).json(response);
     })
@@ -54,7 +55,7 @@ questionRouter.route("/:questionId/answer/:teamId").put((req, res, next) => {
   const correct = req.body.correct;
 
   checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER])
-    .then(() => GameService.setCorrectStatusStatusAnswer(roomKey, id, teamId, questionId, correct))
+    .then(() => QuestionService.setCorrectStatusStatusAnswer(roomKey, teamId, questionId, correct))
     .then(response => {
       res.status(200).json(response);
     })
@@ -70,7 +71,7 @@ questionRouter.route("/reveal").put((req, res, next) => {
   const roomKeyParam = req.params.roomKey;
 
   checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER])
-    .then(() => GameService.revealAnswer(roomKey, id))
+    .then(() => QuestionService.revealAnswer(roomKey, id))
     .then(() => {
       res.status(200).send();
     })
@@ -86,7 +87,7 @@ questionRouter.route("/next").put((req, res, next) => {
   const roomKeyParam = req.params.roomKey;
 
   checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER])
-    .then(() => GameService.goTonextQuestionInRound(roomKey, id))
+    .then(() => QuestionService.goTonextQuestionInRound(roomKey))
     .then(response => {
       res.status(200).json(response);
     })
@@ -98,14 +99,13 @@ questionRouter.route("/next").put((req, res, next) => {
  * ALLOWED: Quizmaster
  */
 questionRouter.route("/:questionId").delete((req, res, next) => {
-  console.log("TEST")
   const { roomKey, role, id } = req.session;
   const roomKeyParam = req.params.roomKey;
 
   const questionId = req.params.questionId;
 
   checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER])
-    .then(() => GameService.deleteQuestionFromCurrentRound(roomKey, id, questionId))
+    .then(() => QuestionService.deleteQuestionFromCurrentRound(roomKey, id, questionId))
     .then(response => {
       res.status(200).json(response);
     })

@@ -1,11 +1,9 @@
 import express from 'express';
 import roundRouter from './roundRouter';
-import GameService from '../service/gameService';
 import QuestionService from './../service/questionService';
 
 import RoomService from './../service/roomService';
 
-import gameStates from '../definitions/gameStates';
 import roles from '../definitions/roles';
 
 import {
@@ -139,7 +137,7 @@ roomRouter.route('/:roomKey/teams').delete((req, res, next) => {
   const roomKeyParam = req.params.roomKey;
 
   checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER])
-    .then(() => GameService.removeUnacceptedTeams(roomKey, id))
+    .then(() => RoomService.removeUnacceptedTeams(roomKey))
     .then(teams => {
       res.status(200).json(teams);
     })
@@ -151,7 +149,6 @@ roomRouter.route('/:roomKey/teams').delete((req, res, next) => {
  * ALLOWED: Team, Quizmaster, Scoreboard
  */
 roomRouter.route('/:roomKey/teams/scores').get((req, res, next) => {
-  console.log(req.session);
   const { roomKey, role, id } = req.session;
   const roomKeyParam = req.params.roomKey;
 
@@ -160,14 +157,11 @@ roomRouter.route('/:roomKey/teams/scores').get((req, res, next) => {
     roles.ROLE_TEAM,
     roles.ROLE_SCOREBOARD
   ])
-    .then(() => GameService.getScores(roomKey))
+    .then(() => RoomService.getScores(roomKey))
     .then(scores => {
       res.status(200).json(scores.teams);
     })
-    .catch(err => {
-      console.log(err);
-      next(err);
-    });
+    .catch(err => next(err));
 });
 
 /**
@@ -182,7 +176,7 @@ roomRouter.route('/:roomKey/team/:teamId/status').put((req, res, next) => {
   const teamStatus = req.body.accepted;
 
   checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER])
-    .then(() => GameService.alterTeamStatus(roomKey, teamId, teamStatus))
+    .then(() => RoomService.alterTeamStatus(roomKey, teamId, teamStatus))
     .then(team => {
       res.status(200).json(team);
     })

@@ -1,7 +1,7 @@
 import express from "express";
 import questionRouter from "./questionRouter";
-import GameService from "../service/gameService";
 
+import RoundService from './../service/roundService';
 import { checkAuthentication } from "./../service/authService";
 import roles from "../definitions/roles";
 
@@ -23,9 +23,9 @@ roundRouter.route("/start").post((req, res, next) => {
   const categories = req.body.categories;
 
   checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER])
-    .then(() => GameService.startNewRound(roomKey, id, categories))
-    .then(response => {
-      res.status(201).json(response);
+    .then(() => RoundService.startNewRound(roomKey, categories))
+    .then(round => {
+      res.status(201).json(round);
     })
     .catch(err => next(err));
 });
@@ -39,9 +39,9 @@ roundRouter.route("/select-category").put((req, res, next) => {
   const roomKeyParam = req.params.roomKey;
 
   checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER])
-    .then(() => GameService.selectCategory(roomKey, id))
+    .then(() => RoundService.setStateselectCategory(roomKey))
     .then(gameState => {
-      res.status(200).json({ gameState: gameState });
+      res.status(200).json(gameState);
     })
     .catch(err => next(err));
 });
@@ -55,9 +55,9 @@ roundRouter.route("/end").put((req, res, next) => {
   const roomKeyParam = req.params.roomKey;
 
   checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER])
-    .then(() => GameService.endRound(roomKey, id))
-    .then(response => {
-      res.status(200).json(response);
+    .then(() => RoundService.endRound(roomKey))
+    .then(scores => {
+      res.status(200).json(scores);
     })
     .catch(err => next(err));
 });

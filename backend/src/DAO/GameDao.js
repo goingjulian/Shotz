@@ -1,7 +1,6 @@
-import mongoose from "mongoose";
-import Game from "../models/Game";
-import gameStates from "../definitions/gameStates";
-import ShotzException from "../exceptions/ShotzException";
+import Game from '../models/Game';
+import gameStates from '../definitions/gameStates';
+import ShotzException from '../exceptions/ShotzException';
 
 export default class GameDAO {
   static addNewGame(roomKey, quizmasterId) {
@@ -13,7 +12,11 @@ export default class GameDAO {
 
   static getGameWithSessionId(sessionId) {
     return Game.findOne({
-      $or: [{ quizmaster: sessionId }, { teams: { $elemMatch: { sessionId: sessionId } } }, {scoreboards: sessionId}]
+      $or: [
+        { quizmaster: sessionId },
+        { teams: { $elemMatch: { sessionId: sessionId } } },
+        { scoreboards: sessionId }
+      ]
     });
   }
 
@@ -26,55 +29,55 @@ export default class GameDAO {
   }
 
   static getTeam(roomKey, teamSessionId) {
-    return Game.findOne({ roomKey: roomKey, "teams.sessionId": teamSessionId }, "teams.$");
+    return Game.findOne({ roomKey: roomKey, 'teams.sessionId': teamSessionId }, 'teams.$');
+  }
+
+  static async getQuizmaster(roomKey) {
+    const quizmaster = await Game.findOne({ roomKey: roomKey }, { quizmaster: 1, _id: 0 });
+    return quizmaster.quizmaster;
   }
 
   static getTeams(roomKey) {
-    return Game.findOne({ roomKey: roomKey }, { _id: 0, "teams._id": 0 });
+    return Game.findOne({ roomKey: roomKey }, { _id: 0, 'teams._id': 0 });
   }
 
   static getScoreBoards(roomKey) {
-    return Game.findOne({roomKey: roomKey}, {scoreboards: 1, _id: 0})
+    return Game.findOne({ roomKey: roomKey }, { scoreboards: 1, _id: 0 });
   }
 
   static getScores(roomKey) {
-    return Game.findOne({ roomKey: roomKey }, { teams: 1, "teams.score": 1, "teams.teamName": 1 });
+    return Game.findOne({ roomKey: roomKey }, { teams: 1, 'teams.score': 1, 'teams.teamName': 1 });
   }
 
   static setTeamAccepted(roomKey, teamSessionId) {
     return Game.updateOne(
-      { roomKey: roomKey, "teams.sessionId": teamSessionId, gameState: gameStates.REGISTER },
+      { roomKey: roomKey, 'teams.sessionId': teamSessionId, gameState: gameStates.REGISTER },
       {
         $set: {
-          "teams.$.accepted": true
+          'teams.$.accepted': true
         }
       }
-    ).then(doc => {
-      if (doc.n < 1) {
-        throw new Error(`Team not found`);
-      }
-    });
+    );
   }
 
   static removeTeam(roomKey, teamSessionId) {
     return Game.updateOne(
-      { roomKey: roomKey, "teams.sessionId": teamSessionId, $or: [{ gameState: gameStates.REGISTER }, { gameState: gameStates.IN_ROUND }] },
+      {
+        roomKey: roomKey,
+        'teams.sessionId': teamSessionId,
+        $or: [{ gameState: gameStates.REGISTER }, { gameState: gameStates.IN_ROUND }]
+      },
       {
         $pull: {
           teams: { sessionId: teamSessionId }
         }
       }
-    ).then(doc => {
-      console.log(doc);
-      if (doc.n < 1) {
-        throw new Error("Team not found or registration is closed");
-      }
-    });
+    );
   }
 
-  static removeUnacceptedTeams(roomKey, quizmasterSessionId) {
+  static removeUnacceptedTeams(roomKey, sessionId) {
     return Game.updateOne(
-      { roomKey: roomKey, quizmaster: quizmasterSessionId, gameState: gameStates.REGISTER },
+      { roomKey: roomKey },
       {
         $pull: {
           teams: { accepted: false }
@@ -83,14 +86,8 @@ export default class GameDAO {
     );
   }
 
-  static alterGameState(roomKey, quizmasterSessionId, newState) {
-    console.log("sess", quizmasterSessionId)
-    return Game.updateOne({ roomKey: roomKey, quizmaster: quizmasterSessionId }, { gameState: newState }).then(doc => {
-      console.log(doc);
-      if (doc.n < 1) {
-        throw new Error("Team not found or registration is closed");
-      }
-    });
+  static alterGameState(roomKey, newState) {
+    return Game.updateOne({ roomKey: roomKey }, { gameState: newState });
   }
 
   static joinGameAsTeam(roomKey, teamName, sessionId) {
@@ -110,18 +107,18 @@ export default class GameDAO {
 
   static joinGameAsScoreBoard(roomKey, sessionId) {
     return Game.updateOne(
-      {roomKey: roomKey},
+      { roomKey: roomKey },
       {
         $push: {
           scoreboards: sessionId
         }
       }
-    )
+    );
   }
 
-  static addRound(roomKey, sessionId, randomQuestions, categories) {
+  static addRound(roomKey, randomQuestions, categories) {
     return Game.updateOne(
-      { roomKey: roomKey, quizmaster: sessionId },
+      { roomKey: roomKey },
       {
         $push: {
           rounds: {
@@ -130,57 +127,65 @@ export default class GameDAO {
           }
         }
       }
-    ).then(doc => {
-      if (doc.n < 1) {
-        throw new ShotzException("User is not the quizmaster of this room or no room found", 400);
-      }
-    });
+    );
   }
 
   static getRounds(roomKey, sessionId) {
-    return Game.findOne({ roomKey: roomKey, quizmaster: sessionId }, { rounds: 1, _id: 0 });
+    return Game.findOne({ roomKey: roomKey }, { rounds: 1, _id: 0 });
   }
 
-  static goTonextQuestionInRound(roomKey, sessionId, currentRoundMongoId) {
+  static goTonextQuestionInRound(roomKey, currentRoundMongoId) {
     return Game.updateOne(
-      { roomKey: roomKey, quizmaster: sessionId, rounds: { $elemMatch: { _id: currentRoundMongoId } } },
+      {
+        roomKey: roomKey,
+        rounds: { $elemMatch: { _id: currentRoundMongoId } }
+      },
       {
         $inc: {
-          "rounds.$.activeQuestionIndex": 1
+          'rounds.$.activeQuestionIndex': 1
         }
       }
     );
   }
 
   static getCurrentQuestion(roomKey) {
-    return Game.aggregate([{ $match: { roomKey: roomKey } }, { $project: { _id: 0, round: { $slice: ["$rounds", -1] } } }]);
+    return Game.aggregate([
+      { $match: { roomKey: roomKey } },
+      { $project: { _id: 0, round: { $slice: ['$rounds', -1] } } }
+    ]);
   }
   static submitAnswer(roomKey, sessionId, questionId, answer) {
     return Game.updateOne(
-      { roomKey: roomKey, teams: { $elemMatch: { "answers.questionId": { $ne: questionId }, sessionId: sessionId } }, gameState: {$ne: gameStates.SUBMIT_CLOSED} },
+      {
+        roomKey: roomKey,
+        teams: { $elemMatch: { 'answers.questionId': { $ne: questionId }, sessionId: sessionId } },
+        gameState: { $ne: gameStates.SUBMIT_CLOSED }
+      },
       {
         $push: {
-          "teams.$.answers": {
+          'teams.$.answers': {
             questionId: questionId,
             answer: answer
           }
         }
       }
-    ).then(doc => {
-      if (doc.n < 1) {
-        throw new ShotzException("Team not found or answer already given", 400);
-      }
-    });
+    );
   }
 
-  static setCorrectStatusStatusAnswer(roomKey, sessionId, teamSessionId, questionId, correct) {
-    console.log(teamSessionId);
-    return Game.findOne({ roomKey: roomKey, quizmaster: sessionId, teams: { $elemMatch: { "answers.questionId": questionId } } }).then(result => {
+  static setCorrectStatusStatusAnswer(roomKey, teamSessionId, questionId, correct) {
+    return Game.findOne({
+      roomKey: roomKey,
+      teams: { $elemMatch: { 'answers.questionId': questionId } }
+    }).then(result => {
       const team = result.teams.findIndex(team => team.sessionId === teamSessionId);
-      if (team === undefined) throw new ShotzException("Team not found with provided sessionId", 401);
+      if (team === undefined)
+        throw new ShotzException('Team not found with provided sessionId', 401);
 
-      const answer = result.teams[team].answers.findIndex(answer => answer.questionId === questionId);
-      if (result.teams[team].answers[answer].correct !== null) throw new ShotzException("You have already graded this answer", 400);
+      const answer = result.teams[team].answers.findIndex(
+        answer => answer.questionId === questionId
+      );
+      if (result.teams[team].answers[answer].correct !== null)
+        throw new ShotzException('You have already graded this answer', 400);
 
       result.teams[team].answers[answer].correct = correct;
 
@@ -191,19 +196,22 @@ export default class GameDAO {
     });
   }
 
-  static deleteQuestionFromCurrentRound(roomKey, sessionId, questionId) {
-    return Game.findOne({ roomKey: roomKey, quizmaster: sessionId }).then(result => {
-      if (result === undefined) throw new ShotzException("Game not found", 400);
+  static deleteQuestionFromCurrentRound(roomKey, questionId) {
+    return Game.findOne({ roomKey: roomKey }).then(result => {
+      if (result === undefined) throw new ShotzException('Game not found', 400);
 
       const curRound = result.rounds.length - 1;
 
-      if (curRound === undefined) throw new ShotzException("No round active", 400);
+      if (curRound === undefined) throw new ShotzException('No round active', 400);
 
-      const questionIndex = result.rounds[curRound].questions.findIndex(question => question._id.toString() === questionId);
+      const questionIndex = result.rounds[curRound].questions.findIndex(
+        question => question._id.toString() === questionId
+      );
 
-      if (questionIndex === undefined) throw new ShotzException("Question not found", 400);
+      if (questionIndex === undefined) throw new ShotzException('Question not found', 400);
 
-      if (result.rounds[curRound].activeQuestionIndex >= questionIndex) throw new ShotzException("QuestionId must be higher than the current question index", 400);
+      if (result.rounds[curRound].activeQuestionIndex >= questionIndex)
+        throw new ShotzException('QuestionId must be higher than the current question index', 400);
 
       result.rounds[curRound].questions.splice(questionIndex, 1);
       result.save();
