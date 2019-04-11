@@ -106,7 +106,7 @@ function runAPIServer() {
   app.use('/room', room);
 
   app.use((err, req, res, next) => {
-    console.log(err.message);
+    console.log('ERROR: ' + err.message);
     const errMsg = err.message || "Destination URL not found";
     const errCode = err.htmlErrorCode || 404;
     res.status(errCode).json({ error: `${errMsg}` });

@@ -2,6 +2,7 @@ import ws from "ws";
 import GameService from "./gameService";
 import ShotzException from "../exceptions/ShotzException";
 import GameDAO from './../DAO/GameDao';
+import RoomService from "./roomService";
 
 let websocketServer;
 
@@ -35,7 +36,7 @@ function _onConnection(websocket, req) {
 }
 
 export async function sendMessageTeams(roomKey, message) {
-    const teams = await GameService.getTeams(roomKey);
+    const teams = await RoomService.getTeams(roomKey);
     if (!teams) {
         throw new ShotzException(`No teams found for roomKey ${roomKey}`);
     } else {

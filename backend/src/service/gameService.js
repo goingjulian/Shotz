@@ -7,69 +7,11 @@ import { sendMessageTeam, closeConnection, sendMessageQuizmaster, sendMessageTea
 import roles from "../definitions/roles";
 
 export default class GameService {
-  static async createRoom(quizmasterId) {
-    try {
-      const roomKey = await this._generateUniqueRoomKey();
-      await GameDAO.addNewGame(roomKey, quizmasterId);
-      return roomKey;
-    } catch (err) {
-      console.log(`createRoom error: ${err.message}`);
-      throw new ShotzException("Error occured when trying to create a new game");
-    }
-  }
+  
 
-  static async joinRoom(roomKey, teamName, sessionId) {
-    try {
-      if (typeof teamName !== "string") throw new ShotzException("Invalid format: teamName must be a string", 400);
 
-      const game = await GameDAO.getGame(roomKey).lean();
-      if (!game) {
-        throw new ShotzException(`There was no room found with room key ${roomKey}`, 404);
-      } else if (game.gameState !== "REGISTER") {
-        throw new ShotzException("Registration is closed for this quiz", 403);
-      } else if (game.quizmaster === sessionId || game.teams.find(team => team.sessionId === sessionId)) {
-        throw new ShotzException("You have already joined this quiz!", 403);
-      } else if (game.teams.find(team => team.teamName === teamName)) {
-        throw new ShotzException(`There is a already a team with the name ${teamName}!`, 403);
-      } else {
-        await GameDAO.joinGameAsTeam(roomKey, teamName, sessionId);
-        sendMessageQuizmaster(roomKey, {
-          type: "quizmaster_newTeam"
-        });
-        return {
-          type: "team_joinRoom",
-          roomKey: roomKey,
-          teamName: teamName
-        };
-      }
-    } catch (err) {
-      console.log(`joinRoom error: ${err.message}`);
-      if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
-      else throw err;
-    }
-  }
 
-  static async joinRoomScoreBoard(roomKey, sessionId) {
-    try {
-      const game = await GameDAO.getGame(roomKey).lean();
-
-      if (!game) throw new ShotzException(`Game with roomKey ${roomKey} not found`, 404);
-      if (game.scoreboards.find(scoreboard => scoreboard === sessionId)) throw new ShotzException(`You have already joined this room`, 403);
-      if (game.quizmaster === sessionId || game.teams.find(team => team.sessionId === sessionId)) throw new ShotzException(`You are a quizmaster or a team`);
-      await GameDAO.joinGameAsScoreBoard(roomKey, sessionId);
-      return {
-        type: "scoreB_joinRound",
-        roomKey: roomKey,
-        gameState: game.gameState,
-        currentRound: game.rounds.length,
-        currentQuestionIndex: game.rounds.length > 0 ? game.rounds[game.rounds.length - 1].activeQuestionIndex : 0,
-        teams: game.teams
-      }
-    } catch (err) {
-      if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
-      else throw err;
-    }
-  }
+  
 
   static getScoreBoards(roomKey) {
     try {
@@ -94,81 +36,9 @@ export default class GameService {
     return gameStates.CATEGORY_SELECT;
   }
 
-  static async restoreSession(roomKey, loginRole, sessionId) {
-    try {
-      if (typeof loginRole !== "string") throw new ShotzException("Invalid format: role must be a string", 400);
 
-      const game = await GameDAO.getGame(roomKey).lean();
-      if (game) game.teams = [...game.teams];
-      if (game && game.quizmaster === sessionId && loginRole === roles.ROLE_QUIZMASTER) {
-        return {
-          type: "quizmaster_restoreSession",
-          roomKey: roomKey,
-          gameState: game.gameState,
-          teams: game.teams,
-          rounds: game.rounds,
-          currentQuestionIndex: game.rounds.length > 0 ? game.rounds[game.rounds.length - 1].activeQuestionIndex : 0
-        };
-      } else if (game && game.teams.length > 0 && game.teams.find(team => team.sessionId === sessionId) && loginRole === roles.ROLE_TEAM) {
-        const team = game.teams.find(team => team.sessionId === sessionId);
-        const currentQuestion = await this.getCurrentQuestion(roomKey);
-        return {
-          type: "team_restoreSession",
-          roomKey: roomKey,
-          gameState: game.gameState,
-          teamName: team.teamName,
-          accepted: team.accepted,
-          question: currentQuestion
-        };
-      } else if (game && game.scoreboards.length > 0 && game.scoreboards.find(scoreboard => scoreboard === sessionId) && loginRole === roles.ROLE_SCOREBOARD) {
-        return {
-          type: "scoreB_restoreSession",
-          roomKey: roomKey,
-          gameState: game.gameState,
-          currentRound: game.rounds.length,
-          currentQuestionIndex: game.rounds.length > 0 ? game.rounds[game.rounds.length - 1].activeQuestionIndex : 0,
-          teams: game.teams
-        }
-      } else {
-        throw new ShotzException("No active sessions found for your role!", 404);
-      }
-    } catch (err) {
-      if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
-      else throw err;
-    }
-  }
 
-  static async _generateUniqueRoomKey() {
-    let roomKey = null;
-    let isUnique = false;
 
-    while (!isUnique) {
-      roomKey = Math.floor(1000 + Math.random() * 9000);
-
-      let keyExists;
-      try {
-        keyExists = await Game.findOne({ roomKey: roomKey });
-      } catch (err) {
-        console.log("ERROR", err);
-      }
-
-      if (!keyExists) {
-        isUnique = true;
-      }
-    }
-    return roomKey;
-  }
-
-  static async getTeams(roomKey) {
-    try {
-      const teams = await GameDAO.getTeams(roomKey).lean();
-      return teams.teams;
-    } catch (err) {
-      console.log(`getTeams error: ${err.message}`);
-      if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
-      else throw err;
-    }
-  }
 
   static async getQuizmaster(roomKey) {
     try {
@@ -179,48 +49,7 @@ export default class GameService {
     }
   }
 
-  static async leaveGame(roomKey, sessionId) {
-    try {
-      const game = await GameDAO.getGame(roomKey).lean();
-      if (game) game.teams = [...game.teams];
-      if (game.quizmaster === sessionId) {
-        await sendMessageTeams(roomKey, {
-          type: "team_quizmasterLeft"
-        });
 
-        const scores = await GameDAO.getScores(roomKey);
-
-        await sendMessageScoreBoards(roomKey, {
-          type: "scoreB_quizmasterLeft",
-          scores: scores
-        });
-        game.teams.forEach(team => {
-          closeConnection(team.sessionId);
-        });
-        closeConnection(sessionId);
-        await GameDAO.deleteGame(roomKey);
-        return {
-          type: "quizmaster_leftGame"
-        };
-      } else if (game.teams.find(team => team.sessionId === sessionId)) {
-        GameDAO.removeTeam(roomKey, sessionId);
-        closeConnection(sessionId);
-        sendMessageQuizmaster(roomKey, {
-          type: "quizmaster_teamLeft",
-          sessionId: sessionId
-        });
-        return {
-          type: "team_leftGame"
-        };
-      } else {
-        throw new ShotzException(`You already were removed or we're unable to remove you from the game ${roomKey}!`, 500);
-      }
-    } catch (err) {
-      console.log(`leaveGame error: ${err.message}`);
-      if (!err.htmlErrorCode) throw new ShotzException(err.message, 500);
-      else throw err;
-    }
-  }
 
   static async alterTeamStatus(roomKey, sessionId, accepted) {
     try {

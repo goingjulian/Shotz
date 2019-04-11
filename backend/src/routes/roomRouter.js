@@ -1,37 +1,41 @@
-import express from "express";
-import roundRouter from "./roundRouter";
-import GameService from "../service/gameService";
-import QuestionService from "./../service/questionService";
+import express from 'express';
+import roundRouter from './roundRouter';
+import GameService from '../service/gameService';
+import QuestionService from './../service/questionService';
 
-import gameStates from "../definitions/gameStates";
-import roles from "../definitions/roles";
+import RoomService from './../service/roomService';
 
-import { checkAuthentication, setSession, checkRoleAuthentication, checkNoActiveGame } from "./../service/authService";
+import gameStates from '../definitions/gameStates';
+import roles from '../definitions/roles';
+
+import {
+  checkAuthentication,
+  setSession,
+  checkRoleAuthentication,
+  checkNoActiveGame
+} from './../service/authService';
 
 const roomRouter = express.Router();
 
 /**
  * Routers
  */
-roomRouter.use("/:roomKey/round", roundRouter);
+roomRouter.use('/:roomKey/round', roundRouter);
 
 /**
  * Create a room
  * ALLOWED: *
  */
-roomRouter.route("/").post((req, res, next) => {
-  const sessionId = req.session.id;
+roomRouter.route('/').post((req, res, next) => {
+  const { id } = req.session;
 
-  checkNoActiveGame(req.session)
+  checkNoActiveGame(req.session.roomKey, req.session.role)
     .then(() =>
-      GameService.createRoom(sessionId)
-        .then(roomKey => {
-          setSession(req.session, roomKey, roles.ROLE_QUIZMASTER);
-          res.status(201).json({
-            roomKey: roomKey,
-            gameState: gameStates.REGISTER
-          });
-        }))
+      RoomService.createRoom(id).then(room => {
+        setSession(req.session, room.roomKey, roles.ROLE_QUIZMASTER);
+        res.status(201).json(room);
+      })
+    )
     .catch(err => next(err));
 });
 
@@ -39,18 +43,17 @@ roomRouter.route("/").post((req, res, next) => {
  * Join a room as a team
  * ALLOWED: *
  */
-roomRouter.route("/:roomKey").post((req, res, next) => {
-  const sessionId = req.session.id;
+roomRouter.route('/:roomKey').post((req, res, next) => {
   const roomKey = req.params.roomKey;
   const teamName = req.body.teamName;
 
-  checkNoActiveGame(req.session)
+  checkNoActiveGame(req.session.roomKey, req.session.role)
     .then(() =>
-      GameService.joinRoom(roomKey, teamName, sessionId)
-        .then(message => {
-          setSession(req.session, roomKey, roles.ROLE_TEAM);
-          res.status(200).json(message);
-        }))
+      RoomService.joinRoom(roomKey, teamName, req.session.id).then(message => {
+        setSession(req.session, roomKey, roles.ROLE_TEAM);
+        res.status(201).json(message);
+      })
+    )
 
     .catch(err => next(err));
 });
@@ -58,35 +61,38 @@ roomRouter.route("/:roomKey").post((req, res, next) => {
 /**
  * Join room as a scoreboard
  */
-roomRouter.route("/scoreboard/:roomKey").post((req, res, next) => {
+roomRouter.route('/scoreboard/:roomKey').post((req, res, next) => {
   const roomKey = req.params.roomKey;
-  const sessionId = req.session.id;
 
-  checkNoActiveGame(req.session)
+  checkNoActiveGame(req.session.roomKey, req.session.role)
     .then(() =>
-      GameService.joinRoomScoreBoard(roomKey, sessionId)
-        .then(message => {
-          setSession(req.session, roomKey, roles.ROLE_SCOREBOARD);
-          res.json(message);
-        }))
+      RoomService.joinRoomScoreboard(roomKey, req.session.id).then(message => {
+        setSession(req.session, roomKey, roles.ROLE_SCOREBOARD);
+        res.status(201).json(message);
+      })
+    )
     .catch(err => {
       next(err);
     });
-})
+});
 
 /**
  * Leave room
  * ALLOWED: Team, Quizmaster, Scoreboard
  */
-roomRouter.route("/:roomKey").delete((req, res, next) => {
+roomRouter.route('/:roomKey').delete((req, res, next) => {
   const { roomKey, role, id } = req.session;
   const roomKeyParam = req.params.roomKey;
 
-  checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER, roles.ROLE_TEAM, roles.ROLE_SCOREBOARD])
-    .then(() => GameService.leaveGame(roomKey, id))
-    .then(response => {
+  checkAuthentication(roomKey, role, roomKeyParam, [
+    roles.ROLE_QUIZMASTER,
+    roles.ROLE_TEAM,
+    roles.ROLE_SCOREBOARD
+  ])
+    .then(() => RoomService.leaveRoom(roomKey, id))
+    .then(() => {
       req.session.destroy();
-      res.status(200).json(response);
+      res.status(200).json({});
     })
     .catch(err => next(err));
 });
@@ -95,12 +101,12 @@ roomRouter.route("/:roomKey").delete((req, res, next) => {
  * Restore a room
  * ALLLOWED: Team, Quizmaster, Scoreboard
  */
-roomRouter.route("/restore/:role").get((req, res, next) => {
+roomRouter.route('/restore/:role').get((req, res, next) => {
   const { roomKey, role, id } = req.session;
   const roleParam = req.params.role;
 
   checkRoleAuthentication(role, roleParam)
-    .then(() => GameService.restoreSession(roomKey, roleParam, id))
+    .then(() => RoomService.restoreSession(roomKey, roleParam, id))
     .then(gameState => {
       res.status(200).json(gameState);
     })
@@ -111,12 +117,12 @@ roomRouter.route("/restore/:role").get((req, res, next) => {
  * Get all teams in a room as quizmaster or scoreboard
  * ALLOWED: Quizmaster, Scoreboard
  */
-roomRouter.route("/:roomKey/teams").get((req, res, next) => {
+roomRouter.route('/:roomKey/teams').get((req, res, next) => {
   const { roomKey, role, id } = req.session;
   const roomKeyParam = req.params.roomKey;
 
   checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER, roles.ROLE_SCOREBOARD])
-    .then(() => GameService.getTeams(roomKey))
+    .then(() => RoomService.getTeams(roomKey))
     .then(teams => {
       res.status(200).json(teams);
     })
@@ -128,7 +134,7 @@ roomRouter.route("/:roomKey/teams").get((req, res, next) => {
  * ALLOWED: Quizmaster
  */
 //BUG: destroy sessions also
-roomRouter.route("/:roomKey/teams").delete((req, res, next) => {
+roomRouter.route('/:roomKey/teams').delete((req, res, next) => {
   const { roomKey, role, id } = req.session;
   const roomKeyParam = req.params.roomKey;
 
@@ -144,27 +150,31 @@ roomRouter.route("/:roomKey/teams").delete((req, res, next) => {
  * Get scores of all teams in a room
  * ALLOWED: Team, Quizmaster, Scoreboard
  */
-roomRouter.route("/:roomKey/teams/scores").get((req, res, next) => {
+roomRouter.route('/:roomKey/teams/scores').get((req, res, next) => {
   console.log(req.session);
   const { roomKey, role, id } = req.session;
   const roomKeyParam = req.params.roomKey;
 
-  checkAuthentication(roomKey, role, roomKeyParam, [roles.ROLE_QUIZMASTER, roles.ROLE_TEAM, roles.ROLE_SCOREBOARD])
+  checkAuthentication(roomKey, role, roomKeyParam, [
+    roles.ROLE_QUIZMASTER,
+    roles.ROLE_TEAM,
+    roles.ROLE_SCOREBOARD
+  ])
     .then(() => GameService.getScores(roomKey))
     .then(scores => {
       res.status(200).json(scores.teams);
     })
     .catch(err => {
-      console.log(err)
-      next(err)}
-      );
+      console.log(err);
+      next(err);
+    });
 });
 
 /**
  * Accept or reject teams
  * ALLOWED: Quizmaster
  */
-roomRouter.route("/:roomKey/team/:teamId/status").put((req, res, next) => {
+roomRouter.route('/:roomKey/team/:teamId/status').put((req, res, next) => {
   const { roomKey, role, id } = req.session;
   const roomKeyParam = req.params.roomKey;
 
@@ -183,7 +193,7 @@ roomRouter.route("/:roomKey/team/:teamId/status").put((req, res, next) => {
  * Get a list of categories for a room
  * ALLOWED: *
  */
-roomRouter.route("/categories").get((req, res, next) => {
+roomRouter.route('/categories').get((req, res, next) => {
   QuestionService.getAllCategories()
     .then(categories => {
       res.json(categories);

@@ -1,6 +1,6 @@
 import environment from '../environments/environment';
 import { initSocket } from './wsActions';
-import { setViewByGameState, viewLoginScreenAction } from './viewActions';
+import { setViewByGameState, viewLoginScreenAction, viewLobbyAction } from './viewActions';
 import { removeTeamsAction, setTeamsAction } from './teamActions';
 import { setRoundsAction } from './roundsActions';
 
@@ -50,7 +50,7 @@ export function createRoom() {
         const body = await response.json();
         if (response.ok) {
           dispatch(createRoomAction(body.roomKey));
-          dispatch(setViewByGameState(body.gameState));
+          dispatch(viewLobbyAction());
           dispatch(initSocket());
         } else {
           throw new Error(body.error);
