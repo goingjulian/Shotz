@@ -11,6 +11,7 @@
     "express": "^4.16.4",
     "express-session": "^1.15.6",
     "mongoose": "^5.4.20",
+    "path": "^0.12.7",
     "ws": "^6.2.1"
   },
   "devDependencies": {
@@ -20,7 +21,7 @@
     "@babel/preset-env": "^7.4.2"
   },
   "scripts": {
-    "start": "nodemon --exec babel-node src/app.js",
+    "start": "babel-node src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Julian Korf de Gidts & Wout Jansen",

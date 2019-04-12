@@ -14,12 +14,13 @@ ASCII art from http://patorjk.com/software/taag/#p=display&f=ANSI%20Shadow&t=Sho
 
 import express from 'express';
 import http from 'http';
-import ws from 'ws';
 import bodyParser from 'body-parser';
 import session from 'express-session';
 import connectMongo from 'connect-mongo';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+const path = require("path");
+
 dotenv.config();
 import cors from 'cors';
 import addQuestionsToDB from './questionSeed'
@@ -103,7 +104,26 @@ function runAPIServer() {
 
   app.use(sessionParser);
 
+  app.use(express.static(path.join(__dirname, "/../static/team")));
+  app.use(express.static(path.join(__dirname, "/../static/scoreboard")));
+  app.use(express.static(path.join(__dirname, "/../static/quizmaster")));
+
   app.use('/room', room);
+
+  app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname + "/../static/team/index.html"));
+  });
+
+  app.get("/scoreboard", (req, res) => {
+    res.sendFile(path.join(__dirname + "/../static/scoreboard/index.html"));
+  });
+
+  app.get("/quizmaster", (req, res) => {
+    res.sendFile(path.join(__dirname + "/../static/quizmaster/index.html"));
+  });
+  
+  
+  
 
   app.use((err, req, res, next) => {
     console.log('ERROR: ' + err.message);

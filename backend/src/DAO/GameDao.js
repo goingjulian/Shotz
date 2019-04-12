@@ -1,4 +1,4 @@
-import Game from '../models/Game';
+import Game from '../models/game';
 import gameStates from '../definitions/gameStates';
 import ShotzException from '../exceptions/ShotzException';
 
