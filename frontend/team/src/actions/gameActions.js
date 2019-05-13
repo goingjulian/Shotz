@@ -179,7 +179,6 @@ export function submitAnswer(roomKey, questionId, answer) {
           throw new Error(body.error);
         } else {
           dispatch(viewMessageScreenAction(messageTypes.MSG_QUESTIONANSWERED));
-          dispatch(initSocket());
         }
       })
       .catch(err => {
