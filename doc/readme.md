@@ -23,5 +23,3 @@
 |                                                   | Should: Can add questions to the questions queue
 |                                                   | Can make a room which can be joined by teams and scoreboards
 |                                                   | Can let the scoreboard show the correct answer                     | 
-
-## Shotz has 2 'channels' over which it will communicate, Websockets and Xhr
