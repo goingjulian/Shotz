@@ -12,7 +12,7 @@
     "express-session": "^1.15.6",
     "mongoose": "^5.4.20",
     "path": "^0.12.7",
-    "ws": "^6.2.1"
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
